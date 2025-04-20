@@ -1,4 +1,4 @@
-<h1 align="center">🛵 Domisys</h1>
+<h1 align="center">🛵 DomiSys</h1>
 
 <p align="center">
   Sistema moderno, rápido y eficiente para gestionar domicilios, pedidos, productos y repartidores desde un dashboard limpio, escalable y potente.
