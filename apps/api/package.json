@@ -1,0 +1,8 @@
+{
+    "name": "@domisys/api",
+    "scripts": {
+        "dev": "php artisan serve",
+        "build": "composer install --optimize-autoloader --no-dev",
+        "test": "php artisan test"
+    }
+}
