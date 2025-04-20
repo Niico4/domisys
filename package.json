@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --filter=@domisys/client --filter=@domisys/landing",
+    "dev": "turbo run dev --filter=@domisys/client --filter=@domisys/landing --filter=@domisys/api",
     "lint": "turbo run lint",
     "test": "turbo run test"
   },
