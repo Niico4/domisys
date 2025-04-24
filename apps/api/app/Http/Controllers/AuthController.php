@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAuthRequest;
+use App\Models\InvitationCode;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,14 @@ class AuthController extends Controller
     {
         try {
             $validated = $request->validated();
+            $role = 'customer';
+
+            if ($request->has('invitation_code')) {
+                if (InvitationCode::validateCode($request->invitation_code, 'delivery')) {
+                    $role = 'delivery';
+                    InvitationCode::markAsUsed($request->invitation_code);
+                }
+            }
 
             $user = User::create([
                 'first_name' => $validated['first_name'],
@@ -24,6 +33,7 @@ class AuthController extends Controller
                 'phone_number' => $validated['phone_number'],
                 'address' => $validated['address'],
                 'password' => Hash::make($validated['password']),
+                'role' => $role
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -61,7 +71,8 @@ class AuthController extends Controller
                 'message' => 'Hola ' . $user->first_name,
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => $user
+                'user' => $user,
+                'role' => $user->role
             ]);
         } catch (\Exception $e) {
             Log::error('Login error', ['error' => $e->getMessage()]);
