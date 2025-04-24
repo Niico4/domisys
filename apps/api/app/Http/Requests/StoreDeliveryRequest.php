@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class StoreCustomerRequest extends FormRequest
+class StoreDeliveryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,12 +22,11 @@ class StoreCustomerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            '*.firstName' => ['required', 'string', 'max:20'],
-            '*.lastName' => ['required', 'string', 'max:20'],
-            '*.phoneNumber' => ['required', 'string', 'max:20'],
-            '*.email' => ['required', 'email', 'unique:customers,email'],
-            '*.address' => ['required', 'string', 'max:60'],
-            '*.paymentMethod' => ['required', 'string', Rule::in(['credit_card', 'cash', 'nequi'])]
+            'firstName' => ['required', 'string', 'max:20'],
+            'lastName' => ['required', 'string', 'max:20'],
+            'phoneNumber' => ['required', 'string', 'max:20'],
+            'email' => ['required', 'email', 'unique:customers,email'],
+            'address' => ['required', 'string', 'max:60'],
         ];
     }
 
@@ -38,7 +36,6 @@ class StoreCustomerRequest extends FormRequest
             'first_name' => $this->firstName,
             'last_name' => $this->lastName,
             'phone_number' => $this->phoneNumber,
-            'payment_method' => $this->paymentMethod,
         ]);
     }
 }
