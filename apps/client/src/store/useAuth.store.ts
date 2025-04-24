@@ -1,11 +1,13 @@
+import axios from 'axios';
 import { create } from 'zustand';
 import { toast } from 'sonner';
 
+import instance from '@/utils/axios';
 import { mockUsers } from '@/constants/mock/mock-users';
 
 export type User = {
   id: string;
-  name: string;
+  firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
@@ -32,28 +34,34 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     set({ isLoading: true });
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await instance.post<{
+        accessToken: string;
+        userData: User;
+      }>('/auth/sign-in', {
+        email,
+        password,
+      });
 
-      const foundUser = mockUsers.find(
-        (user) => user.email === email && user.password === password,
-      );
-
-      if (!foundUser) {
-        toast.error('Credenciales inválidas');
-        return false;
-      }
+      const { accessToken, userData } = response.data;
 
       set({
-        user: foundUser,
-        token: 'mock-jwt-token',
+        user: userData,
+        token: accessToken,
         isLoading: false,
       });
+
+      localStorage.setItem('token', accessToken);
 
       toast.success('¡Bienvenido de nuevo!');
       return true;
     } catch (error) {
       console.error(error);
-      toast.error('Error al iniciar sesión');
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : 'Error al iniciar sesión';
+
+      toast.error(errorMessage);
+
       return false;
     } finally {
       set({ isLoading: false });
@@ -91,21 +99,37 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   },
 
   logout: () => {
+    localStorage.removeItem('token');
+
     set({ user: null, token: null });
     toast.info('Sesión cerrada');
   },
 
-  updateUser: (data) => {
-    const { user } = get();
-    if (!user) {
+  updateUser: async (data) => {
+    const { user, token } = get();
+
+    if (!user || !token) {
       toast.error('No hay usuario activo');
-      return;
+      return false;
     }
 
-    const updatedUser = { ...user, ...data };
+    try {
+      const response = await instance.put('/user', data);
 
-    set({ user: updatedUser });
-    toast.success('Perfil actualizado');
-    return true;
+      const updatedUser = response.data;
+
+      set({ user: updatedUser });
+
+      toast.success('Perfil actualizado correctamente');
+      return true;
+    } catch (error) {
+      console.error(error);
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : 'Error al actualizar el perfil';
+
+      toast.error(errorMessage);
+      return false;
+    }
   },
 }));

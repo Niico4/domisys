@@ -26,7 +26,7 @@ const SignInForm = () => {
     },
   });
 
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth();
 
   const onSubmit = async (data: AuthBase) => {
     try {
@@ -34,10 +34,8 @@ const SignInForm = () => {
 
       if (!success) return;
 
+      navigate('/', { replace: true });
       reset();
-      setTimeout(() => {
-        navigate('/', { replace: true });
-      }, 1500);
     } catch (error) {
       console.error(error);
       toast.error(`Error al iniciar sesión`);
@@ -78,7 +76,13 @@ const SignInForm = () => {
         </Link>
       </div>
 
-      <Button fullWidth radius="sm" color="primary" type="submit">
+      <Button
+        fullWidth
+        radius="sm"
+        color="primary"
+        type="submit"
+        isLoading={isLoading}
+      >
         Iniciar Sesión
       </Button>
       <p className="text-sm">

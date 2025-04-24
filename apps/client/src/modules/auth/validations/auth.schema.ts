@@ -21,7 +21,7 @@ export const signInSchema = z.object({
 // Esquema para registro
 export const signUpSchema = z
   .object({
-    name: z
+    firstName: z
       .string()
       .min(3, 'El nombre debe tener al menos 3 caracteres')
       .max(20, 'El nombre no puede tener más de 20 caracteres'),

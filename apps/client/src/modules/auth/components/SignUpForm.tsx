@@ -27,7 +27,7 @@ const SignUpForm = () => {
   } = useForm<SignUpPayload>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      name: '',
+      firstName: '',
       lastName: '',
       email: '',
       phoneNumber: '',
@@ -81,9 +81,9 @@ const SignUpForm = () => {
           label="Nombre"
           type="text"
           isRequired
-          errorMessage={errors.name?.message}
-          isInvalid={!!errors.name}
-          {...register('name')}
+          errorMessage={errors.firstName?.message}
+          isInvalid={!!errors.firstName}
+          {...register('firstName')}
         />
         <Input
           required

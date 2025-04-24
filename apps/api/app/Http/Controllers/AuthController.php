@@ -68,11 +68,20 @@ class AuthController extends Controller
             Log::info('User logged in', ['user_id' => $user->id]);
 
             return response()->json([
-                'message' => 'Hola ' . $user->first_name,
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user,
-                'role' => $user->role
+                'accessToken' => $token,
+                'tokenType' => 'Bearer',
+                'userData' =>  [
+                    'id' => $user->id,
+                    'role' => $user->role,
+                    'firstName' => $user->first_name,
+                    'lastName' => $user->last_name,
+                    'email' => $user->email,
+                    'phoneNumber' => $user->phone_number,
+                    'address' => $user->address,
+                    'emailVerifiedAt' => $user->email_verified_at,
+                    'createdAt' => $user->created_at,
+                    'updatedAt' => $user->updated_at
+                ]
             ]);
         } catch (\Exception $e) {
             Log::error('Login error', ['error' => $e->getMessage()]);

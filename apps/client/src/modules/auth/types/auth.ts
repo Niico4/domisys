@@ -9,6 +9,6 @@ export type SignUpPayload = AuthBase & {
   invitationCode?: string;
   isDelivery: boolean;
   lastName: string;
-  name: string;
+  firstName: string;
   phoneNumber: string;
 };

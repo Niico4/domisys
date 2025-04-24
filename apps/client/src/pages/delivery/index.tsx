@@ -10,7 +10,7 @@ const Home = () => {
 
   return (
     <section>
-      <h1>¡Bienvenido, {user.name}!</h1>
+      <h1>¡Bienvenido, {user.firstName}!</h1>
 
       <article>
         <Card className="bg-glass" radius="sm">

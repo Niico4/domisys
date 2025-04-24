@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import { useForm } from 'react-hook-form';
@@ -15,20 +15,20 @@ import { paths } from '@/constants/routerPaths';
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [formKey, setFormKey] = useState(Date.now());
   const navigate = useNavigate();
 
-  const { user, logout, updateUser } = useAuth();
+  const { user, logout, updateUser, isLoading } = useAuth();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
+    watch,
   } = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user?.name || '',
+      name: user?.firstName || '',
       lastName: user?.lastName || '',
       email: user?.email || '',
       phoneNumber: user?.phoneNumber || '',
@@ -36,29 +36,54 @@ const ProfilePage = () => {
     },
   });
 
+  const formValues = watch();
+
+  const hasChanges = useMemo(() => {
+    if (!user) return false;
+    return (
+      formValues.name !== user.firstName ||
+      formValues.lastName !== user.lastName ||
+      formValues.phoneNumber !== user.phoneNumber ||
+      formValues.address !== user.address
+    );
+  }, [formValues, user]);
+
   useEffect(() => {
     if (user) {
-      reset({
-        name: user.name || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phoneNumber: user.phoneNumber || '',
-        address: user.address || '',
-      });
+      reset(
+        {
+          name: user.firstName || '',
+          lastName: user.lastName || '',
+          email: user.email || '',
+          phoneNumber: user.phoneNumber || '',
+          address: user.address || '',
+        },
+        {
+          keepDefaultValues: true,
+        },
+      );
     }
-  }, [isEditing, user, reset]);
+  }, [user, reset]);
 
-  const onSubmit = (data: ProfileForm) => {
-    try {
-      if (!user) return;
+  const onSubmit = async (data: ProfileForm) => {
+    if (!user) return;
 
-      updateUser(data);
+    const hasChanges =
+      data.name !== user.firstName ||
+      data.lastName !== user.lastName ||
+      data.phoneNumber !== user.phoneNumber ||
+      data.address !== user.address;
 
+    if (!hasChanges) {
+      toast.info('No se detectaron cambios para guardar');
       setIsEditing(false);
-      setFormKey(Date.now());
-    } catch (error) {
-      console.error(error);
-      toast.error(`Hubo un error al actualizar el perfil`);
+      return;
+    }
+
+    const success = await updateUser(data);
+
+    if (success) {
+      setIsEditing(false);
     }
   };
 
@@ -75,10 +100,8 @@ const ProfilePage = () => {
       action: {
         label: 'Confirmar',
         onClick: () => {
-          setTimeout(() => {
-            logout();
-            navigate(`/${paths.authRoot}/${paths.signIn}`);
-          }, 200);
+          logout();
+          navigate(`/${paths.authRoot}/${paths.signIn}`);
         },
       },
       cancel: {
@@ -89,33 +112,26 @@ const ProfilePage = () => {
   };
 
   const handleCancel = () => {
-    if (user) {
-      reset(
-        {
-          name: user.name || '',
-          lastName: user.lastName || '',
-          email: user.email || '',
-          phoneNumber: user.phoneNumber || '',
-          address: user.address || '',
-        },
-        {
-          keepDefaultValues: true,
-        },
-      );
-    }
+    reset(
+      {
+        name: user?.firstName || '',
+        lastName: user?.lastName || '',
+        email: user?.email || '',
+        phoneNumber: user?.phoneNumber || '',
+        address: user?.address || '',
+      },
+      {
+        keepDefaultValues: true,
+      },
+    );
     setIsEditing(false);
-    setFormKey(Date.now());
   };
 
   return (
     <section className="max-w-2xl mx-auto px-4 py-8">
       <div className="bg-glass border border-borderGlass backdrop-blur-md shadow-xl rounded-2xl p-6 sm:p-8 space-y-6">
         <h2 className="text-2xl font-semibold text-white/90">Mi Perfil</h2>
-        <form
-          key={formKey}
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-6"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <Input
               label="Nombre"
@@ -182,7 +198,8 @@ const ProfilePage = () => {
               className="sm:w-auto w-full"
               color="primary"
               onPress={handleEditToggle}
-              isLoading={isSubmitting}
+              isLoading={isLoading}
+              isDisabled={isEditing && !hasChanges}
             >
               {isEditing ? 'Guardar cambios' : 'Editar perfil'}
             </Button>

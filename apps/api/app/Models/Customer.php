@@ -12,6 +12,7 @@ class Customer extends Model
 
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $table = 'customers';
 
     protected $fillable = [
         'first_name',
