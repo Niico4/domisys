@@ -50,35 +50,41 @@ class OrderController extends Controller
     {
         $validatedData = $request->validated();
 
-        $bulkData = array_map(function ($item) {
-            $customerExists = Customer::where('id', $item['customerID'])->exists();
-            // $deliveryExists = Delivery::where('id', $item['deliveryID'])->exists();
+        // Pre-cargar todos los IDs de customers existentes (1 sola consulta)
+        $customerIds = collect($validatedData)->pluck('customerID')->unique();
+        $existingCustomers = Customer::whereIn('id', $customerIds)->pluck('id')->toArray();
 
-            if (!$customerExists) {
-                return null;
+        // Procesar datos
+        $ordersToInsert = [];
+        $failedOrders = [];
+
+        foreach ($validatedData as $index => $item) {
+            if (!in_array($item['customerID'], $existingCustomers)) {
+                $failedOrders[$index] = 'Customer no encontrado';
+                continue;
             }
 
-            // Generar el UUID para cada orden
-            $item['id'] = Str::uuid();
-
-            return [
-                'id' => $item['id'],
+            $ordersToInsert[] = [
+                'id' => Str::uuid(),
                 'customer_id' => $item['customerID'],
-                'delivery_id' => $item['deliveryID'],
+                'delivery_id' => $item['deliveryID'] ?? null,
                 'status' => $item['orderState'],
                 'total_amount' => $item['totalAmount'],
                 'created_at' => $item['createdAt'],
-                'updated_at' => $item['updatedAt'] ?? null
+                'updated_at' => $item['updatedAt'],
             ];
-        }, $validatedData);
-
-        // Filtrar elementos nulos (si alguno no pasó la validación)
-        $bulkData = array_filter($bulkData);
-
-        // Inserción masiva
-        if (count($bulkData) > 0) {
-            Order::insert($bulkData);
         }
+
+        // Insertar en lote (1 sola operación SQL)
+        if (!empty($ordersToInsert)) {
+            Order::insert($ordersToInsert);
+        }
+
+        return response()->json([
+            'message' => 'Proceso completado',
+            'successful_orders' => $ordersToInsert,
+            'failed_orders' => $failedOrders,
+        ], 200);
     }
 
 
