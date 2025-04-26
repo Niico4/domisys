@@ -4,13 +4,19 @@ import ItemNavbar from './ItemNavbar';
 
 import Brand from '@/components/common/Brand';
 import useAuth from '@/hooks/useAuth';
-import { deliveryRoutes, customerRoutes } from '@/routes';
+import { deliveryRoutes, customerRoutes, adminRoutes } from '@/routes';
+import { UserRole } from '@/store/useAuth.store';
 
 const Navbar = () => {
   const { scrollY } = useScroll();
   const { user } = useAuth();
 
-  const routes = user?.isDelivery ? deliveryRoutes : customerRoutes;
+  const routes =
+    user?.role === UserRole.DELIVERY
+      ? deliveryRoutes
+      : user?.role === UserRole.ADMIN
+        ? adminRoutes
+        : customerRoutes;
 
   // Animaciones controladas por scroll
   const headerHeight = useTransform(scrollY, [0, 100], [80, 60]);

@@ -216,7 +216,9 @@ const ShoppingCartPage = () => {
           Tu carrito está vacío
         </h2>
         <p className="text-gray-400">Agrega productos para continuar</p>
-        <Button onPress={() => navigate('/')}>Ver productos</Button>
+        <Button onPress={() => navigate(`${paths.root}${paths.home}`)}>
+          Ver productos
+        </Button>
       </div>
     );
   }

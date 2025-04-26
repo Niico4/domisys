@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Delivery;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DeliverySeeder extends Seeder
@@ -12,8 +12,6 @@ class DeliverySeeder extends Seeder
      */
     public function run(): void
     {
-        Delivery::factory()
-            ->count(10)
-            ->create();
+        User::factory()->delivery()->create();
     }
 }

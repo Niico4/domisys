@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Esquema común para contraseña reutilizable
 const passwordSchema = z
   .string()
   .min(6, 'La contraseña debe tener al menos 6 caracteres')
@@ -9,7 +8,7 @@ const passwordSchema = z
   .regex(/[a-z]/, 'Debe incluir al menos una letra minúscula')
   .regex(/[0-9]/, 'Debe incluir al menos un número');
 
-// Esquema para inicio de sesión
+// inicio de sesión
 export const signInSchema = z.object({
   email: z
     .string()
@@ -18,7 +17,7 @@ export const signInSchema = z.object({
   password: passwordSchema,
 });
 
-// Esquema para registro
+// registrarse
 export const signUpSchema = z
   .object({
     firstName: z
@@ -43,31 +42,28 @@ export const signUpSchema = z
       .max(50, 'La dirección no puede tener más de 50 caracteres'),
     password: passwordSchema,
     confirmPassword: z.string().min(1, 'Debes confirmar tu contraseña'),
+    invitationCode: z
+      .string()
+      .length(8, 'El código debe tener 8 caracteres')
+      .optional(),
     isDelivery: z.boolean(),
-    invitationCode: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Las contraseñas no coinciden',
     path: ['confirmPassword'],
   })
-  .superRefine((data, ctx) => {
-    if (data.isDelivery) {
-      if (!data.invitationCode?.trim()) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'El código de invitación es requerido para repartidores',
-          path: ['invitationCode'],
-        });
-      } else if (data.invitationCode.length !== 8) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'El código debe tener exactamente 8 caracteres',
-          path: ['invitationCode'],
-        });
+  .refine(
+    (data) => {
+      if (data.isDelivery && !data.invitationCode) {
+        return false;
       }
-    }
-  });
+      return true;
+    },
+    {
+      message: 'El código de invitación es obligatorio para repartidores',
+      path: ['invitationCode'],
+    },
+  );
 
-// Tipos TypeScript inferidos
 export type SignInType = z.infer<typeof signInSchema>;
 export type SignUpType = z.infer<typeof signUpSchema>;

@@ -15,6 +15,7 @@ import { paths } from '@/constants/routerPaths';
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
 
   const { user, logout, updateUser, isLoading } = useAuth();
@@ -49,21 +50,17 @@ const ProfilePage = () => {
   }, [formValues, user]);
 
   useEffect(() => {
-    if (user) {
-      reset(
-        {
-          name: user.firstName || '',
-          lastName: user.lastName || '',
-          email: user.email || '',
-          phoneNumber: user.phoneNumber || '',
-          address: user.address || '',
-        },
-        {
-          keepDefaultValues: true,
-        },
-      );
+    if (user && !initialized) {
+      reset({
+        name: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phoneNumber: user.phoneNumber || '',
+        address: user.address || '',
+      });
+      setInitialized(true);
     }
-  }, [user, reset]);
+  }, [user, initialized, reset]);
 
   const onSubmit = async (data: ProfileForm) => {
     if (!user) return;

@@ -3,7 +3,13 @@ import { create } from 'zustand';
 import { toast } from 'sonner';
 
 import instance from '@/utils/axios';
-import { mockUsers } from '@/constants/mock/mock-users';
+import { paths } from '@/constants/routerPaths';
+
+export enum UserRole {
+  ADMIN = 'admin',
+  CUSTOMER = 'customer',
+  DELIVERY = 'delivery',
+}
 
 export type User = {
   id: string;
@@ -12,124 +18,146 @@ export type User = {
   email: string;
   phoneNumber: string;
   address: string;
-  isDelivery: boolean;
+  invitationCode?: string;
+  role: UserRole | null;
 };
 
-type AuthStore = {
+type AuthState = {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  updateUser: (user: Partial<User>) => void;
-  signUp: (newUser: Omit<User, 'id'>) => Promise<boolean>;
+  error: string | null;
 };
 
-export const useAuthStore = create<AuthStore>()((set, get) => ({
+type AuthActions = {
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (newUser: SignUpPayload) => Promise<boolean>;
+  updateUser: (user: Partial<User>) => void;
+  logout: () => void;
+  clearError: () => void;
+};
+
+export type SignUpPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  password: string;
+  confirmPassword?: string;
+  invitationCode?: string;
+};
+
+export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
   user: null,
   token: null,
   isLoading: false,
+  error: null,
 
-  login: async (email, password) => {
-    set({ isLoading: true });
+  signIn: async (email, password) => {
+    set({ isLoading: true, error: null });
 
     try {
-      const response = await instance.post<{
+      const { data } = await instance.post<{
         accessToken: string;
         userData: User;
-      }>('/auth/sign-in', {
+      }>(`/${paths.authRoot}/${paths.signIn}`, {
         email,
         password,
       });
 
-      const { accessToken, userData } = response.data;
-
       set({
-        user: userData,
-        token: accessToken,
-        isLoading: false,
+        user: data.userData,
+        token: data.accessToken,
       });
 
-      localStorage.setItem('token', accessToken);
-
+      localStorage.setItem('token', data.accessToken);
       toast.success('¡Bienvenido de nuevo!');
-      return true;
     } catch (error) {
       console.error(error);
-      const errorMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message || error.message
-        : 'Error al iniciar sesión';
+      const errorMessage = getErrorMessage(error);
 
+      set({ error: errorMessage, isLoading: false });
       toast.error(errorMessage);
-
-      return false;
     } finally {
       set({ isLoading: false });
     }
   },
 
   signUp: async (newUser) => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
 
     try {
-      const emailAlreadyExists = mockUsers.some(
-        (user) => user.email === newUser.email,
-      );
+      await instance.post(`/${paths.authRoot}/${paths.signUp}`, {
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        phoneNumber: newUser.phoneNumber,
+        address: newUser.address,
+        // role: newUser.role,
+        password: newUser.password,
+        invitationCode: newUser.invitationCode,
+      });
 
-      if (emailAlreadyExists) {
-        toast.warning('El email ya está registrado');
-        return false;
-      }
-
-      const userWithId = {
-        ...newUser,
-        id: crypto.randomUUID(),
-      };
-
-      set({ user: userWithId });
-      toast.success('Cuenta creada exitosamente!');
+      toast.success('Cuenta creada con éxito, inicia sesión');
       return true;
     } catch (error) {
       console.error(error);
-      toast.error(`Error al crear la cuenta`);
+      const errorMessage = getErrorMessage(error);
+
+      set({ error: errorMessage, isLoading: false });
+      toast.error(errorMessage);
       return false;
     } finally {
       set({ isLoading: false });
     }
   },
 
+  updateUser: async (userData) => {
+    const { user, token } = get();
+
+    if (!user || !token) {
+      toast.error('No hay usuario autenticado');
+      return;
+    }
+
+    try {
+      const { data } = await instance.put('/user', userData);
+
+      const updatedUser: User = {
+        id: data.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        address: data.address,
+        invitationCode: data.invitationCode,
+        role: data.role,
+      };
+
+      set({ user: updatedUser });
+      toast.success('Perfil actualizado correctamente');
+    } catch (error) {
+      console.error(error);
+      const errorMessage = getErrorMessage(error);
+
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+    }
+  },
+
   logout: () => {
     localStorage.removeItem('token');
-
     set({ user: null, token: null });
     toast.info('Sesión cerrada');
   },
 
-  updateUser: async (data) => {
-    const { user, token } = get();
-
-    if (!user || !token) {
-      toast.error('No hay usuario activo');
-      return false;
-    }
-
-    try {
-      const response = await instance.put('/user', data);
-
-      const updatedUser = response.data;
-
-      set({ user: updatedUser });
-
-      toast.success('Perfil actualizado correctamente');
-      return true;
-    } catch (error) {
-      console.error(error);
-      const errorMessage = axios.isAxiosError(error)
-        ? error.response?.data?.message || error.message
-        : 'Error al actualizar el perfil';
-
-      toast.error(errorMessage);
-      return false;
-    }
-  },
+  clearError: () => set({ error: null }),
 }));
+
+function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    return error.response?.data?.message || error.message;
+  }
+  return error instanceof Error ? error.message : 'Error desconocido';
+}

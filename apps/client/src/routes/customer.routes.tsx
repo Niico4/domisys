@@ -1,29 +1,23 @@
-import { ReactElement } from 'react';
+import { lazy } from 'react';
 import {
   IconHome,
   IconShoppingCart,
   IconBoxSeam,
   IconUser,
-  Icon,
 } from '@tabler/icons-react';
 
+import { RoleRouterType } from './role-router.type';
+
 import { paths } from '@/constants/routerPaths';
-import HomePage from '@/pages/customer';
-import OrdersPage from '@/pages/customer/Orders';
-import ProfilePage from '@/pages/customer/Profile';
-import ShoppingCartPage from '@/pages/customer/ShoppingCart';
 
-interface CustomerRouteType {
-  path: string;
-  label: string;
-  icon: Icon;
-  badge?: boolean;
-  element: ReactElement;
-}
+const HomePage = lazy(() => import('@/pages/customer'));
+const ShoppingCartPage = lazy(() => import('@/pages/customer/ShoppingCart'));
+const OrdersPage = lazy(() => import('@/pages/customer/Orders'));
+const ProfilePage = lazy(() => import('@/pages/Profile'));
 
-export const customerRoutes: CustomerRouteType[] = [
+export const customerRoutes: RoleRouterType[] = [
   {
-    path: paths.root,
+    path: paths.home,
     icon: IconHome,
     label: 'Inicio',
     element: <HomePage />,

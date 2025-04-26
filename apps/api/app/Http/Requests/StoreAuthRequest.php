@@ -28,7 +28,7 @@ class StoreAuthRequest extends FormRequest
             'phoneNumber' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8'],
-            'invitationCode' => ['nullable', 'string', 'min:8', 'max:8']
+            'invitationCode' => ['sometimes', 'string', 'min:8', 'max:8']
         ];
     }
 

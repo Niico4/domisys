@@ -1,20 +1,15 @@
-import { ReactElement } from 'react';
-import { IconHome, IconUser, Icon, IconHistory } from '@tabler/icons-react';
+import { lazy } from 'react';
+import { IconHome, IconUser, IconHistory } from '@tabler/icons-react';
+
+import { RoleRouterType } from './role-router.type';
 
 import { paths } from '@/constants/routerPaths';
-import HomePage from '@/pages/delivery';
-import ProfilePage from '@/pages/customer/Profile';
-import HistoryPage from '@/pages/delivery/History';
 
-interface DeliveryRouteType {
-  path: string;
-  label: string;
-  icon: Icon;
-  badge?: boolean;
-  element: ReactElement;
-}
+const HomePage = lazy(() => import('@/pages/delivery'));
+const HistoryPage = lazy(() => import('@/pages/delivery/History'));
+const ProfilePage = lazy(() => import('@/pages/Profile'));
 
-export const deliveryRoutes: DeliveryRouteType[] = [
+export const deliveryRoutes: RoleRouterType[] = [
   {
     path: paths.home,
     icon: IconHome,
@@ -25,7 +20,6 @@ export const deliveryRoutes: DeliveryRouteType[] = [
     path: paths.history,
     icon: IconHistory,
     label: 'Historial',
-    badge: true,
     element: <HistoryPage />,
   },
   {
