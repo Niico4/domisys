@@ -22,12 +22,13 @@ class StoreAuthRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'string', 'max:30'],
-            'last_name' => ['required', 'string', 'max:30'],
+            'firstName' => ['required', 'string', 'max:30'],
+            'lastName' => ['required', 'string', 'max:30'],
             'email' => ['required', 'string', 'email', 'max:50', 'unique:users,email'],
-            'phone_number' => ['required', 'string', 'max:20'],
+            'phoneNumber' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'string', 'min:8']
+            'password' => ['required', 'string', 'min:8'],
+            'invitationCode' => ['sometimes', 'string', 'min:8', 'max:8']
         ];
     }
 
@@ -37,6 +38,7 @@ class StoreAuthRequest extends FormRequest
             'first_name' => $this->firstName,
             'last_name' => $this->lastName,
             'phone_number' => $this->phoneNumber,
+            'invitation_code' => $this->invitationCode,
         ]);
     }
 }

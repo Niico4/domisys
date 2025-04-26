@@ -2,7 +2,7 @@ import { useAuthStore, User } from '@/store/useAuth.store';
 
 const useAuth = () => {
   const user = useAuthStore((state) => state.user);
-  const login = useAuthStore((state) => state.login);
+  const signIn = useAuthStore((state) => state.signIn);
   const logout = useAuthStore((state) => state.logout);
   const updateUser = useAuthStore((state) => state.updateUser);
   const signUp = useAuthStore((state) => state.signUp);
@@ -23,12 +23,10 @@ const useAuth = () => {
     user,
     token,
     isLoading,
-    login,
+    signIn,
     logout,
     updateUser: enhancedUpdateUser,
     signUp,
-    isAuthenticated: !!user,
-    isDelivery: user?.isDelivery || false,
   };
 };
 

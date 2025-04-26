@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InvitationCodeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user', function (Request $request) {
         return $request->user();
     })->name('user.profile');
+
+    Route::put('user', [UserController::class, 'update'])->name('user.update');
+
 
     // Auth (close session)
     Route::delete('logout', [AuthController::class, 'logout'])->name('auth.logout');

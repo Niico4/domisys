@@ -2,6 +2,7 @@ export const paths = {
   root: '/',
   authRoot: 'auth',
   deliveryRoot: 'delivery',
+  adminRoot: 'admin',
 
   signIn: 'sign-in',
   signUp: 'sign-up',
@@ -12,8 +13,8 @@ export const paths = {
   orders: 'orders',
 
   // Delivery
-  home: 'home',
   history: 'history',
 
+  home: 'home',
   profile: 'profile',
 };

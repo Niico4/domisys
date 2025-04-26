@@ -1,15 +1,17 @@
+import { useEffect } from 'react';
 import { Button } from '@heroui/button';
 import { Input } from '@heroui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AuthBase } from '@modules/auth/types/auth';
+import { UserBase } from '@modules/auth/types/auth';
 
 import { signInSchema } from '../validations/auth.schema';
 
 import { paths } from '@/constants/routerPaths';
 import useAuth from '@/hooks/useAuth';
+import { UserRole } from '@/store/useAuth.store';
 
 const SignInForm = () => {
   const navigate = useNavigate();
@@ -18,7 +20,7 @@ const SignInForm = () => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<AuthBase>({
+  } = useForm<UserBase>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: '',
@@ -26,18 +28,28 @@ const SignInForm = () => {
     },
   });
 
-  const { login } = useAuth();
+  const { signIn, isLoading, user } = useAuth();
 
-  const onSubmit = async (data: AuthBase) => {
+  useEffect(() => {
+    if (user && user.role) {
+      switch (user.role) {
+        case UserRole.DELIVERY:
+          navigate(`/${paths.deliveryRoot}/${paths.home}`, { replace: true });
+          break;
+        case UserRole.ADMIN:
+          navigate(`/${paths.adminRoot}/${paths.home}`, { replace: true });
+          break;
+        default:
+          navigate(`${paths.root}${paths.home}`, { replace: true });
+      }
+    }
+  }, [user, navigate]);
+
+  const onSubmit = async (data: UserBase) => {
     try {
-      const success = await login(data.email, data.password);
-
-      if (!success) return;
+      await signIn(data.email, data.password);
 
       reset();
-      setTimeout(() => {
-        navigate('/', { replace: true });
-      }, 1500);
     } catch (error) {
       console.error(error);
       toast.error(`Error al iniciar sesión`);
@@ -78,7 +90,13 @@ const SignInForm = () => {
         </Link>
       </div>
 
-      <Button fullWidth radius="sm" color="primary" type="submit">
+      <Button
+        fullWidth
+        radius="sm"
+        color="primary"
+        type="submit"
+        isLoading={isLoading}
+      >
         Iniciar Sesión
       </Button>
       <p className="text-sm">

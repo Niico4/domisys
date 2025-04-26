@@ -10,8 +10,10 @@ class Delivery extends Model
 {
     /** @use HasFactory<\Database\Factories\DeliveryFactory> */
     use HasFactory, HasUuids;
+
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $table = 'deliveries';
 
     protected $fillable = [
         'first_name',

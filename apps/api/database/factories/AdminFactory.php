@@ -24,7 +24,7 @@ class AdminFactory extends Factory
             'phone_number' => $this->faker->phoneNumber(),
             'email' => 'admin@correo.com',
             'address' => $this->faker->streetAddress(),
-            'password' => Hash::make('password1234'),
+            'password' => Hash::make('Password1234'),
             'role' => 'admin'
         ];
     }

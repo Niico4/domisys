@@ -19,18 +19,22 @@ class AuthController extends Controller
             $validated = $request->validated();
             $role = 'customer';
 
-            if ($request->has('invitation_code')) {
-                if (InvitationCode::validateCode($request->invitation_code, 'delivery')) {
-                    $role = 'delivery';
-                    InvitationCode::markAsUsed($request->invitation_code);
+            if ($request->filled('invitation_code')) {
+                $code = $request->invitation_code;
+
+                if (!InvitationCode::validateCode($code, 'delivery')) {
+                    return response()->json(['message' => 'El código de invitación es inválido'], 422);
                 }
+
+                $role = 'delivery';
+                InvitationCode::markAsUsed($code);
             }
 
             $user = User::create([
-                'first_name' => $validated['first_name'],
-                'last_name' => $validated['last_name'],
+                'first_name' => $validated['firstName'],
+                'last_name' => $validated['lastName'],
                 'email' => $validated['email'],
-                'phone_number' => $validated['phone_number'],
+                'phone_number' => $validated['phoneNumber'],
                 'address' => $validated['address'],
                 'password' => Hash::make($validated['password']),
                 'role' => $role
@@ -38,16 +42,14 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            Log::info('New user registered', ['user_id' => $user->id]);
-
             return response()->json([
-                'data' => $user,
-                'access_token' => $token,
-                'token_type' => 'Bearer'
+                'userData' => $user,
+                'accessToken' => $token,
+                'tokenType' => 'Bearer'
             ], 201);
-        } catch (\Exception $e) {
-            Log::error('Registration error', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Error during registration'], 500);
+        } catch (\Exception $error) {
+            Log::error('Registration error', ['error' => $error->getMessage()]);
+            return response()->json(['message' => 'Error durante el registro'], 500);
         }
     }
 
@@ -55,7 +57,6 @@ class AuthController extends Controller
     {
         try {
             if (!Auth::attempt($request->only('email', 'password'))) {
-                Log::warning('Failed login attempt', ['email' => $request->email]);
                 return response()->json([
                     'message' => 'Credenciales inválidas',
                     'errors' => ['email' => ['Las credenciales proporcionadas no son correctas.']]
@@ -65,18 +66,26 @@ class AuthController extends Controller
             $user = User::where('email', $request->email)->firstOrFail();
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            Log::info('User logged in', ['user_id' => $user->id]);
 
             return response()->json([
-                'message' => 'Hola ' . $user->first_name,
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user,
-                'role' => $user->role
+                'accessToken' => $token,
+                'tokenType' => 'Bearer',
+                'userData' =>  [
+                    'id' => $user->id,
+                    'role' => $user->role,
+                    'firstName' => $user->first_name,
+                    'lastName' => $user->last_name,
+                    'email' => $user->email,
+                    'phoneNumber' => $user->phone_number,
+                    'address' => $user->address,
+                    'emailVerifiedAt' => $user->email_verified_at,
+                    'createdAt' => $user->created_at,
+                    'updatedAt' => $user->updated_at
+                ]
             ]);
         } catch (\Exception $e) {
             Log::error('Login error', ['error' => $e->getMessage()]);
-            return response()->json(['message' => 'Error during login'], 500);
+            return response()->json(['message' => 'Error durante el inicio de sesión'], 500);
         }
     }
 
@@ -85,7 +94,6 @@ class AuthController extends Controller
         try {
             if ($request->user()) {
                 $request->user()->tokens()->delete();
-                Log::info('User logged out', ['user_id' => $request->user()->id]);
             }
 
             return response()->json(['message' => 'Se ha cerrado la sesión correctamente']);

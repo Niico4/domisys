@@ -31,7 +31,7 @@ class UserFactory extends Factory
             'email' => $this->faker->email(),
             'address' => $this->faker->streetAddress(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Hash::make('Password1234'),
             'remember_token' => Str::random(10),
             'role' => 'customer'
         ];
@@ -52,7 +52,7 @@ class UserFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'role' => 'admin',
-                'email' => 'admin@example.com'
+                'email' => 'admin@correo.com'
             ];
         });
     }
@@ -61,7 +61,8 @@ class UserFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'role' => 'delivery'
+                'role' => 'delivery',
+                'email' => 'delivery@correo.com'
             ];
         });
     }

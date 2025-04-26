@@ -1,14 +1,14 @@
-export type AuthBase = {
+export type UserBase = {
   email: string;
   password: string;
 };
 
-export type SignUpPayload = AuthBase & {
+export type SignUpPayload = UserBase & {
   address: string;
   confirmPassword: string;
   invitationCode?: string;
-  isDelivery: boolean;
   lastName: string;
-  name: string;
+  firstName: string;
   phoneNumber: string;
+  isDelivery: boolean;
 };
