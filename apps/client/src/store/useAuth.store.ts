@@ -94,7 +94,6 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
         email: newUser.email,
         phoneNumber: newUser.phoneNumber,
         address: newUser.address,
-        // role: newUser.role,
         password: newUser.password,
         invitationCode: newUser.invitationCode,
       });
