@@ -3,6 +3,7 @@
     "scripts": {
         "dev": "php artisan serve",
         "build": "composer install --optimize-autoloader --no-dev",
-        "test": "php artisan test"
+        "test": "php artisan test",
+        "start": "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT}"
     }
 }
