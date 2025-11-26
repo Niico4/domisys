@@ -1,0 +1,46 @@
+{
+  "name": "@domisys/api",
+  "version": "1.0.0",
+  "description": "Esta REST API  reúne todo lo que necesita un supermercado para operar: desde los pedidos a domicilio hasta el inventario, las ventas, los usuarios y los reportes. Funciona sobre Node.js + Express y está organizado de forma modular para mantener todo limpio y fácil de escalar.",
+  "main": "./src/app.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon",
+    "build": "rimraf ./dist && tsc",
+    "start": "pnpm run build && node dist/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "backend",
+    "nodejs",
+    "express",
+    "api",
+    "supermercados",
+    "domicilios",
+    "inventario",
+    "ventas",
+    "punto-de-venta",
+    "gestion-usuarios",
+    "reportes",
+    "sistema-integral",
+    "gestion-operativa"
+  ],
+  "author": "Nicolás Garzón (@Niico4)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "dotenv": "^17.2.3",
+    "nodemon": "^3.1.11",
+    "prisma": "^6.19.0",
+    "rimraf": "^6.1.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "express": "^5.1.0",
+    "zod": "^4.1.12"
+  }
+}

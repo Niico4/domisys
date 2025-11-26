@@ -1,0 +1,274 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+enum UserRole {
+  admin
+  customer
+  cashier
+  delivery
+}
+
+enum OrderState {
+  pending
+  confirmed
+  shipped
+  delivered
+  cancel
+}
+
+enum PaymentMethod {
+  Nequi
+  DaviPlata
+  cash
+  credit_card
+}
+
+enum SaleState {
+  sold
+  cancel
+}
+
+enum MovementType {
+  in
+  out
+  adjustment
+}
+
+enum MovementReason {
+  expired
+  return_to_supplier
+  sale
+  manual_error
+  damaged_product
+  other
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  role        UserRole @default(customer)
+  username    String   @unique @db.VarChar(20)
+  email       String   @unique @db.VarChar(100)
+  name        String   @db.VarChar(50)
+  lastName    String   @map("last_name") @db.VarChar(50)
+  phoneNumber String   @map("phone_number") @db.VarChar(20)
+  password    String   @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  ordersAsCustomer       Order[]             @relation("OrderCustomer")
+  ordersAsDelivery       Order[]             @relation("OrderDelivery")
+  salesAsCashier         Sale[]              @relation("SaleCashier")
+  addresses              Address[]           @relation("UserAddress")
+  inventoryMovements     InventoryMovement[] @relation("UserInventory")
+  customerDeliveryRating DeliveryRating[]    @relation("CustomerToDeliveryRating")
+
+  @@index([role])
+  @@index([name])
+  @@index([lastName])
+  @@map("user")
+}
+
+model Order {
+  id            Int           @id @default(autoincrement())
+  state         OrderState    @default(pending)
+  paymentMethod PaymentMethod @map("payment_method")
+  totalAmount   Decimal       @map("total_amount") @db.Decimal(10, 2)
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  customerId Int? @map("customer_id")
+  deliveryId Int? @map("delivery_id")
+
+  // Relations
+  customer User? @relation("OrderCustomer", fields: [customerId], references: [id], onDelete: SetNull)
+  delivery User? @relation("OrderDelivery", fields: [deliveryId], references: [id], onDelete: SetNull)
+
+  orderProducts       OrderProduct[]   @relation("OrderToOrderProduct")
+  orderDeliveryRating DeliveryRating[] @relation("OrderToDeliveryRating")
+
+  @@index([state])
+  @@index([paymentMethod])
+  @@index([createdAt])
+  @@map("order")
+}
+
+model Address {
+  id           Int      @id @default(autoincrement())
+  alias        String   @db.VarChar(100)
+  city         String   @db.VarChar(50)
+  neighborhood String   @db.VarChar(50)
+  street       String   @db.VarChar(50)
+  details      String?  @db.Text
+  isDefault    Boolean  @default(false) @map("is_default")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  userId Int @map("user_id")
+
+  // Relations
+  user User @relation("UserAddress", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([alias])
+  @@map("address")
+}
+
+model Provider {
+  id            Int       @id @default(autoincrement())
+  name          String    @db.VarChar(100)
+  nit           String    @unique @db.VarChar(20)
+  email         String    @unique @db.VarChar(100)
+  contactNumber String    @map("contact_number") @db.VarChar(20)
+  address       String    @db.VarChar(100)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  products      Product[]
+
+  @@index([name])
+  @@map("provider")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique @db.VarChar(30)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  products    Product[]
+
+  @@map("category")
+}
+
+model Product {
+  id             Int       @id @default(autoincrement())
+  name           String    @db.VarChar(100)
+  price          Decimal   @db.Decimal(10, 2)
+  stock          Int       @default(0)
+  measure        String    @db.VarChar(20)
+  lot            String    @db.VarChar(15)
+  expirationDate DateTime? @map("expiration_date") @db.Date
+  image          String?   @db.VarChar(200)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  providerId Int? @map("provider_id")
+  categoryId Int? @map("category_id")
+
+  // Relations
+  provider Provider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  orderProducts      OrderProduct[]      @relation("ProductToOrderProduct")
+  saleProducts       SaleProduct[]       @relation("ProductToSaleProduct")
+  inventoryMovements InventoryMovement[] @relation("ProductInventory")
+
+  @@unique([name, lot, measure])
+  @@index([providerId])
+  @@index([name])
+  @@index([expirationDate])
+  @@index([categoryId])
+  @@index([categoryId, providerId])
+  @@map("product")
+}
+
+model Sale {
+  id            Int           @id @default(autoincrement())
+  paymentMethod PaymentMethod @map("payment_method")
+  state         SaleState     @default(sold)
+  totalAmount   Decimal       @map("total_amount") @db.Decimal(10, 2)
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  cashierId Int? @map("cashier_id")
+
+  // Relations
+  cashier User? @relation("SaleCashier", fields: [cashierId], references: [id], onDelete: SetNull)
+
+  saleProducts SaleProduct[] @relation("SaleToSaleProduct")
+
+  @@index([cashierId])
+  @@index([createdAt])
+  @@map("sale")
+}
+
+model SaleProduct {
+  quantity  Int
+  unitPrice Decimal  @map("unit_price") @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  saleId    Int @map("sale_id")
+  productId Int @map("product_id")
+
+  // Relations
+  sale    Sale    @relation("SaleToSaleProduct", fields: [saleId], references: [id], onDelete: Cascade)
+  product Product @relation("ProductToSaleProduct", fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([saleId, productId])
+  @@map("sale_product")
+}
+
+model OrderProduct {
+  quantity  Int
+  unitPrice Decimal  @map("unit_price") @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  orderId   Int @map("order_id")
+  productId Int @map("product_id")
+
+  // Relations
+  order   Order   @relation("OrderToOrderProduct", fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation("ProductToOrderProduct", fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([orderId, productId])
+  @@map("order_product")
+}
+
+model InventoryMovement {
+  id           Int            @id @default(autoincrement())
+  movementType MovementType   @map("movement_type")
+  reason       MovementReason
+  quantity     Int?
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  productId Int @map("product_id")
+  adminId   Int @map("admin_id")
+
+  // Relations
+  product Product @relation("ProductInventory", fields: [productId], references: [id], onDelete: Cascade)
+  admin   User    @relation("UserInventory", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([movementType])
+  @@index([reason])
+  @@index([createdAt])
+  @@map("inventory_movement")
+}
+
+model DeliveryRating {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  orderId    Int @map("order_id")
+  customerId Int @map("customer_id")
+
+  // Relations
+  order    Order @relation("OrderToDeliveryRating", fields: [orderId], references: [id], onDelete: Cascade)
+  customer User  @relation("CustomerToDeliveryRating", fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, customerId])
+  @@map("delivery_rating")
+}
