@@ -1,6 +1,6 @@
 node_modules/
 dist/
-.DB_Store
+.DS_Store
 .env
 postgres/
 /src/generated/prisma
