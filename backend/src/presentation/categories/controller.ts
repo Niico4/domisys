@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 import { createCategoryDto } from '@/domain/dtos/categories/create-category.dto';
 import { updateCategoryDto } from '@/domain/dtos/categories/update-category.dto';
 import { CategoryRepository } from '@/domain/repositories/category.repository';
 
-import { GetAllCategories } from '@/domain/use-cases/category/get-all-category';
+import { GetAllCategories } from '@/domain/use-cases/category/get-all-categories';
 import { CreateCategory } from '@/domain/use-cases/category/create-category';
 import { GetCategoryById } from '@/domain/use-cases/category/get-category-by-id';
 import { DeleteCategory } from '@/domain/use-cases/category/delete-category';
@@ -51,15 +51,6 @@ export const categoryController = (categoryRepository: CategoryRepository) => ({
 
       return res.status(201).json(newCategory);
     } catch (error) {
-      if (
-        error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        return res.status(409).json({
-          message: `El ${error.meta?.target} ya está registrado`,
-        });
-      }
-
       return handleError(res, error, 'Error al crear la categoría');
     }
   },

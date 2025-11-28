@@ -50,6 +50,11 @@ enum MovementReason {
   other
 }
 
+enum ProductState {
+  active
+  inactive
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   role        UserRole @default(customer)
@@ -148,16 +153,17 @@ model Category {
 }
 
 model Product {
-  id             Int       @id @default(autoincrement())
-  name           String    @db.VarChar(100)
-  price          Decimal   @db.Decimal(10, 2)
-  stock          Int       @default(0)
-  measure        String    @db.VarChar(20)
-  lot            String    @db.VarChar(15)
-  expirationDate DateTime? @map("expiration_date") @db.Date
-  image          String?   @db.VarChar(200)
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  id             Int          @id @default(autoincrement())
+  name           String       @db.VarChar(100)
+  price          Decimal      @db.Decimal(10, 2)
+  stock          Int          @default(0)
+  measure        String       @db.VarChar(20)
+  lot            String       @db.VarChar(15)
+  expirationDate DateTime?    @map("expiration_date") @db.Date
+  image          String?      @db.VarChar(200)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamp(6)
+  state          ProductState @default(active)
 
   // Foreign Keys
   providerId Int? @map("provider_id")

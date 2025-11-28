@@ -1,7 +1,8 @@
-import { prisma } from '@/data/postgres';
-import { CategoryDatasource } from '@/domain/datasources/category.datasource';
+import { prisma } from '@/data/postgresql';
+
 import { CreateCategoryDtoType } from '@/domain/dtos/categories/create-category.dto';
 import { UpdateCategoryDtoType } from '@/domain/dtos/categories/update-category.dto';
+import { CategoryDatasource } from '@/domain/datasources/category.datasource';
 import { CategoryEntity } from '@/domain/entities/category.entity';
 
 export const categoryDatasourceImplementation: CategoryDatasource = {
