@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClientKnownRequestError } from '@/generated/internal/prismaNamespace';
 
 import { createProviderDto } from '@/domain/dtos/providers/create-provider.dto';
-import { UpdateProviderDto } from '@/domain/dtos/providers/update-provider.dto';
+import { updateProviderDto } from '@/domain/dtos/providers/update-provider.dto';
 import { ProviderRepository } from '@/domain/repositories/provider.repository';
 
 import { CreateProvider } from '@/domain/use-cases/provider/create-provider';
@@ -72,7 +72,7 @@ export const providerController = (providerRepository: ProviderRepository) => ({
     }
 
     try {
-      const data = UpdateProviderDto.parse(req.body ?? {});
+      const data = updateProviderDto.parse(req.body ?? {});
 
       const useCase = new UpdateProvider(providerRepository);
       const updatedProvider = await useCase.execute(id, data);

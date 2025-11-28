@@ -1355,6 +1355,7 @@ export const ProductScalarFieldEnum = {
   image: 'image',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
+  state: 'state',
   providerId: 'providerId',
   categoryId: 'categoryId'
 } as const
@@ -1553,6 +1554,20 @@ export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMo
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductState'
+ */
+export type EnumProductStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductState'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductState[]'
+ */
+export type ListEnumProductStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductState[]'>
     
 
 

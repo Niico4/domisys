@@ -2,26 +2,24 @@ import { z } from 'zod';
 
 export const createProviderDto = z.object({
   name: z
-    .string('El nombre es obligatorio')
-    .min(3, 'El nombre debe tener mínimo 3 caracteres')
-    .max(100, 'El nombre no puede tener más de 100 caracteres')
-    .trim(),
+    .string({ error: 'El nombre debe ser un texto válido.' })
+    .min(3, { error: 'El nombre debe tener mínimo 3 caracteres.' })
+    .max(100, { error: 'El nombre puede tener máximo 100 caracteres.' }),
   nit: z
-    .string('El NIT es obligatorio')
-    .length(10, 'El NIT debe tener exactamente 10 dígitos')
-    .regex(/^[0-9-]+$/, 'El NIT solo puede contener números y guiones')
-    .trim(),
-  email: z.email('Formato de correo electrónico inválido').trim(),
+    .string({ error: 'El NIT debe ser un texto válido.' })
+    .regex(/^[0-9]{10}$/, {
+      error: 'El NIT debe tener exactamente 10 dígitos.',
+    }),
+  email: z.email({ error: 'Formato de correo electrónico inválido.' }),
   contactNumber: z
-    .string('El número de contacto es obligatorio')
-    .regex(/^[0-9]{7,10}$/, 'Debe ser un número válido')
-    .length(10, 'El número de contacto debe tener 10 dígitos')
-    .trim(),
+    .string({ error: 'El número de contacto debe ser un texto válido.' })
+    .regex(/^[0-9]{10}$/, {
+      error: 'El número de contacto debe tener exactamente 10 dígitos.',
+    }),
   address: z
-    .string('La dirección es obligatoria')
-    .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(100, 'La dirección no puede tener más de 100 caracteres')
-    .trim(),
+    .string({ error: 'La dirección debe ser un texto válido.' })
+    .min(10, { error: 'La dirección debe tener mínimo 10 caracteres.' })
+    .max(100, { error: 'La dirección puede tener máximo 100 caracteres.' }),
 });
 
 export type CreateProviderDtoType = z.infer<typeof createProviderDto>;

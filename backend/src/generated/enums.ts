@@ -67,3 +67,11 @@ export const MovementReason = {
 } as const
 
 export type MovementReason = (typeof MovementReason)[keyof typeof MovementReason]
+
+
+export const ProductState = {
+  active: 'active',
+  inactive: 'inactive'
+} as const
+
+export type ProductState = (typeof ProductState)[keyof typeof ProductState]

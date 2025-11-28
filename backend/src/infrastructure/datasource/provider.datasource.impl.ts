@@ -1,7 +1,8 @@
-import { prisma } from '@/data/postgres';
-import { ProviderDatasource } from '@/domain/datasources/provider.datasource';
+import { prisma } from '@/data/postgresql';
+
 import { CreateProviderDtoType } from '@/domain/dtos/providers/create-provider.dto';
 import { UpdateProviderDtoType } from '@/domain/dtos/providers/update-provider.dto';
+import { ProviderDatasource } from '@/domain/datasources/provider.datasource';
 import { ProviderEntity } from '@/domain/entities/provider.entity';
 
 export const providerDatasourceImplementation: ProviderDatasource = {
