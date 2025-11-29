@@ -241,11 +241,11 @@ model OrderProduct {
 }
 
 model InventoryMovement {
-  id           Int            @id @default(autoincrement())
-  movementType MovementType   @map("movement_type")
-  reason       MovementReason
+  id           Int             @id @default(autoincrement())
+  movementType MovementType    @map("movement_type")
+  reason       MovementReason?
   quantity     Int?
-  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
 
   // Foreign Keys
   productId Int @map("product_id")

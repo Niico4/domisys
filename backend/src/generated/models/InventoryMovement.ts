@@ -206,7 +206,7 @@ export type InventoryMovementGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type InventoryMovementGroupByOutputType = {
   id: number
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason: $Enums.MovementReason | null
   quantity: number | null
   createdAt: Date
   productId: number
@@ -239,7 +239,7 @@ export type InventoryMovementWhereInput = {
   NOT?: Prisma.InventoryMovementWhereInput | Prisma.InventoryMovementWhereInput[]
   id?: Prisma.IntFilter<"InventoryMovement"> | number
   movementType?: Prisma.EnumMovementTypeFilter<"InventoryMovement"> | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFilter<"InventoryMovement"> | $Enums.MovementReason
+  reason?: Prisma.EnumMovementReasonNullableFilter<"InventoryMovement"> | $Enums.MovementReason | null
   quantity?: Prisma.IntNullableFilter<"InventoryMovement"> | number | null
   createdAt?: Prisma.DateTimeFilter<"InventoryMovement"> | Date | string
   productId?: Prisma.IntFilter<"InventoryMovement"> | number
@@ -251,7 +251,7 @@ export type InventoryMovementWhereInput = {
 export type InventoryMovementOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   movementType?: Prisma.SortOrder
-  reason?: Prisma.SortOrder
+  reason?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   productId?: Prisma.SortOrder
@@ -266,7 +266,7 @@ export type InventoryMovementWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.InventoryMovementWhereInput[]
   NOT?: Prisma.InventoryMovementWhereInput | Prisma.InventoryMovementWhereInput[]
   movementType?: Prisma.EnumMovementTypeFilter<"InventoryMovement"> | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFilter<"InventoryMovement"> | $Enums.MovementReason
+  reason?: Prisma.EnumMovementReasonNullableFilter<"InventoryMovement"> | $Enums.MovementReason | null
   quantity?: Prisma.IntNullableFilter<"InventoryMovement"> | number | null
   createdAt?: Prisma.DateTimeFilter<"InventoryMovement"> | Date | string
   productId?: Prisma.IntFilter<"InventoryMovement"> | number
@@ -278,7 +278,7 @@ export type InventoryMovementWhereUniqueInput = Prisma.AtLeast<{
 export type InventoryMovementOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   movementType?: Prisma.SortOrder
-  reason?: Prisma.SortOrder
+  reason?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   productId?: Prisma.SortOrder
@@ -296,7 +296,7 @@ export type InventoryMovementScalarWhereWithAggregatesInput = {
   NOT?: Prisma.InventoryMovementScalarWhereWithAggregatesInput | Prisma.InventoryMovementScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"InventoryMovement"> | number
   movementType?: Prisma.EnumMovementTypeWithAggregatesFilter<"InventoryMovement"> | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonWithAggregatesFilter<"InventoryMovement"> | $Enums.MovementReason
+  reason?: Prisma.EnumMovementReasonNullableWithAggregatesFilter<"InventoryMovement"> | $Enums.MovementReason | null
   quantity?: Prisma.IntNullableWithAggregatesFilter<"InventoryMovement"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"InventoryMovement"> | Date | string
   productId?: Prisma.IntWithAggregatesFilter<"InventoryMovement"> | number
@@ -305,7 +305,7 @@ export type InventoryMovementScalarWhereWithAggregatesInput = {
 
 export type InventoryMovementCreateInput = {
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   product: Prisma.ProductCreateNestedOneWithoutInventoryMovementsInput
@@ -315,7 +315,7 @@ export type InventoryMovementCreateInput = {
 export type InventoryMovementUncheckedCreateInput = {
   id?: number
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   productId: number
@@ -324,7 +324,7 @@ export type InventoryMovementUncheckedCreateInput = {
 
 export type InventoryMovementUpdateInput = {
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   product?: Prisma.ProductUpdateOneRequiredWithoutInventoryMovementsNestedInput
@@ -334,7 +334,7 @@ export type InventoryMovementUpdateInput = {
 export type InventoryMovementUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -344,7 +344,7 @@ export type InventoryMovementUncheckedUpdateInput = {
 export type InventoryMovementCreateManyInput = {
   id?: number
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   productId: number
@@ -353,7 +353,7 @@ export type InventoryMovementCreateManyInput = {
 
 export type InventoryMovementUpdateManyMutationInput = {
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -361,7 +361,7 @@ export type InventoryMovementUpdateManyMutationInput = {
 export type InventoryMovementUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -510,13 +510,13 @@ export type EnumMovementTypeFieldUpdateOperationsInput = {
   set?: $Enums.MovementType
 }
 
-export type EnumMovementReasonFieldUpdateOperationsInput = {
-  set?: $Enums.MovementReason
+export type NullableEnumMovementReasonFieldUpdateOperationsInput = {
+  set?: $Enums.MovementReason | null
 }
 
 export type InventoryMovementCreateWithoutAdminInput = {
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   product: Prisma.ProductCreateNestedOneWithoutInventoryMovementsInput
@@ -525,7 +525,7 @@ export type InventoryMovementCreateWithoutAdminInput = {
 export type InventoryMovementUncheckedCreateWithoutAdminInput = {
   id?: number
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   productId: number
@@ -563,7 +563,7 @@ export type InventoryMovementScalarWhereInput = {
   NOT?: Prisma.InventoryMovementScalarWhereInput | Prisma.InventoryMovementScalarWhereInput[]
   id?: Prisma.IntFilter<"InventoryMovement"> | number
   movementType?: Prisma.EnumMovementTypeFilter<"InventoryMovement"> | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFilter<"InventoryMovement"> | $Enums.MovementReason
+  reason?: Prisma.EnumMovementReasonNullableFilter<"InventoryMovement"> | $Enums.MovementReason | null
   quantity?: Prisma.IntNullableFilter<"InventoryMovement"> | number | null
   createdAt?: Prisma.DateTimeFilter<"InventoryMovement"> | Date | string
   productId?: Prisma.IntFilter<"InventoryMovement"> | number
@@ -572,7 +572,7 @@ export type InventoryMovementScalarWhereInput = {
 
 export type InventoryMovementCreateWithoutProductInput = {
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   admin: Prisma.UserCreateNestedOneWithoutInventoryMovementsInput
@@ -581,7 +581,7 @@ export type InventoryMovementCreateWithoutProductInput = {
 export type InventoryMovementUncheckedCreateWithoutProductInput = {
   id?: number
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   adminId: number
@@ -616,7 +616,7 @@ export type InventoryMovementUpdateManyWithWhereWithoutProductInput = {
 export type InventoryMovementCreateManyAdminInput = {
   id?: number
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   productId: number
@@ -624,7 +624,7 @@ export type InventoryMovementCreateManyAdminInput = {
 
 export type InventoryMovementUpdateWithoutAdminInput = {
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   product?: Prisma.ProductUpdateOneRequiredWithoutInventoryMovementsNestedInput
@@ -633,7 +633,7 @@ export type InventoryMovementUpdateWithoutAdminInput = {
 export type InventoryMovementUncheckedUpdateWithoutAdminInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -642,7 +642,7 @@ export type InventoryMovementUncheckedUpdateWithoutAdminInput = {
 export type InventoryMovementUncheckedUpdateManyWithoutAdminInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   productId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -651,7 +651,7 @@ export type InventoryMovementUncheckedUpdateManyWithoutAdminInput = {
 export type InventoryMovementCreateManyProductInput = {
   id?: number
   movementType: $Enums.MovementType
-  reason: $Enums.MovementReason
+  reason?: $Enums.MovementReason | null
   quantity?: number | null
   createdAt?: Date | string
   adminId: number
@@ -659,7 +659,7 @@ export type InventoryMovementCreateManyProductInput = {
 
 export type InventoryMovementUpdateWithoutProductInput = {
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   admin?: Prisma.UserUpdateOneRequiredWithoutInventoryMovementsNestedInput
@@ -668,7 +668,7 @@ export type InventoryMovementUpdateWithoutProductInput = {
 export type InventoryMovementUncheckedUpdateWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -677,7 +677,7 @@ export type InventoryMovementUncheckedUpdateWithoutProductInput = {
 export type InventoryMovementUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   movementType?: Prisma.EnumMovementTypeFieldUpdateOperationsInput | $Enums.MovementType
-  reason?: Prisma.EnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason
+  reason?: Prisma.NullableEnumMovementReasonFieldUpdateOperationsInput | $Enums.MovementReason | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminId?: Prisma.IntFieldUpdateOperationsInput | number
@@ -754,7 +754,7 @@ export type $InventoryMovementPayload<ExtArgs extends runtime.Types.Extensions.I
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     movementType: $Enums.MovementType
-    reason: $Enums.MovementReason
+    reason: $Enums.MovementReason | null
     quantity: number | null
     createdAt: Date
     productId: number

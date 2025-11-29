@@ -22,17 +22,22 @@ export const productRoutes = (): Router => {
   router.get('/', controller.getAllProducts);
   router.post('/', controller.createProduct);
 
-  router.get('/inventory/movement', controller.getInventoryMovementReport);
-
-  router.get('/alerts/low-stock', controller.getStockAlerts);
-  router.get('/report', controller.productReport);
-
   router.get('/:id', controller.getProductById);
   router.put('/:id', controller.updateProduct);
   router.delete('/:id', controller.deleteProduct);
 
-  router.post('/:id/add-stock', controller.addStock);
-  router.post('/:id/remove-stock', controller.removeStock);
+  router.post('/:id/update-state', controller.updateState);
+
+  router.post('/:id/stock/add', controller.addStock);
+  router.post('/:id/stock/remove', controller.removeStock);
+
+  router.get('/reports/inventory', controller.inventoryReport);
+  router.get(
+    '/reports/inventory-movement',
+    controller.getInventoryMovementReport
+  );
+
+  router.get('/alerts/low-stock', controller.getStockAlerts);
 
   return router;
 };

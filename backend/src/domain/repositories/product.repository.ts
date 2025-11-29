@@ -1,5 +1,5 @@
 import { InventoryMovement } from '@/generated/client';
-import { MovementReason, MovementType } from '@/generated/enums';
+import { MovementReason, MovementType, ProductState } from '@/generated/enums';
 
 import { CreateProductDtoType } from '../dtos/products/create-product.dto';
 import { UpdateProductDtoType } from '../dtos/products/update-product.dto';
@@ -27,13 +27,14 @@ export interface ProductRepository {
     quantity: number;
     type: MovementType;
     date: Date;
-    reason?: MovementReason;
+    reason: MovementReason | null;
   }): Promise<void>;
+
+  updateState(id: number, state: ProductState): Promise<ProductEntity>;
 
   getStockAlerts(dto?: StockAlertDtoType): Promise<ProductEntity[]>;
   getInventoryMovementReport(
     dto: InventoryReportDtoType
   ): Promise<InventoryMovement[]>;
-
-  getProductReport(dto?: ProductReportDtoType): Promise<ProductEntity[]>;
+  getInventoryReport(dto?: ProductReportDtoType): Promise<ProductEntity[]>;
 }

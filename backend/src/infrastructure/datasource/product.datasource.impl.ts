@@ -1,14 +1,15 @@
 import { InventoryMovement } from '@/generated/client';
-import { MovementReason, MovementType } from '@/generated/enums';
+import { MovementReason, MovementType, ProductState } from '@/generated/enums';
 import { prisma } from '@/data/postgresql';
+
+import { ProductEntity } from '@/domain/entities/product.entity';
+
+import { ProductDatasource } from '@/domain/datasources/product.datasource';
 
 import { CreateProductDtoType } from '@/domain/dtos/products/create-product.dto';
 import { InventoryReportDtoType } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
 import { StockAlertDtoType } from '@/domain/dtos/products/inventory/stock-alert.dto';
 import { UpdateProductDtoType } from '@/domain/dtos/products/update-product.dto';
-
-import { ProductDatasource } from '@/domain/datasources/product.datasource';
-import { ProductEntity } from '@/domain/entities/product.entity';
 import { ProductReportDtoType } from '@/domain/dtos/products/inventory/product-report.dto';
 
 export const productDatasourceImplementation: ProductDatasource = {
@@ -136,6 +137,17 @@ export const productDatasourceImplementation: ProductDatasource = {
     }
   },
 
+  async updateState(id: number, state: ProductState): Promise<ProductEntity> {
+    await this.findById(id);
+
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+      data: { state },
+    });
+
+    return updatedProduct;
+  },
+
   async addStockMovement(params: {
     productId: number;
     adminId: number;
@@ -143,7 +155,7 @@ export const productDatasourceImplementation: ProductDatasource = {
     quantity: number;
     type: MovementType;
     date: Date;
-    reason?: MovementReason;
+    reason: MovementReason | null;
   }): Promise<void> {
     try {
       await prisma.inventoryMovement.create({
@@ -152,7 +164,7 @@ export const productDatasourceImplementation: ProductDatasource = {
           adminId: params.adminId,
           movementType: params.type,
           quantity: params.quantity,
-          reason: params.reason ?? MovementReason.other,
+          reason: params.reason,
           createdAt: params.date,
         },
       });
@@ -166,10 +178,11 @@ export const productDatasourceImplementation: ProductDatasource = {
   },
 
   async getStockAlerts(dto?: StockAlertDtoType): Promise<ProductEntity[]> {
-    const threshold = dto?.threshold ?? 10;
+    const threshold = dto?.threshold ?? 50;
+
     return prisma.product.findMany({
       where: {
-        stock: { lt: threshold },
+        stock: { lte: threshold },
       },
     });
   },
@@ -178,10 +191,22 @@ export const productDatasourceImplementation: ProductDatasource = {
     dto: InventoryReportDtoType
   ): Promise<InventoryMovement[]> {
     const where: any = {};
-    if (dto.startDate) where.createdAt = { gte: new Date(dto.startDate) };
-    if (dto.endDate)
-      where.createdAt = { ...where.createdAt, lte: new Date(dto.endDate) };
-    if (dto.productId) where.productId = dto.productId;
+
+    if (dto.startDate) {
+      const start = new Date(dto.startDate);
+      start.setUTCHours(0, 0, 0, 0);
+      where.createdAt = { gte: start };
+    }
+
+    if (dto.endDate) {
+      const end = new Date(dto.endDate);
+      end.setUTCHours(23, 59, 59, 999);
+      where.createdAt = { ...where.createdAt, lte: end };
+    }
+
+    if (dto.productId) {
+      where.productId = dto.productId;
+    }
 
     return prisma.inventoryMovement.findMany({
       where,
@@ -189,12 +214,14 @@ export const productDatasourceImplementation: ProductDatasource = {
     });
   },
 
-  async getProductReport(dto?: ProductReportDtoType): Promise<ProductEntity[]> {
+  async getInventoryReport(
+    dto?: ProductReportDtoType
+  ): Promise<ProductEntity[]> {
     const where: any = {};
 
     if (dto?.categoryId) where.categoryId = dto.categoryId;
     if (dto?.providerId) where.providerId = dto.providerId;
-    // if (dto?.state) where.state = dto.state;
+    if (dto?.state) where.state = dto.state;
 
     return prisma.product.findMany({
       where,
