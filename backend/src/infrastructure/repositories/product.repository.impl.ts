@@ -1,11 +1,14 @@
+import { MovementReason, MovementType, ProductState } from '@/generated/enums';
+
 import { ProductDatasource } from '@/domain/datasources/product.datasource';
+
+import { ProductRepository } from '@/domain/repositories/product.repository';
+
 import { CreateProductDtoType } from '@/domain/dtos/products/create-product.dto';
 import { InventoryReportDtoType } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
 import { ProductReportDtoType } from '@/domain/dtos/products/inventory/product-report.dto';
 import { StockAlertDtoType } from '@/domain/dtos/products/inventory/stock-alert.dto';
 import { UpdateProductDtoType } from '@/domain/dtos/products/update-product.dto';
-import { ProductRepository } from '@/domain/repositories/product.repository';
-import { MovementReason, MovementType } from '@/generated/enums';
 
 export const productRepositoryImplementation = (
   datasource: ProductDatasource
@@ -25,13 +28,15 @@ export const productRepositoryImplementation = (
     quantity: number;
     type: MovementType;
     date: Date;
-    reason?: MovementReason;
+    reason: MovementReason | null;
   }) => datasource.addStockMovement(params),
+
+  updateState: (id: number, state: ProductState) =>
+    datasource.updateState(id, state),
 
   getStockAlerts: (data?: StockAlertDtoType) => datasource.getStockAlerts(data),
   getInventoryMovementReport: (data: InventoryReportDtoType) =>
     datasource.getInventoryMovementReport(data),
-
-  getProductReport: (dto: ProductReportDtoType) =>
-    datasource.getProductReport(dto),
+  getInventoryReport: (dto: ProductReportDtoType) =>
+    datasource.getInventoryReport(dto),
 });

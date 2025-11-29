@@ -4,7 +4,7 @@ import { AddStockDtoType } from '@/domain/dtos/products/add-stock.dto';
 import { MovementType } from '@/generated/enums';
 
 export interface AddStockUseCase {
-  execute(productId: number, dto: AddStockDtoType): Promise<void>;
+  execute(productId: number, dto: AddStockDtoType): Promise<AddStockDtoType>;
 }
 
 export class AddStock implements AddStockUseCase {
@@ -33,8 +33,16 @@ export class AddStock implements AddStockUseCase {
       providerId,
       quantity,
       type: MovementType.in,
+      reason: null,
       date: new Date(),
       adminId,
     });
+
+    return {
+      quantity,
+      providerId,
+      adminId,
+      productId,
+    };
   }
 }

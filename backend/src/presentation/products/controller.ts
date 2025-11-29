@@ -2,6 +2,14 @@ import { Request, Response } from 'express';
 
 import { createProductDto } from '@/domain/dtos/products/create-product.dto';
 import { updateProductDto } from '@/domain/dtos/products/update-product.dto';
+import { removeStockDto } from '@/domain/dtos/products/remove-stock.dto';
+import { stockAlertDto } from '@/domain/dtos/products/inventory/stock-alert.dto';
+import { addStockDto } from '@/domain/dtos/products/add-stock.dto';
+import { inventoryReportDto } from '@/domain/dtos/products/inventory/product-report.dto';
+import { inventoryMovementReportDto } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
+import { updateProductStateDto } from '@/domain/dtos/products/update-product-state.dto';
+
+import { ProviderRepository } from '@/domain/repositories/provider.repository';
 import { ProductRepository } from '@/domain/repositories/product.repository';
 
 import { CreateProduct } from '@/domain/use-cases/product/create-product';
@@ -10,16 +18,13 @@ import { GetAllProducts } from '@/domain/use-cases/product/get-all-products';
 import { GetProductById } from '@/domain/use-cases/product/get-product-by-id';
 import { UpdateProduct } from '@/domain/use-cases/product/update-product';
 import { RemoveStock } from '@/domain/use-cases/product/remove-stock';
-import { GetProductReport } from '@/domain/use-cases/product/inventory/get-product-report';
+import { GetInventoryReport } from '@/domain/use-cases/product/inventory/get-product-report';
+import { GetInventoryMovementReport } from '@/domain/use-cases/product/inventory/get-inventory-movement-report';
+import { GetStockAlerts } from '@/domain/use-cases/product/inventory/get-stock-alerts';
+import { AddStock } from '@/domain/use-cases/product/add-stock';
+import { UpdateProductState } from '@/domain/use-cases/product/update-product-state';
 
 import { handleError } from '../errors/http-error-handler';
-import { addStockDto } from '@/domain/dtos/products/add-stock.dto';
-import { AddStock } from '@/domain/use-cases/product/add-stock';
-import { ProviderRepository } from '@/domain/repositories/provider.repository';
-import { removeStockDto } from '@/domain/dtos/products/remove-stock.dto';
-import { InventoryReportDtoType } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
-import { StockAlertDtoType } from '@/domain/dtos/products/inventory/stock-alert.dto';
-import { productReportDto } from '@/domain/dtos/products/inventory/product-report.dto';
 
 export const productController = (
   productRepository: ProductRepository,
@@ -28,9 +33,9 @@ export const productController = (
   getAllProducts: async (_req: Request, res: Response) => {
     try {
       const useCase = new GetAllProducts(productRepository);
-      const products = await useCase.execute();
+      const data = await useCase.execute();
 
-      return res.status(200).json(products);
+      return res.status(200).json(data);
     } catch (error) {
       return handleError(res, error, 'Error al obtener los productos');
     }
@@ -45,22 +50,24 @@ export const productController = (
 
     try {
       const useCase = new GetProductById(productRepository);
-      const getProduct = await useCase.execute(id);
+      const data = await useCase.execute(id);
 
-      return res.status(200).json(getProduct);
+      return res.status(200).json(data);
     } catch (error) {
       return handleError(res, error, `Error al obtener el producto ${id}`);
     }
   },
 
   createProduct: async (req: Request, res: Response) => {
-    const data = createProductDto.parse(req.body);
+    const dto = createProductDto.parse(req.body);
 
     try {
       const useCase = new CreateProduct(productRepository);
-      const newProduct = await useCase.execute(data);
+      const data = await useCase.execute(dto);
 
-      return res.status(201).json(newProduct);
+      return res
+        .status(201)
+        .json({ message: 'Producto creado correctamente', data });
     } catch (error) {
       return handleError(res, error, 'Error al crear el producto');
     }
@@ -74,12 +81,12 @@ export const productController = (
     }
 
     try {
-      const data = updateProductDto.parse(req.body ?? {});
+      const dto = updateProductDto.parse(req.body ?? {});
 
       const useCase = new UpdateProduct(productRepository);
-      const updatedProduct = await useCase.execute(id, data);
+      const data = await useCase.execute(id, dto);
 
-      return res.status(200).json(updatedProduct);
+      return res.status(200).json({ message: 'Producto actualizado', data });
     } catch (error) {
       return handleError(res, error, 'Error al actualizar el producto');
     }
@@ -94,9 +101,11 @@ export const productController = (
 
     try {
       const useCase = new DeleteProduct(productRepository);
-      const deletedProduct = await useCase.execute(id);
+      const data = await useCase.execute(id);
 
-      return res.status(200).json(deletedProduct);
+      return res
+        .status(200)
+        .json({ message: 'Producto eliminado correctamente', data });
     } catch (error) {
       return handleError(res, error, 'Error al eliminar el producto');
     }
@@ -109,14 +118,14 @@ export const productController = (
       return res.status(400).json({ message: 'El ID no es un número' });
     }
     try {
-      const data = addStockDto.parse(req.body);
+      const dto = addStockDto.parse(req.body);
 
       const useCase = new AddStock(productRepository, providerRepository);
-      await useCase.execute(id, data);
+      const data = await useCase.execute(id, dto);
 
       return res
         .status(200)
-        .json({ message: 'Cantidad agregada correctamente' });
+        .json({ message: 'Cantidad agregada correctamente', data });
     } catch (error) {
       return handleError(res, error, 'Error al agregar los productos');
     }
@@ -130,25 +139,47 @@ export const productController = (
     }
 
     try {
-      const data = removeStockDto.parse(req.body);
+      const dto = removeStockDto.parse(req.body);
 
       const useCase = new RemoveStock(productRepository, providerRepository);
-      await useCase.execute(id, data);
+      const data = await useCase.execute(id, dto);
 
       return res
         .status(200)
-        .json({ message: 'Cantidad retirada correctamente' });
+        .json({ message: 'Cantidad retirada correctamente', data });
     } catch (error) {
       return handleError(res, error, 'Error al retirar los productos');
     }
   },
 
+  updateState: async (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    try {
+      const dto = updateProductStateDto.parse(req.body);
+
+      const useCase = new UpdateProductState(productRepository);
+      const { state } = await useCase.execute(id, dto.state);
+
+      return res
+        .status(200)
+        .json({ message: 'Estado actualizado correctamente', state });
+    } catch (error: any) {
+      return res.status(400).json({ message: error.message });
+    }
+  },
+
   getStockAlerts: async (req: Request, res: Response) => {
     try {
-      const dto: StockAlertDtoType = req.query;
-      const alerts = await productRepository.getStockAlerts(dto);
+      const dto = stockAlertDto.parse(req.query);
 
-      return res.status(200).json(alerts);
+      const useCase = new GetStockAlerts(productRepository);
+      const data = await useCase.execute(dto);
+
+      return res.status(200).json({
+        message: `Productos con stock menor que ${dto.threshold ?? 50}`,
+        data,
+      });
     } catch (error) {
       return handleError(res, error, 'Error al obtener alertas de stock');
     }
@@ -156,23 +187,25 @@ export const productController = (
 
   getInventoryMovementReport: async (req: Request, res: Response) => {
     try {
-      const dto: InventoryReportDtoType = req.query;
-      const report = await productRepository.getInventoryMovementReport(dto);
+      const dto = inventoryMovementReportDto.parse(req.query);
 
-      return res.status(200).json(report);
+      const useCase = new GetInventoryMovementReport(productRepository);
+      const data = await useCase.execute(dto);
+
+      return res.status(200).json(data);
     } catch (error) {
       return handleError(res, error, 'Error al generar reporte de inventario');
     }
   },
 
-  productReport: async (req: Request, res: Response) => {
+  inventoryReport: async (req: Request, res: Response) => {
     try {
-      const dto = productReportDto.parse(req.query);
+      const dto = inventoryReportDto.parse(req.query);
 
-      const useCase = new GetProductReport(productRepository);
-      const products = await useCase.execute(dto);
+      const useCase = new GetInventoryReport(productRepository);
+      const data = await useCase.execute(dto);
 
-      return res.status(200).json(products);
+      return res.status(200).json(data);
     } catch (error: any) {
       return handleError(
         res,

@@ -321,11 +321,11 @@ export type EnumMovementTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumMovementTypeFilter<$PrismaModel> | $Enums.MovementType
 }
 
-export type EnumMovementReasonFilter<$PrismaModel = never> = {
-  equals?: $Enums.MovementReason | Prisma.EnumMovementReasonFieldRefInput<$PrismaModel>
-  in?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel>
-  notIn?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumMovementReasonFilter<$PrismaModel> | $Enums.MovementReason
+export type EnumMovementReasonNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.MovementReason | Prisma.EnumMovementReasonFieldRefInput<$PrismaModel> | null
+  in?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumMovementReasonNullableFilter<$PrismaModel> | $Enums.MovementReason | null
 }
 
 export type EnumMovementTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -338,14 +338,14 @@ export type EnumMovementTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumMovementTypeFilter<$PrismaModel>
 }
 
-export type EnumMovementReasonWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.MovementReason | Prisma.EnumMovementReasonFieldRefInput<$PrismaModel>
-  in?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel>
-  notIn?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumMovementReasonWithAggregatesFilter<$PrismaModel> | $Enums.MovementReason
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumMovementReasonFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumMovementReasonFilter<$PrismaModel>
+export type EnumMovementReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MovementReason | Prisma.EnumMovementReasonFieldRefInput<$PrismaModel> | null
+  in?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumMovementReasonNullableWithAggregatesFilter<$PrismaModel> | $Enums.MovementReason | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMovementReasonNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMovementReasonNullableFilter<$PrismaModel>
 }
 
 export type NestedIntFilter<$PrismaModel = never> = {
@@ -668,11 +668,11 @@ export type NestedEnumMovementTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumMovementTypeFilter<$PrismaModel> | $Enums.MovementType
 }
 
-export type NestedEnumMovementReasonFilter<$PrismaModel = never> = {
-  equals?: $Enums.MovementReason | Prisma.EnumMovementReasonFieldRefInput<$PrismaModel>
-  in?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel>
-  notIn?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumMovementReasonFilter<$PrismaModel> | $Enums.MovementReason
+export type NestedEnumMovementReasonNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.MovementReason | Prisma.EnumMovementReasonFieldRefInput<$PrismaModel> | null
+  in?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumMovementReasonNullableFilter<$PrismaModel> | $Enums.MovementReason | null
 }
 
 export type NestedEnumMovementTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -685,14 +685,14 @@ export type NestedEnumMovementTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumMovementTypeFilter<$PrismaModel>
 }
 
-export type NestedEnumMovementReasonWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.MovementReason | Prisma.EnumMovementReasonFieldRefInput<$PrismaModel>
-  in?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel>
-  notIn?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumMovementReasonWithAggregatesFilter<$PrismaModel> | $Enums.MovementReason
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumMovementReasonFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumMovementReasonFilter<$PrismaModel>
+export type NestedEnumMovementReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MovementReason | Prisma.EnumMovementReasonFieldRefInput<$PrismaModel> | null
+  in?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.MovementReason[] | Prisma.ListEnumMovementReasonFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumMovementReasonNullableWithAggregatesFilter<$PrismaModel> | $Enums.MovementReason | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMovementReasonNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMovementReasonNullableFilter<$PrismaModel>
 }
 
 

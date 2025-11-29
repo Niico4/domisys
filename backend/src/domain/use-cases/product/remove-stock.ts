@@ -4,7 +4,10 @@ import { RemoveStockDtoType } from '@/domain/dtos/products/remove-stock.dto';
 import { MovementType, MovementReason } from '@/generated/enums';
 
 export interface RemoveStockUseCase {
-  execute(productId: number, dto: RemoveStockDtoType): Promise<void>;
+  execute(
+    productId: number,
+    dto: RemoveStockDtoType
+  ): Promise<RemoveStockDtoType>;
 }
 
 export class RemoveStock implements RemoveStockUseCase {
@@ -51,5 +54,13 @@ export class RemoveStock implements RemoveStockUseCase {
       reason: reason as MovementReason,
       date: new Date(),
     });
+
+    return {
+      productId,
+      quantity,
+      providerId,
+      adminId,
+      reason,
+    };
   }
 }
