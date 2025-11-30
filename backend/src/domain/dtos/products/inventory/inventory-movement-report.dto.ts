@@ -16,4 +16,6 @@ export const inventoryMovementReportDto = z.object({
     .optional(),
 });
 
-export type InventoryReportDtoType = z.infer<typeof inventoryMovementReportDto>;
+export type InventoryMovementReportDtoType = z.infer<
+  typeof inventoryMovementReportDto
+>;

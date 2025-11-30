@@ -7,7 +7,7 @@ export interface CreateCategoryUseCase {
 }
 
 export class CreateCategory implements CreateCategoryUseCase {
-  constructor(public readonly repository: CategoryRepository) {}
+  constructor(private readonly repository: CategoryRepository) {}
 
   execute(dto: CreateCategoryDtoType): Promise<CategoryEntity> {
     return this.repository.create(dto);

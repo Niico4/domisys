@@ -9,11 +9,10 @@ export interface UpdateProductUseCase {
 export class UpdateProduct implements UpdateProductUseCase {
   constructor(private readonly repository: ProductRepository) {}
 
-  execute(id: number, dto: UpdateProductDtoType): Promise<ProductEntity> {
+  async execute(id: number, dto: UpdateProductDtoType): Promise<ProductEntity> {
     if (dto.expirationDate) {
       const expiration = new Date(dto.expirationDate);
       const today = new Date();
-
       today.setHours(0, 0, 0, 0);
 
       if (expiration < today) {

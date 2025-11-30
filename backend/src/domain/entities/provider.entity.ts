@@ -1,12 +1,12 @@
 export class ProviderEntity {
   constructor(
-    public id: number,
-    public name: string,
-    public nit: string,
-    public email: string,
-    public contactNumber: string,
-    public address: string,
-    public createdAt: Date,
-    public updatedAt: Date
+    public readonly id: number,
+    public readonly name: string,
+    public readonly nit: string,
+    public readonly email: string,
+    public readonly contactNumber: string,
+    public readonly address: string,
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date
   ) {}
 }

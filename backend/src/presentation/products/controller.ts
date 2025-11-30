@@ -23,8 +23,8 @@ import { GetInventoryMovementReport } from '@/domain/use-cases/product/inventory
 import { GetStockAlerts } from '@/domain/use-cases/product/inventory/get-stock-alerts';
 import { AddStock } from '@/domain/use-cases/product/add-stock';
 import { UpdateProductState } from '@/domain/use-cases/product/update-product-state';
-
-import { handleError } from '../errors/http-error-handler';
+import { ResponseHandler } from '@/shared/http/response-handler';
+import { validateId } from '@/shared/utils/validate-id';
 
 export const productController = (
   productRepository: ProductRepository,
@@ -35,26 +35,34 @@ export const productController = (
       const useCase = new GetAllProducts(productRepository);
       const data = await useCase.execute();
 
-      return res.status(200).json(data);
+      return ResponseHandler.ok(
+        res,
+        'Productos obtenidos correctamente.',
+        data
+      );
     } catch (error) {
-      return handleError(res, error, 'Error al obtener los productos');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al obtener los productos'
+      );
     }
   },
 
   getProductById: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'El ID no es un número' });
-    }
+    const id = validateId(req.params.id);
 
     try {
       const useCase = new GetProductById(productRepository);
       const data = await useCase.execute(id);
 
-      return res.status(200).json(data);
+      return ResponseHandler.ok(res, 'Producto obtenido correctamente.', data);
     } catch (error) {
-      return handleError(res, error, `Error al obtener el producto ${id}`);
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al obtener el producto.'
+      );
     }
   },
 
@@ -65,20 +73,23 @@ export const productController = (
       const useCase = new CreateProduct(productRepository);
       const data = await useCase.execute(dto);
 
-      return res
-        .status(201)
-        .json({ message: 'Producto creado correctamente', data });
+      return ResponseHandler.ok(
+        res,
+        'Producto creado correctamente.',
+        data,
+        201
+      );
     } catch (error) {
-      return handleError(res, error, 'Error al crear el producto');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al crear el producto.'
+      );
     }
   },
 
   updateProduct: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'El ID no es un número' });
-    }
+    const id = validateId(req.params.id);
 
     try {
       const dto = updateProductDto.parse(req.body ?? {});
@@ -86,74 +97,76 @@ export const productController = (
       const useCase = new UpdateProduct(productRepository);
       const data = await useCase.execute(id, dto);
 
-      return res.status(200).json({ message: 'Producto actualizado', data });
+      return ResponseHandler.ok(
+        res,
+        'Producto actualizado correctamente.',
+        data
+      );
     } catch (error) {
-      return handleError(res, error, 'Error al actualizar el producto');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al actualizar el producto.'
+      );
     }
   },
 
   deleteProduct: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'El ID no es un número' });
-    }
+    const id = validateId(req.params.id);
 
     try {
       const useCase = new DeleteProduct(productRepository);
       const data = await useCase.execute(id);
 
-      return res
-        .status(200)
-        .json({ message: 'Producto eliminado correctamente', data });
+      return ResponseHandler.ok(res, 'Producto eliminado correctamente.', data);
     } catch (error) {
-      return handleError(res, error, 'Error al eliminar el producto');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        `Error al eliminar el producto.`
+      );
     }
   },
 
   addStock: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
+    const id = validateId(req.params.id);
 
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'El ID no es un número' });
-    }
     try {
       const dto = addStockDto.parse(req.body);
 
       const useCase = new AddStock(productRepository, providerRepository);
       const data = await useCase.execute(id, dto);
 
-      return res
-        .status(200)
-        .json({ message: 'Cantidad agregada correctamente', data });
+      return ResponseHandler.ok(res, 'Cantidad agregada correctamente.', data);
     } catch (error) {
-      return handleError(res, error, 'Error al agregar los productos');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al agregar la cantidad.'
+      );
     }
   },
 
   removeStock: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'El ID no es un número' });
-    }
-
+    const id = validateId(req.params.id);
     try {
       const dto = removeStockDto.parse(req.body);
 
       const useCase = new RemoveStock(productRepository, providerRepository);
       const data = await useCase.execute(id, dto);
 
-      return res
-        .status(200)
-        .json({ message: 'Cantidad retirada correctamente', data });
+      return ResponseHandler.ok(res, 'Cantidad retirada correctamente.', data);
     } catch (error) {
-      return handleError(res, error, 'Error al retirar los productos');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al retirar la cantidad.'
+      );
     }
   },
 
   updateState: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
+    const id = validateId(req.params.id);
 
     try {
       const dto = updateProductStateDto.parse(req.body);
@@ -161,11 +174,15 @@ export const productController = (
       const useCase = new UpdateProductState(productRepository);
       const { state } = await useCase.execute(id, dto.state);
 
-      return res
-        .status(200)
-        .json({ message: 'Estado actualizado correctamente', state });
+      return ResponseHandler.ok(res, 'Estado actualizado correctamente.', {
+        state,
+      });
     } catch (error: any) {
-      return res.status(400).json({ message: error.message });
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al actualizar el estado del producto.'
+      );
     }
   },
 
@@ -176,12 +193,17 @@ export const productController = (
       const useCase = new GetStockAlerts(productRepository);
       const data = await useCase.execute(dto);
 
-      return res.status(200).json({
-        message: `Productos con stock menor que ${dto.threshold ?? 50}`,
-        data,
-      });
+      return ResponseHandler.ok(
+        res,
+        'Alertas de stock obtenidas correctamente.',
+        data
+      );
     } catch (error) {
-      return handleError(res, error, 'Error al obtener alertas de stock');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al obtener alertas de stock'
+      );
     }
   },
 
@@ -192,9 +214,17 @@ export const productController = (
       const useCase = new GetInventoryMovementReport(productRepository);
       const data = await useCase.execute(dto);
 
-      return res.status(200).json(data);
+      return ResponseHandler.ok(
+        res,
+        'Reporte de movimientos de inventario generado correctamente.',
+        data
+      );
     } catch (error) {
-      return handleError(res, error, 'Error al generar reporte de inventario');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al generar el reporte de movimientos de inventario.'
+      );
     }
   },
 
@@ -205,12 +235,16 @@ export const productController = (
       const useCase = new GetInventoryReport(productRepository);
       const data = await useCase.execute(dto);
 
-      return res.status(200).json(data);
+      return ResponseHandler.ok(
+        res,
+        'Reporte de productos generado correctamente.',
+        data
+      );
     } catch (error: any) {
-      return handleError(
+      return ResponseHandler.handleException(
         res,
         error,
-        'Error al generar el reporte de productos'
+        'Error al generar el reporte de productos.'
       );
     }
   },

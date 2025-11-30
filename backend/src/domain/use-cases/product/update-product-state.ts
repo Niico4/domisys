@@ -1,5 +1,5 @@
-import { ProductRepository } from '@/domain/repositories/product.repository';
 import { ProductEntity } from '@/domain/entities/product.entity';
+import { ProductRepository } from '@/domain/repositories/product.repository';
 import { ProductState } from '@/generated/enums';
 
 export interface UpdateProductStateUseCase {
@@ -11,9 +11,6 @@ export class UpdateProductState implements UpdateProductStateUseCase {
 
   async execute(id: number, state: ProductState): Promise<ProductEntity> {
     const product = await this.productRepository.findById(id);
-    if (!product) {
-      throw new Error(`No se encontró el producto ${id}`);
-    }
 
     if (product.state === state) {
       throw new Error(

@@ -6,7 +6,7 @@ export const updateProductDto = z.object({
     .string({ error: 'El nombre del producto es obligatorio.' })
     .trim()
     .min(3, { error: 'El nombre debe tener mínimo 3 caracteres.' })
-    .max(100, { error: 'El nombre puede tener máximo 10 caracteres.' })
+    .max(100, { error: 'El nombre puede tener máximo 100 caracteres.' })
     .optional(),
 
   price: z.coerce
