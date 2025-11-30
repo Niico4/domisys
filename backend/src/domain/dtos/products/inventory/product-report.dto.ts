@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { ProductState } from '@/generated/enums';
+import { z } from 'zod';
 
 export const inventoryReportDto = z.object({
   categoryId: z.coerce

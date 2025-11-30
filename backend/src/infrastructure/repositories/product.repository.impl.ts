@@ -5,7 +5,7 @@ import { ProductDatasource } from '@/domain/datasources/product.datasource';
 import { ProductRepository } from '@/domain/repositories/product.repository';
 
 import { CreateProductDtoType } from '@/domain/dtos/products/create-product.dto';
-import { InventoryReportDtoType } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
+import { InventoryMovementReportDtoType } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
 import { ProductReportDtoType } from '@/domain/dtos/products/inventory/product-report.dto';
 import { StockAlertDtoType } from '@/domain/dtos/products/inventory/stock-alert.dto';
 import { UpdateProductDtoType } from '@/domain/dtos/products/update-product.dto';
@@ -35,7 +35,7 @@ export const productRepositoryImplementation = (
     datasource.updateState(id, state),
 
   getStockAlerts: (data?: StockAlertDtoType) => datasource.getStockAlerts(data),
-  getInventoryMovementReport: (data: InventoryReportDtoType) =>
+  getInventoryMovementReport: (data: InventoryMovementReportDtoType) =>
     datasource.getInventoryMovementReport(data),
   getInventoryReport: (dto: ProductReportDtoType) =>
     datasource.getInventoryReport(dto),

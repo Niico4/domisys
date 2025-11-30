@@ -1,10 +1,10 @@
+import { AddStockDtoType } from '@/domain/dtos/products/add-stock.dto';
 import { ProductRepository } from '@/domain/repositories/product.repository';
 import { ProviderRepository } from '@/domain/repositories/provider.repository';
-import { AddStockDtoType } from '@/domain/dtos/products/add-stock.dto';
 import { MovementType } from '@/generated/enums';
 
 export interface AddStockUseCase {
-  execute(productId: number, dto: AddStockDtoType): Promise<AddStockDtoType>;
+  execute(productId: number, dto: AddStockDtoType): Promise<void>;
 }
 
 export class AddStock implements AddStockUseCase {
@@ -13,16 +13,11 @@ export class AddStock implements AddStockUseCase {
     private readonly providerRepository: ProviderRepository
   ) {}
 
-  async execute(productId: number, dto: AddStockDtoType) {
+  async execute(productId: number, dto: AddStockDtoType): Promise<void> {
     const { quantity, providerId, adminId } = dto;
 
     const product = await this.productRepository.findById(productId);
-    if (!product) throw new Error('Producto no encontrado');
-
-    const provider = await this.providerRepository.findById(providerId);
-    if (!provider) throw new Error('Proveedor no encontrado');
-
-    if (quantity <= 0) throw new Error('La cantidad debe ser mayor a 0');
+    await this.providerRepository.findById(providerId);
 
     await this.productRepository.update(productId, {
       stock: product.stock + quantity,
@@ -37,12 +32,5 @@ export class AddStock implements AddStockUseCase {
       date: new Date(),
       adminId,
     });
-
-    return {
-      quantity,
-      providerId,
-      adminId,
-      productId,
-    };
   }
 }

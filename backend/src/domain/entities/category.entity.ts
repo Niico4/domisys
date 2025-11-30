@@ -1,9 +1,9 @@
 export class CategoryEntity {
   constructor(
-    public id: number,
-    public name: string,
-    public createdAt: Date,
-    public updatedAt: Date,
-    public description: string | null
+    public readonly id: number,
+    public readonly name: string,
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date,
+    public readonly description: string | null
   ) {}
 }

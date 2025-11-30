@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 import { createCategoryDto } from '@/domain/dtos/categories/create-category.dto';
 import { updateCategoryDto } from '@/domain/dtos/categories/update-category.dto';
@@ -10,93 +9,108 @@ import { CreateCategory } from '@/domain/use-cases/category/create-category';
 import { GetCategoryById } from '@/domain/use-cases/category/get-category-by-id';
 import { DeleteCategory } from '@/domain/use-cases/category/delete-category';
 import { UpdateCategory } from '@/domain/use-cases/category/update-category';
-
-import { handleError } from '../errors/http-error-handler';
+import { ResponseHandler } from '@/shared/http/response-handler';
+import { validateId } from '@/shared/utils/validate-id';
 
 export const categoryController = (categoryRepository: CategoryRepository) => ({
   getAllCategories: async (_req: Request, res: Response) => {
     try {
       const useCase = new GetAllCategories(categoryRepository);
-      const categories = await useCase.execute();
+      const data = await useCase.execute();
 
-      return res.status(200).json(categories);
+      return ResponseHandler.ok(
+        res,
+        'Categorías obtenidas correctamente.',
+        data
+      );
     } catch (error) {
-      return handleError(res, error, 'Error al obtener las categorías');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al obtener las categorías.'
+      );
     }
   },
 
   getCategoryById: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'El ID no es un número' });
-    }
-
     try {
-      const useCase = new GetCategoryById(categoryRepository);
-      const getCategory = await useCase.execute(id);
+      const id = validateId(req.params.id);
 
-      return res.status(200).json(getCategory);
+      const useCase = new GetCategoryById(categoryRepository);
+      const data = await useCase.execute(id);
+
+      return ResponseHandler.ok(res, 'Categoría obtenida correctamente.', data);
     } catch (error) {
-      return handleError(res, error, `Error al obtener la categoría ${id}`);
+      return ResponseHandler.handleException(
+        res,
+        error,
+        `Error al obtener la categoría.`
+      );
     }
   },
 
   createCategory: async (req: Request, res: Response) => {
-    const data = createCategoryDto.parse(req.body);
-
     try {
-      const useCase = new CreateCategory(categoryRepository);
-      const newCategory = await useCase.execute(data);
+      const dto = createCategoryDto.parse(req.body);
 
-      return res.status(201).json(newCategory);
+      const useCase = new CreateCategory(categoryRepository);
+      const data = await useCase.execute(dto);
+
+      return ResponseHandler.ok(
+        res,
+        'Categoría creada correctamente.',
+        data,
+        201
+      );
     } catch (error) {
-      return handleError(res, error, 'Error al crear la categoría');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al crear la categoría.'
+      );
     }
   },
 
   updateCategory: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'El ID no es un número' });
-    }
-
     try {
-      const data = updateCategoryDto.parse(req.body ?? {});
+      const id = validateId(req.params.id);
+      const dto = updateCategoryDto.parse(req.body ?? {});
 
       const useCase = new UpdateCategory(categoryRepository);
-      const updatedCategory = await useCase.execute(id, data);
+      const data = await useCase.execute(id, dto);
 
-      return res.status(200).json(updatedCategory);
+      return ResponseHandler.ok(
+        res,
+        'Categoría actualizada correctamente.',
+        data
+      );
     } catch (error) {
-      if (
-        error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        return res.status(409).json({
-          message: `El ${error.meta?.target} ya está registrado`,
-        });
-      }
-
-      return handleError(res, error, 'Error al actualizar la categoría');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al actualizar la categoría.'
+      );
     }
   },
 
   deleteCategory: async (req: Request, res: Response) => {
-    const id = Number(req.params.id);
-
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'El ID no es un número' });
-    }
-
     try {
-      const useCase = new DeleteCategory(categoryRepository);
-      const deletedCategory = await useCase.execute(id);
+      const id = validateId(req.params.id);
 
-      return res.status(200).json(deletedCategory);
+      const useCase = new DeleteCategory(categoryRepository);
+      const data = await useCase.execute(id);
+
+      return ResponseHandler.ok(
+        res,
+        'Categoría eliminada correctamente.',
+        data
+      );
     } catch (error) {
-      return handleError(res, error, 'Error al eliminar la categoría');
+      return ResponseHandler.handleException(
+        res,
+        error,
+        'Error al eliminar la categoría.'
+      );
     }
   },
 });
