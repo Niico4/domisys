@@ -1,6 +1,8 @@
 import { Router } from 'express';
+
 import { orderDatasourceImplementation } from '@/infrastructure/datasource/order.datasource.impl';
-import { orderRepositoryImplementation } from '@/infrastructure/repositories/order.repository.imp';
+import { orderRepositoryImplementation } from '@/infrastructure/repositories/order.repository.impl';
+
 import { orderController } from './controller';
 
 export const orderRoutes = (): Router => {

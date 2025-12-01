@@ -23,37 +23,43 @@ export class UpdateOrderState implements UpdateOrderStateUseCase {
 
     if (order.state === newState) {
       throw new BadRequestException(
-        `La orden ya tiene el estado '${newState}'.`
+        `El pedido ya tiene el estado '${newState}'.`
       );
     }
 
-    if (newState === 'cancel') {
-      if (order.state === 'delivered') {
+    // cancelar desde cualquier estado (excepto si ya está cancelado/entregado)
+    if (newState === OrderState.cancel) {
+      if (order.state === OrderState.cancel) {
+        throw new BadRequestException('El pedido ya está cancelado.');
+      }
+      if (order.state === OrderState.delivered) {
         throw new BadRequestException(
-          'No se puede cancelar una orden ya entregada.'
+          'No se puede cancelar un pedido ya entregado.'
         );
       }
       return this.repository.updateState(id, newState);
     }
 
-    if (order.state === 'cancel') {
+    if (order.state === OrderState.cancel) {
       throw new BadRequestException(
-        'No se puede modificar una orden cancelada.'
+        'No se puede modificar un pedido cancelado.'
       );
     }
 
-    if (order.state === 'delivered') {
+    if (order.state === OrderState.delivered) {
       throw new BadRequestException(
-        'No se puede modificar una orden ya entregada.'
+        'No se puede modificar un pedido ya entregado.'
       );
     }
 
     const currentIndex = this.stateOrder.indexOf(order.state);
     const newIndex = this.stateOrder.indexOf(newState);
 
-    if (newIndex <= currentIndex) {
+    // avanza exactamente 1 posición
+    if (newIndex !== currentIndex + 1) {
+      const nextState = this.stateOrder[currentIndex + 1];
       throw new BadRequestException(
-        `No se puede retroceder el estado de '${order.state}' a '${newState}'. Solo se permite avanzar linealmente.`
+        `No se puede cambiar de '${order.state}' a '${newState}'. El siguiente estado debe ser '${nextState}'.`
       );
     }
 

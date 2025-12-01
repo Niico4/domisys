@@ -1,10 +1,15 @@
 import { PaymentMethod } from '@/generated/enums';
 import { z } from 'zod';
 
-export const createOrderDto = z.strictObject({
+export const createSaleDto = z.strictObject({
   paymentMethod: z.enum(PaymentMethod, {
     error: 'El método de pago es obligatorio y debe ser válido.',
   }),
+
+  cashierId: z.coerce
+    .number({ error: 'El ID del cajero debe ser un número.' })
+    .int({ error: 'El ID del cajero debe ser un número entero.' })
+    .positive({ error: 'El ID del cajero debe ser un ID válido.' }),
 
   products: z
     .array(
@@ -24,16 +29,6 @@ export const createOrderDto = z.strictObject({
       })
     )
     .min(1, { message: 'Debe haber al menos un producto en el pedido.' }),
-
-  customerId: z.coerce
-    .number({ error: 'El cliente es obligatorio y debe ser un número.' })
-    .int({ error: 'El cliente debe ser un número entero.' })
-    .positive({ error: 'El cliente debe ser un ID válido.' }),
-
-  deliveryId: z.coerce
-    .number({ error: 'El repartidor es obligatorio y debe ser un número.' })
-    .int({ error: 'El repartidor debe ser un número entero.' })
-    .positive({ error: 'El repartidor debe ser un ID válido.' }),
 });
 
-export type CreateOrderDtoType = z.infer<typeof createOrderDto>;
+export type CreateSaleDtoType = z.infer<typeof createSaleDto>;

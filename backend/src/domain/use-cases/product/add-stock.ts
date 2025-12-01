@@ -16,12 +16,8 @@ export class AddStock implements AddStockUseCase {
   async execute(productId: number, dto: AddStockDtoType): Promise<void> {
     const { quantity, providerId, adminId } = dto;
 
-    const product = await this.productRepository.findById(productId);
+    await this.productRepository.findById(productId);
     await this.providerRepository.findById(providerId);
-
-    await this.productRepository.update(productId, {
-      stock: product.stock + quantity,
-    });
 
     await this.productRepository.addStockMovement({
       productId,

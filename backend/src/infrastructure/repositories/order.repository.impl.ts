@@ -1,8 +1,10 @@
+import { OrderState } from '@/generated/enums';
+
 import { OrderDatasource } from '@/domain/datasources/order.datasource';
+import { OrderRepository } from '@/domain/repositories/order.repository';
+
 import { CancelOrderDtoType } from '@/domain/dtos/orders/cancel-order.dto';
 import { OrdersReportDtoType } from '@/domain/dtos/orders/orders-report.dto';
-import { OrderRepository } from '@/domain/repositories/order.repository';
-import { OrderState } from '@/generated/enums';
 
 export const orderRepositoryImplementation = (
   datasource: OrderDatasource

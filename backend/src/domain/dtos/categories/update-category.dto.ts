@@ -10,6 +10,7 @@ export const updateCategoryDto = z
       .max(30, {
         error: 'El nombre de la categoría no puede tener más de 30 caracteres.',
       })
+      .regex(/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$/, 'El nombre no puede contener números')
       .optional(),
 
     description: z

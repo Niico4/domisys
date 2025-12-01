@@ -1,35 +1,20 @@
+import { InventoryMovement, Prisma } from '@/generated/client';
+import { MovementReason, MovementType, ProductState } from '@/generated/enums';
 import { prisma } from '@/data/postgresql';
+
 import { ProductDatasource } from '@/domain/datasources/product.datasource';
+
 import { CreateProductDtoType } from '@/domain/dtos/products/create-product.dto';
 import { InventoryMovementReportDtoType } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
 import { ProductReportDtoType } from '@/domain/dtos/products/inventory/product-report.dto';
 import { StockAlertDtoType } from '@/domain/dtos/products/inventory/stock-alert.dto';
 import { UpdateProductDtoType } from '@/domain/dtos/products/update-product.dto';
+
 import { ProductEntity } from '@/domain/entities/product.entity';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
-import { InventoryMovement, Prisma } from '@/generated/client';
-import { MovementReason, MovementType, ProductState } from '@/generated/enums';
-import { PrismaClientKnownRequestError } from '@/generated/internal/prismaNamespace';
+import { UserRoleService } from '../services/user-role.service';
 
-const handleForeignKeyError = (error: any): never => {
-  if (
-    error instanceof PrismaClientKnownRequestError &&
-    error.code === 'P2003'
-  ) {
-    const field = (error.meta?.field as string)?.toLowerCase() ?? '';
-
-    if (field.includes('category')) {
-      throw new BadRequestException('La categoría proporcionada no existe.');
-    }
-
-    if (field.includes('provider')) {
-      throw new BadRequestException('El proveedor proporcionado no existe.');
-    }
-
-    throw new BadRequestException('Uno de los valores asociados no es válido.');
-  }
-  throw error;
-};
+const userRoleService = new UserRoleService(prisma);
 
 export const productDatasourceImplementation: ProductDatasource = {
   async getAll(): Promise<ProductEntity[]> {
@@ -55,13 +40,13 @@ export const productDatasourceImplementation: ProductDatasource = {
           ...rest,
           image: image ?? null,
           expirationDate: expirationDate ? new Date(expirationDate) : null,
+          stock: data.stock ?? 0,
         },
       });
     } catch (error: any) {
-      if (error.code === 'P2003') {
-        handleForeignKeyError(error);
-      }
-      throw error;
+      throw new BadRequestException(
+        'Uno de los valores asociados no es válido.'
+      );
     }
   },
 
@@ -90,7 +75,9 @@ export const productDatasourceImplementation: ProductDatasource = {
         data: updateData,
       });
     } catch (error: any) {
-      return handleForeignKeyError(error);
+      throw new BadRequestException(
+        'Uno de los valores asociados no es válido.'
+      );
     }
   },
 
@@ -118,8 +105,32 @@ export const productDatasourceImplementation: ProductDatasource = {
     date: Date;
     reason: MovementReason | null;
   }): Promise<void> {
-    try {
-      await prisma.inventoryMovement.create({
+    await userRoleService.validateUserRole(params.adminId, 'admin');
+
+    await prisma.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: { id: params.productId },
+      });
+
+      if (!product) {
+        throw new BadRequestException('Producto no encontrado.');
+      }
+
+      const newStock =
+        params.type === MovementType.in
+          ? product.stock + params.quantity
+          : product.stock - params.quantity;
+
+      if (newStock < 0) {
+        throw new BadRequestException('Stock insuficiente.');
+      }
+
+      await tx.product.update({
+        where: { id: params.productId },
+        data: { stock: newStock },
+      });
+
+      await tx.inventoryMovement.create({
         data: {
           productId: params.productId,
           adminId: params.adminId,
@@ -129,11 +140,7 @@ export const productDatasourceImplementation: ProductDatasource = {
           createdAt: params.date,
         },
       });
-    } catch (error: any) {
-      throw new BadRequestException(
-        'El administrador no existe o no es válido.'
-      );
-    }
+    });
   },
 
   async getStockAlerts(dto?: StockAlertDtoType): Promise<ProductEntity[]> {
@@ -165,11 +172,9 @@ export const productDatasourceImplementation: ProductDatasource = {
       }
     }
 
-    if (dto.productId) {
-      where.productId = dto.productId;
-    }
+    if (dto.productId) where.productId = dto.productId; //TODO: revisar y ajustar filtrado
 
-    return prisma.inventoryMovement.findMany({
+    return await prisma.inventoryMovement.findMany({
       where,
       orderBy: { createdAt: 'desc' },
     });
