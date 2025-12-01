@@ -1,7 +1,9 @@
 import { Router } from 'express';
-import { categoryController } from './controller';
-import { categoryRepositoryImplementation } from '@/infrastructure/repositories/category.repository.imp';
+
+import { categoryRepositoryImplementation } from '@/infrastructure/repositories/category.repository.impl';
 import { categoryDatasourceImplementation } from '@/infrastructure/datasource/category.datasource.impl';
+
+import { categoryController } from './controller';
 
 export const categoriesRoutes = (): Router => {
   const router = Router();

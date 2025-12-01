@@ -3,10 +3,10 @@ import { z } from 'zod';
 
 export const ordersReportDto = z.object({
   startDate: z.iso
-    .datetime({ error: 'El formato de la fecha debe ser válido.' })
+    .date({ error: 'El formato de la fecha debe ser válido.' })
     .optional(),
   endDate: z.iso
-    .datetime({ error: 'El formato de la fecha debe ser válido.' })
+    .date({ error: 'El formato de la fecha debe ser válido.' })
     .optional(),
   state: z
     .enum(OrderState, {

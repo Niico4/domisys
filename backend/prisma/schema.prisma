@@ -24,8 +24,8 @@ enum OrderState {
 }
 
 enum PaymentMethod {
-  Nequi
-  DaviPlata
+  nequi
+  daviplata
   cash
   credit_card
 }
@@ -47,6 +47,7 @@ enum MovementReason {
   sale
   manual_error
   damaged_product
+  return
   other
 }
 

@@ -1,7 +1,7 @@
 import { ProductState } from '@/generated/enums';
 import { z } from 'zod';
 
-export const createProductDto = z.object({
+export const createProductDto = z.strictObject({
   name: z
     .string({ error: 'El nombre del producto es obligatorio.' })
     .trim()
@@ -15,7 +15,8 @@ export const createProductDto = z.object({
   stock: z.coerce
     .number({ error: 'El stock es obligatorio y debe ser un número.' })
     .int({ error: 'El stock debe ser un número entero.' })
-    .nonnegative({ error: 'El stock no puede ser negativo.' }),
+    .nonnegative({ error: 'El stock no puede ser negativo.' })
+    .optional(),
 
   measure: z
     .string({ error: 'La unidad de medida es obligatoria.' })

@@ -31,8 +31,8 @@ export type OrderState = (typeof OrderState)[keyof typeof OrderState]
 
 
 export const PaymentMethod = {
-  Nequi: 'Nequi',
-  DaviPlata: 'DaviPlata',
+  nequi: 'nequi',
+  daviplata: 'daviplata',
   cash: 'cash',
   credit_card: 'credit_card'
 } as const
@@ -63,6 +63,7 @@ export const MovementReason = {
   sale: 'sale',
   manual_error: 'manual_error',
   damaged_product: 'damaged_product',
+  return: 'return',
   other: 'other'
 } as const
 
