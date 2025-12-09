@@ -1,7 +1,13 @@
 import { InventoryMovement, Prisma } from '@/generated/client';
-import { MovementReason, MovementType, ProductState } from '@/generated/enums';
+import {
+  MovementReason,
+  MovementType,
+  ProductState,
+  UserRole,
+} from '@/generated/enums';
 import { prisma } from '@/data/postgresql';
 
+import { ProductEntity } from '@/domain/entities/product.entity';
 import { ProductDatasource } from '@/domain/datasources/product.datasource';
 
 import { CreateProductDtoType } from '@/domain/dtos/products/create-product.dto';
@@ -10,9 +16,9 @@ import { ProductReportDtoType } from '@/domain/dtos/products/inventory/product-r
 import { StockAlertDtoType } from '@/domain/dtos/products/inventory/stock-alert.dto';
 import { UpdateProductDtoType } from '@/domain/dtos/products/update-product.dto';
 
-import { ProductEntity } from '@/domain/entities/product.entity';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
 import { UserRoleService } from '../services/user-role.service';
+import { messages } from '@/shared/messages';
 
 const userRoleService = new UserRoleService(prisma);
 
@@ -25,7 +31,7 @@ export const productDatasourceImplementation: ProductDatasource = {
     const product = await prisma.product.findUnique({ where: { id } });
 
     if (!product) {
-      throw new BadRequestException('No se encontró el producto.');
+      throw new BadRequestException(messages.product.notFound());
     }
 
     return product;
@@ -44,9 +50,7 @@ export const productDatasourceImplementation: ProductDatasource = {
         },
       });
     } catch (error: any) {
-      throw new BadRequestException(
-        'Uno de los valores asociados no es válido.'
-      );
+      throw new BadRequestException(messages.product.invalidAssociatedValue());
     }
   },
 
@@ -75,9 +79,7 @@ export const productDatasourceImplementation: ProductDatasource = {
         data: updateData,
       });
     } catch (error: any) {
-      throw new BadRequestException(
-        'Uno de los valores asociados no es válido.'
-      );
+      throw new BadRequestException(messages.product.invalidAssociatedValue());
     }
   },
 
@@ -105,7 +107,7 @@ export const productDatasourceImplementation: ProductDatasource = {
     date: Date;
     reason: MovementReason | null;
   }): Promise<void> {
-    await userRoleService.validateUserRole(params.adminId, 'admin');
+    await userRoleService.validateUserRole(params.adminId, UserRole.admin);
 
     await prisma.$transaction(async (tx) => {
       const product = await tx.product.findUnique({
@@ -113,7 +115,7 @@ export const productDatasourceImplementation: ProductDatasource = {
       });
 
       if (!product) {
-        throw new BadRequestException('Producto no encontrado.');
+        throw new BadRequestException(messages.product.notFound());
       }
 
       const newStock =
@@ -122,7 +124,9 @@ export const productDatasourceImplementation: ProductDatasource = {
           : product.stock - params.quantity;
 
       if (newStock < 0) {
-        throw new BadRequestException('Stock insuficiente.');
+        throw new BadRequestException(
+          messages.product.insufficientStockGeneric()
+        );
       }
 
       await tx.product.update({

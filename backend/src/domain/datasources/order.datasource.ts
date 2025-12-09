@@ -7,6 +7,8 @@ import { OrderState } from '@/generated/enums';
 export interface OrderDatasource {
   getAll(): Promise<OrderEntity[]>;
   findById(id: number): Promise<OrderEntity>;
+  findByDelivery(deliveryId: number): Promise<OrderEntity[]>;
+  findByCustomer(customerId: number): Promise<OrderEntity[]>;
   createOrder(data: CreateOrderDtoType): Promise<OrderEntity>;
   updateState(id: number, state: OrderState): Promise<OrderEntity>;
   cancelOrder(id: number, dto: CancelOrderDtoType): Promise<OrderEntity>;

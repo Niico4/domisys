@@ -3,6 +3,7 @@ import { ProductEntity } from '@/domain/entities/product.entity';
 import { ProductRepository } from '@/domain/repositories/product.repository';
 
 import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 export interface CreateProductUseCase {
   execute(dto: CreateProductDtoType): Promise<ProductEntity>;
@@ -19,7 +20,7 @@ export class CreateProduct implements CreateProductUseCase {
 
       if (expiration <= today) {
         throw new BadRequestException(
-          'La fecha de vencimiento debe ser mayor a la fecha actual.'
+          messages.product.expirationMustBeFuture()
         );
       }
     }

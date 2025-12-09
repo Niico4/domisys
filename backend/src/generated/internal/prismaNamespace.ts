@@ -391,6 +391,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  AccessCode: 'AccessCode',
   Order: 'Order',
   Address: 'Address',
   Provider: 'Provider',
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "order" | "address" | "provider" | "category" | "product" | "sale" | "saleProduct" | "orderProduct" | "inventoryMovement" | "deliveryRating"
+    modelProps: "user" | "accessCode" | "order" | "address" | "provider" | "category" | "product" | "sale" | "saleProduct" | "orderProduct" | "inventoryMovement" | "deliveryRating"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -491,6 +492,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    AccessCode: {
+      payload: Prisma.$AccessCodePayload<ExtArgs>
+      fields: Prisma.AccessCodeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AccessCodeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AccessCodeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>
+        }
+        findFirst: {
+          args: Prisma.AccessCodeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AccessCodeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>
+        }
+        findMany: {
+          args: Prisma.AccessCodeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>[]
+        }
+        create: {
+          args: Prisma.AccessCodeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>
+        }
+        createMany: {
+          args: Prisma.AccessCodeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AccessCodeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>[]
+        }
+        delete: {
+          args: Prisma.AccessCodeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>
+        }
+        update: {
+          args: Prisma.AccessCodeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>
+        }
+        deleteMany: {
+          args: Prisma.AccessCodeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AccessCodeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AccessCodeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>[]
+        }
+        upsert: {
+          args: Prisma.AccessCodeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AccessCodePayload>
+        }
+        aggregate: {
+          args: Prisma.AccessCodeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAccessCode>
+        }
+        groupBy: {
+          args: Prisma.AccessCodeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccessCodeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AccessCodeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AccessCodeCountAggregateOutputType> | number
         }
       }
     }
@@ -1289,6 +1364,20 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const AccessCodeScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  role: 'role',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  createdBy: 'createdBy'
+} as const
+
+export type AccessCodeScalarFieldEnum = (typeof AccessCodeScalarFieldEnum)[keyof typeof AccessCodeScalarFieldEnum]
+
+
 export const OrderScalarFieldEnum = {
   id: 'id',
   state: 'state',
@@ -1297,7 +1386,8 @@ export const OrderScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   customerId: 'customerId',
-  deliveryId: 'deliveryId'
+  deliveryId: 'deliveryId',
+  addressId: 'addressId'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -1509,6 +1599,34 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'AccessCodeRole'
+ */
+export type EnumAccessCodeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccessCodeRole'>
+    
+
+
+/**
+ * Reference to a field of type 'AccessCodeRole[]'
+ */
+export type ListEnumAccessCodeRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccessCodeRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AccessCodeState'
+ */
+export type EnumAccessCodeStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccessCodeState'>
+    
+
+
+/**
+ * Reference to a field of type 'AccessCodeState[]'
+ */
+export type ListEnumAccessCodeStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccessCodeState[]'>
+    
+
+
+/**
  * Reference to a field of type 'OrderState'
  */
 export type EnumOrderStateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderState'>
@@ -1714,6 +1832,7 @@ export interface PrismaClientOptions {
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  accessCode?: Prisma.AccessCodeOmit
   order?: Prisma.OrderOmit
   address?: Prisma.AddressOmit
   provider?: Prisma.ProviderOmit

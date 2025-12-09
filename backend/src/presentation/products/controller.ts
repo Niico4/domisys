@@ -25,6 +25,7 @@ import { AddStock } from '@/domain/use-cases/product/add-stock';
 import { UpdateProductState } from '@/domain/use-cases/product/update-product-state';
 import { ResponseHandler } from '@/shared/http/response-handler';
 import { validateId } from '@/shared/utils/validate-id';
+import { messages } from '@/shared/messages';
 
 export const productController = (
   productRepository: ProductRepository,
@@ -35,16 +36,12 @@ export const productController = (
       const useCase = new GetAllProducts(productRepository);
       const data = await useCase.execute();
 
-      return ResponseHandler.ok(
-        res,
-        'Productos obtenidos correctamente.',
-        data
-      );
+      return ResponseHandler.ok(res, messages.product.getAllSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener los productos'
+        messages.product.getAllError()
       );
     }
   },
@@ -56,12 +53,12 @@ export const productController = (
       const useCase = new GetProductById(productRepository);
       const data = await useCase.execute(id);
 
-      return ResponseHandler.ok(res, 'Producto obtenido correctamente.', data);
+      return ResponseHandler.ok(res, messages.product.getByIdSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener el producto.'
+        messages.product.getByIdError()
       );
     }
   },
@@ -75,7 +72,7 @@ export const productController = (
 
       return ResponseHandler.ok(
         res,
-        'Producto creado correctamente.',
+        messages.product.createSuccess(),
         data,
         201
       );
@@ -83,7 +80,7 @@ export const productController = (
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al crear el producto.'
+        messages.product.createError()
       );
     }
   },
@@ -97,16 +94,12 @@ export const productController = (
       const useCase = new UpdateProduct(productRepository);
       const data = await useCase.execute(id, dto);
 
-      return ResponseHandler.ok(
-        res,
-        'Producto actualizado correctamente.',
-        data
-      );
+      return ResponseHandler.ok(res, messages.product.updateSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al actualizar el producto.'
+        messages.product.updateError()
       );
     }
   },
@@ -118,12 +111,12 @@ export const productController = (
       const useCase = new DeleteProduct(productRepository);
       const data = await useCase.execute(id);
 
-      return ResponseHandler.ok(res, 'Producto eliminado correctamente.', data);
+      return ResponseHandler.ok(res, messages.product.deleteSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        `Error al eliminar el producto.`
+        messages.product.deleteError()
       );
     }
   },
@@ -134,15 +127,17 @@ export const productController = (
     try {
       const dto = addStockDto.parse(req.body);
 
-      const useCase = new AddStock(productRepository, providerRepository);
-      const data = await useCase.execute(id, dto);
+      const adminId = req.user!.id;
 
-      return ResponseHandler.ok(res, 'Cantidad agregada correctamente.', data);
+      const useCase = new AddStock(productRepository, providerRepository);
+      const data = await useCase.execute(id, dto, adminId);
+
+      return ResponseHandler.ok(res, messages.product.addStockSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al agregar la cantidad.'
+        messages.product.addStockError()
       );
     }
   },
@@ -152,15 +147,21 @@ export const productController = (
     try {
       const dto = removeStockDto.parse(req.body);
 
-      const useCase = new RemoveStock(productRepository, providerRepository);
-      const data = await useCase.execute(id, dto);
+      const adminId = req.user!.id;
 
-      return ResponseHandler.ok(res, 'Cantidad retirada correctamente.', data);
+      const useCase = new RemoveStock(productRepository, providerRepository);
+      const data = await useCase.execute(id, dto, adminId);
+
+      return ResponseHandler.ok(
+        res,
+        messages.product.removeStockSuccess(),
+        data
+      );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al retirar la cantidad.'
+        messages.product.removeStockError()
       );
     }
   },
@@ -174,14 +175,14 @@ export const productController = (
       const useCase = new UpdateProductState(productRepository);
       const { state } = await useCase.execute(id, dto.state);
 
-      return ResponseHandler.ok(res, 'Estado actualizado correctamente.', {
+      return ResponseHandler.ok(res, messages.product.updateStateSuccess(), {
         state,
       });
     } catch (error: any) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al actualizar el estado del producto.'
+        messages.product.updateStateError()
       );
     }
   },
@@ -195,14 +196,14 @@ export const productController = (
 
       return ResponseHandler.ok(
         res,
-        'Alertas de stock obtenidas correctamente.',
+        messages.product.stockAlertsSuccess(),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener alertas de stock'
+        messages.product.stockAlertsError()
       );
     }
   },
@@ -216,14 +217,14 @@ export const productController = (
 
       return ResponseHandler.ok(
         res,
-        'Reporte de movimientos de inventario generado correctamente.',
+        messages.product.movementReportSuccess(),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al generar el reporte de movimientos de inventario.'
+        messages.product.movementReportError()
       );
     }
   },
@@ -237,14 +238,14 @@ export const productController = (
 
       return ResponseHandler.ok(
         res,
-        'Reporte de productos generado correctamente.',
+        messages.product.inventoryReportSuccess(),
         data
       );
     } catch (error: any) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al generar el reporte de productos.'
+        messages.product.inventoryReportError()
       );
     }
   },

@@ -2,7 +2,9 @@ import { OrderState } from '@/generated/enums';
 
 import { OrderEntity } from '@/domain/entities/order.entity';
 import { OrderRepository } from '@/domain/repositories/order.repository';
+
 import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 export interface UpdateOrderStateUseCase {
   execute(id: number, state: OrderState): Promise<OrderEntity>;
@@ -22,34 +24,25 @@ export class UpdateOrderState implements UpdateOrderStateUseCase {
     const order = await this.repository.findById(id);
 
     if (order.state === newState) {
-      throw new BadRequestException(
-        `El pedido ya tiene el estado '${newState}'.`
-      );
+      throw new BadRequestException(messages.order.alreadyInState(newState));
     }
 
-    // cancelar desde cualquier estado (excepto si ya está cancelado/entregado)
     if (newState === OrderState.cancel) {
       if (order.state === OrderState.cancel) {
-        throw new BadRequestException('El pedido ya está cancelado.');
+        throw new BadRequestException(messages.order.alreadyCanceled());
       }
       if (order.state === OrderState.delivered) {
-        throw new BadRequestException(
-          'No se puede cancelar un pedido ya entregado.'
-        );
+        throw new BadRequestException(messages.order.cannotCancelDelivered());
       }
       return this.repository.updateState(id, newState);
     }
 
     if (order.state === OrderState.cancel) {
-      throw new BadRequestException(
-        'No se puede modificar un pedido cancelado.'
-      );
+      throw new BadRequestException(messages.order.cannotModifyCanceled());
     }
 
     if (order.state === OrderState.delivered) {
-      throw new BadRequestException(
-        'No se puede modificar un pedido ya entregado.'
-      );
+      throw new BadRequestException(messages.order.cannotModifyDelivered());
     }
 
     const currentIndex = this.stateOrder.indexOf(order.state);
@@ -57,9 +50,10 @@ export class UpdateOrderState implements UpdateOrderStateUseCase {
 
     // avanza exactamente 1 posición
     if (newIndex !== currentIndex + 1) {
-      const nextState = this.stateOrder[currentIndex + 1];
+      const nextState =
+        this.stateOrder[currentIndex + 1] || OrderState.delivered;
       throw new BadRequestException(
-        `No se puede cambiar de '${order.state}' a '${newState}'. El siguiente estado debe ser '${nextState}'.`
+        messages.order.invalidStateTransition(order.state, newState, nextState)
       );
     }
 

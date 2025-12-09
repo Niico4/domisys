@@ -11,6 +11,8 @@ export const orderRepositoryImplementation = (
 ): OrderRepository => ({
   getAll: () => datasource.getAll(),
   findById: (id: number) => datasource.findById(id),
+  findByDelivery: (deliveryId: number) => datasource.findByDelivery(deliveryId),
+  findByCustomer: (customerId: number) => datasource.findByCustomer(customerId),
   createOrder: (data) => datasource.createOrder(data),
   updateState: (id: number, newState: OrderState) =>
     datasource.updateState(id, newState),

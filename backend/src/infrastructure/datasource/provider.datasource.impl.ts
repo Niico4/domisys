@@ -1,9 +1,12 @@
 import { prisma } from '@/data/postgresql';
+
+import { ProviderEntity } from '@/domain/entities/provider.entity';
+import { ProviderDatasource } from '@/domain/datasources/provider.datasource';
+
 import { CreateProviderDtoType } from '@/domain/dtos/providers/create-provider.dto';
 import { UpdateProviderDtoType } from '@/domain/dtos/providers/update-provider.dto';
-import { ProviderDatasource } from '@/domain/datasources/provider.datasource';
-import { ProviderEntity } from '@/domain/entities/provider.entity';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 export const providerDatasourceImplementation: ProviderDatasource = {
   async getAll(): Promise<ProviderEntity[]> {
@@ -13,8 +16,7 @@ export const providerDatasourceImplementation: ProviderDatasource = {
   async findById(id: number): Promise<ProviderEntity> {
     const provider = await prisma.provider.findUnique({ where: { id } });
 
-    if (!provider)
-      throw new BadRequestException('No se encontró el proveedor.');
+    if (!provider) throw new BadRequestException(messages.provider.notFound());
 
     return provider;
   },

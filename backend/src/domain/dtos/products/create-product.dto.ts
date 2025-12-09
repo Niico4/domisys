@@ -29,7 +29,7 @@ export const createProductDto = z.strictObject({
   lot: z
     .string({ error: 'El lote es obligatorio.' })
     .trim()
-    .min(9, { error: 'El lote debe tener al menos 9 caracteres.' })
+    .min(6, { error: 'El lote debe tener al menos 6 caracteres.' })
     .max(15, { error: 'El lote no puede superar los 15 caracteres.' }),
 
   expirationDate: z.iso

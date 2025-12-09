@@ -11,6 +11,7 @@ import { GetProviderById } from '@/domain/use-cases/provider/get-provider-by-id'
 import { UpdateProvider } from '@/domain/use-cases/provider/update-provider';
 import { ResponseHandler } from '@/shared/http/response-handler';
 import { validateId } from '@/shared/utils/validate-id';
+import { messages } from '@/shared/messages';
 
 export const providerController = (providerRepository: ProviderRepository) => ({
   getAllProviders: async (_req: Request, res: Response) => {
@@ -20,14 +21,14 @@ export const providerController = (providerRepository: ProviderRepository) => ({
 
       return ResponseHandler.ok(
         res,
-        'Proveedores obtenidos correctamente.',
+        messages.provider.getAllSuccess(),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener los proveedores.'
+        messages.provider.getAllError()
       );
     }
   },
@@ -39,12 +40,12 @@ export const providerController = (providerRepository: ProviderRepository) => ({
       const useCase = new GetProviderById(providerRepository);
       const data = await useCase.execute(id);
 
-      return ResponseHandler.ok(res, 'Proveedor obtenido correctamente.', data);
+      return ResponseHandler.ok(res, messages.provider.getByIdSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener el proveedor.'
+        messages.provider.getByIdError()
       );
     }
   },
@@ -58,7 +59,7 @@ export const providerController = (providerRepository: ProviderRepository) => ({
 
       return ResponseHandler.ok(
         res,
-        'Proveedor creado correctamente.',
+        messages.provider.createSuccess(),
         newProvider,
         201
       );
@@ -66,7 +67,7 @@ export const providerController = (providerRepository: ProviderRepository) => ({
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al crear el proveedor.'
+        messages.provider.createError()
       );
     }
   },
@@ -82,14 +83,14 @@ export const providerController = (providerRepository: ProviderRepository) => ({
 
       return ResponseHandler.ok(
         res,
-        'Proveedor actualizado correctamente.',
+        messages.provider.updateSuccess(),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al actualizar el proveedor.'
+        messages.provider.updateError()
       );
     }
   },
@@ -103,14 +104,14 @@ export const providerController = (providerRepository: ProviderRepository) => ({
 
       return ResponseHandler.ok(
         res,
-        'Proveedor eliminado correctamente.',
+        messages.provider.deleteSuccess(),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al eliminar el proveedor.'
+        messages.provider.deleteError()
       );
     }
   },

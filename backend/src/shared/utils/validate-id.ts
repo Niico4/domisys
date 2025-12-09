@@ -1,14 +1,15 @@
 import { BadRequestException } from '../exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 export const validateId = (id: string | undefined): number => {
   if (!id) {
-    throw new BadRequestException('El ID es requerido');
+    throw new BadRequestException(messages.validation.idRequired());
   }
 
   const numericId = Number(id);
 
   if (isNaN(numericId)) {
-    throw new BadRequestException('El ID debe ser un número válido');
+    throw new BadRequestException(messages.validation.idMustBeNumber());
   }
   return numericId;
 };
