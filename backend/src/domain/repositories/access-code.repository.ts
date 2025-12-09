@@ -10,7 +10,7 @@ export interface AccessCodeRepository {
   findActiveByCode(code: string): Promise<AccessCodeEntity | null>;
 
   createCode(
-    data: CreateCodeDtoType & { code: string; expiresAt: Date }
+    data: CreateCodeDtoType & { code: string; expiresAt: Date; adminId: number }
   ): Promise<AccessCodeEntity>;
   updateState(
     id: number,

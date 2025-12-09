@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 
 import { SaleRepository } from '@/domain/repositories/sale.repository';
 
-import { cancelSaleDto } from '@/domain/dtos/sales/cancel-sale.dto';
 import { createSaleDto } from '@/domain/dtos/sales/create-sale.dto';
 import { salesReportDto } from '@/domain/dtos/sales/sales-report.dto';
 
@@ -53,9 +52,10 @@ export const saleController = (saleRepository: SaleRepository) => ({
   createSale: async (req: Request, res: Response) => {
     try {
       const dto = createSaleDto.parse(req.body);
+      const cashierId = req.user!.id;
 
       const useCase = new CreateSale(saleRepository);
-      const data = await useCase.execute(dto);
+      const data = await useCase.execute(dto, cashierId);
 
       return ResponseHandler.ok(res, messages.sale.createSuccess(), data);
     } catch (error) {
@@ -70,10 +70,10 @@ export const saleController = (saleRepository: SaleRepository) => ({
   cancelSale: async (req: Request, res: Response) => {
     try {
       const id = validateId(req.params.id);
-      const dto = cancelSaleDto.parse(req.body);
+      const cashierId = req.user!.id;
 
       const useCase = new CancelSale(saleRepository);
-      const data = await useCase.execute(id, dto);
+      const data = await useCase.execute(id, cashierId);
 
       return ResponseHandler.ok(res, messages.sale.cancelSuccess(), data);
     } catch (error) {
@@ -109,11 +109,7 @@ export const saleController = (saleRepository: SaleRepository) => ({
       const useCase = new GetSalesReport(saleRepository);
       const data = await useCase.execute(dto);
 
-      return ResponseHandler.ok(
-        res,
-        messages.sale.reportSuccess(),
-        data
-      );
+      return ResponseHandler.ok(res, messages.sale.reportSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,

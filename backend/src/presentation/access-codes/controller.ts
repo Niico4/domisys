@@ -8,7 +8,6 @@ import { CreateAccessCode } from '@/domain/use-cases/access-code/create-code';
 import { ResponseHandler } from '@/shared/http/response-handler';
 import { validateId } from '@/shared/utils/validate-id';
 import { messages } from '@/shared/messages';
-import { BadRequestException } from '@/shared/exceptions/bad-request';
 
 export const accessCodeController = (
   accessCodeRepository: AccessCodeRepository
@@ -48,15 +47,11 @@ export const accessCodeController = (
 
   createCode: async (req: Request, res: Response) => {
     try {
+      const dto = createCodeDto.parse(req.body);
       const createdBy = req.user!.id;
-      if (!createdBy) {
-        return new BadRequestException(messages.auth.unauthorized());
-      }
-
-      const dto = createCodeDto.parse({ ...req.body, createdBy });
 
       const useCase = new CreateAccessCode(accessCodeRepository);
-      const data = await useCase.execute(dto);
+      const data = await useCase.execute({ ...dto, createdBy });
 
       return ResponseHandler.ok(
         res,

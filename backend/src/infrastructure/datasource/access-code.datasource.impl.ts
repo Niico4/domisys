@@ -40,14 +40,16 @@ export const accessCodeDatasourceImplementation: AccessCodeDatasource = {
   },
 
   async createCode(
-    data: CreateCodeDtoType & { code: string; expiresAt: Date }
+    data: CreateCodeDtoType & { code: string; expiresAt: Date; adminId: number }
   ): Promise<AccessCodeEntity> {
     return await prisma.accessCode.create({
       data: {
         code: data.code,
         role: data.role,
         expiresAt: data.expiresAt,
-        createdBy: data.createdBy,
+        admin: {
+          connect: { id: data.adminId },
+        },
       },
     });
   },

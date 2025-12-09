@@ -11,7 +11,6 @@ import {
 import { OrderEntity } from '@/domain/entities/order.entity';
 import { OrderDatasource } from '@/domain/datasources/order.datasource';
 
-import { CancelOrderDtoType } from '@/domain/dtos/orders/cancel-order.dto';
 import { CreateOrderDtoType } from '@/domain/dtos/orders/create-order.dto';
 import { OrdersReportDtoType } from '@/domain/dtos/orders/orders-report.dto';
 
@@ -160,13 +159,7 @@ export const orderDatasourceImplementation: OrderDatasource = {
     });
   },
 
-  async cancelOrder(id: number, dto: CancelOrderDtoType): Promise<OrderEntity> {
-    await this.findById(id);
-    const { customerId, deliveryId, ...data } = dto;
-
-    await userRoleService.validateUserRole(customerId, UserRole.customer);
-    await userRoleService.validateUserRole(deliveryId, UserRole.delivery);
-
+  async cancelOrder(id: number): Promise<OrderEntity> {
     return await prisma.$transaction(async (tx) => {
       const orderWithProducts = await tx.order.findUnique({
         where: { id },
@@ -194,7 +187,8 @@ export const orderDatasourceImplementation: OrderDatasource = {
             quantity: orderProduct.quantity,
             movementType: MovementType.in,
             reason: MovementReason.return,
-            adminId: deliveryId,
+            adminId:
+              orderWithProducts.deliveryId || orderWithProducts.customerId || 0,
             createdAt: new Date(),
           },
         });
@@ -202,7 +196,7 @@ export const orderDatasourceImplementation: OrderDatasource = {
 
       const canceledOrder = await tx.order.update({
         where: { id },
-        data: { ...data, state: OrderState.cancel },
+        data: { state: OrderState.cancel },
         include: { orderProducts: true },
       });
 

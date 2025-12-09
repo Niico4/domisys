@@ -3,13 +3,13 @@ import { AccessCodeEntity } from '@/domain/entities/access-code.entity';
 import { AccessCodeRepository } from '@/domain/repositories/access-code.repository';
 
 export interface CreateAccessCodeUseCase {
-  execute(dto: CreateCodeDtoType): Promise<AccessCodeEntity>;
+  execute(dto: CreateCodeDtoType & { createdBy: number }): Promise<AccessCodeEntity>;
 }
 
 export class CreateAccessCode implements CreateAccessCodeUseCase {
   constructor(private readonly repository: AccessCodeRepository) {}
 
-  async execute(dto: CreateCodeDtoType): Promise<AccessCodeEntity> {
+  async execute(dto: CreateCodeDtoType & { createdBy: number }): Promise<AccessCodeEntity> {
     const code = this.generateUniqueCode();
     const expiresAt = this.calculateExpirationDate();
 
@@ -19,9 +19,10 @@ export class CreateAccessCode implements CreateAccessCodeUseCase {
     }
 
     return this.repository.createCode({
-      ...dto,
+      role: dto.role,
       code,
       expiresAt,
+      adminId: dto.createdBy,
     });
   }
 

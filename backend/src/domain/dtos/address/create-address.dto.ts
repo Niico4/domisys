@@ -6,7 +6,14 @@ export const createAddressDto = z.object({
   neighborhood: z.string().min(1, 'El barrio es requerido').max(50),
   street: z.string().min(1, 'La calle es requerida').max(50),
   details: z.string().optional().nullable(),
-  isDefault: z.boolean().optional().default(false),
+  isDefault: z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .transform((val) => {
+      if (val === undefined) return false;
+      if (typeof val === 'boolean') return val;
+      return val === 'true';
+    }),
 });
 
 export type CreateAddressDtoType = z.infer<typeof createAddressDto>;

@@ -3,7 +3,6 @@ import { OrderState } from '@/generated/enums';
 import { OrderDatasource } from '@/domain/datasources/order.datasource';
 import { OrderRepository } from '@/domain/repositories/order.repository';
 
-import { CancelOrderDtoType } from '@/domain/dtos/orders/cancel-order.dto';
 import { OrdersReportDtoType } from '@/domain/dtos/orders/orders-report.dto';
 
 export const orderRepositoryImplementation = (
@@ -16,8 +15,7 @@ export const orderRepositoryImplementation = (
   createOrder: (data) => datasource.createOrder(data),
   updateState: (id: number, newState: OrderState) =>
     datasource.updateState(id, newState),
-  cancelOrder: (id: number, dto: CancelOrderDtoType) =>
-    datasource.cancelOrder(id, dto),
+  cancelOrder: (id: number) => datasource.cancelOrder(id),
   deleteOrder: (id: number) => datasource.deleteOrder(id),
 
   getOrdersReport: (dto: OrdersReportDtoType) =>

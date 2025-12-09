@@ -29,13 +29,12 @@ export const saleRoutes = (): Router => {
     hasRole(UserRole.cashier, UserRole.admin),
     controller.getAllSales
   );
-  router.post('/', hasRole(UserRole.cashier), controller.createSale);
   router.get(
     '/:id',
     hasRole(UserRole.cashier, UserRole.admin),
     controller.getSaleById
   );
-
+  router.post('/', hasRole(UserRole.cashier), controller.createSale);
   router.patch(
     '/:id/cancel',
     hasRole(UserRole.cashier, UserRole.admin),
