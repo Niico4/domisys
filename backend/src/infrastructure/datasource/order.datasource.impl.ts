@@ -1,6 +1,12 @@
 import { Prisma } from '@/generated/client';
 import { prisma } from '@/data/postgresql';
-import { MovementReason, MovementType, OrderState } from '@/generated/enums';
+import {
+  MovementReason,
+  MovementType,
+  OrderState,
+  ProductState,
+  UserRole,
+} from '@/generated/enums';
 
 import { OrderEntity } from '@/domain/entities/order.entity';
 import { OrderDatasource } from '@/domain/datasources/order.datasource';
@@ -10,9 +16,12 @@ import { CreateOrderDtoType } from '@/domain/dtos/orders/create-order.dto';
 import { OrdersReportDtoType } from '@/domain/dtos/orders/orders-report.dto';
 
 import { UserRoleService } from '@/infrastructure/services/user-role.service';
+import { DeliveryAssignmentService } from '@/shared/services/delivery-assignment.service';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 const userRoleService = new UserRoleService(prisma);
+const deliveryAssignmentService = new DeliveryAssignmentService();
 
 export const orderDatasourceImplementation: OrderDatasource = {
   async getAll(): Promise<OrderEntity[]> {
@@ -27,27 +36,39 @@ export const orderDatasourceImplementation: OrderDatasource = {
       include: { orderProducts: true },
     });
 
-    if (!order) throw new BadRequestException('No se encontró el pedido.');
+    if (!order) throw new BadRequestException(messages.order.notFound());
 
     return order;
   },
 
   async createOrder(data: CreateOrderDtoType): Promise<OrderEntity> {
-    const { products, customerId, deliveryId, ...orderData } = data;
+    const { products, customerId, ...orderData } = data;
 
-    await userRoleService.validateUserRole(customerId, 'customer');
-    await userRoleService.validateUserRole(deliveryId, 'delivery');
+    await userRoleService.validateUserRole(customerId, UserRole.customer);
+
+    // Validar que la dirección pertenezca al customer
+    const address = await prisma.address.findUnique({
+      where: { id: orderData.addressId },
+    });
+
+    if (!address) {
+      throw new BadRequestException(messages.address.notFound());
+    }
+
+    if (address.userId !== customerId) {
+      throw new BadRequestException(messages.address.doesNotBelongToUser());
+    }
+
+    const assignedDeliveryId = await deliveryAssignmentService.assignDelivery();
 
     const productIds = products.map((p) => p.productId);
     const existingProducts = await prisma.product.findMany({
-      where: { id: { in: productIds }, state: 'active' },
+      where: { id: { in: productIds }, state: ProductState.active },
       select: { id: true, name: true, stock: true, price: true },
     });
 
     if (existingProducts.length !== products.length) {
-      throw new BadRequestException(
-        'Hay productos inválidos o inactivos en el pedido.'
-      );
+      throw new BadRequestException(messages.product.invalidOrInactive());
     }
 
     // validar stock para cada producto
@@ -58,19 +79,22 @@ export const orderDatasourceImplementation: OrderDatasource = {
 
       if (!product) {
         throw new BadRequestException(
-          `Producto con ID ${orderProduct.productId} no encontrado.`
+          messages.product.notFoundWithId(orderProduct.productId)
         );
       }
 
       if (product.stock < orderProduct.quantity) {
         throw new BadRequestException(
-          `Stock insuficiente para "${product.name}". Disponible: ${product.stock}, Requerido: ${orderProduct.quantity}`
+          messages.product.insufficientStock(
+            product.name,
+            product.stock,
+            orderProduct.quantity
+          )
         );
       }
     }
 
     return await prisma.$transaction(async (tx) => {
-      // Calcular total automáticamente
       let totalAmount: number = 0;
 
       for (const orderProduct of products) {
@@ -94,7 +118,7 @@ export const orderDatasourceImplementation: OrderDatasource = {
             quantity: orderProduct.quantity,
             movementType: MovementType.out,
             reason: MovementReason.sale,
-            adminId: deliveryId,
+            adminId: assignedDeliveryId,
             createdAt: new Date(),
           },
         });
@@ -103,9 +127,9 @@ export const orderDatasourceImplementation: OrderDatasource = {
       const newOrder = await tx.order.create({
         data: {
           ...orderData,
-          totalAmount, // Calculado automáticamente
+          totalAmount,
           state: OrderState.pending,
-          deliveryId,
+          deliveryId: assignedDeliveryId,
           customerId,
           orderProducts: {
             create: products.map((p) => {
@@ -140,8 +164,8 @@ export const orderDatasourceImplementation: OrderDatasource = {
     await this.findById(id);
     const { customerId, deliveryId, ...data } = dto;
 
-    await userRoleService.validateUserRole(customerId, 'customer');
-    await userRoleService.validateUserRole(deliveryId, 'delivery');
+    await userRoleService.validateUserRole(customerId, UserRole.customer);
+    await userRoleService.validateUserRole(deliveryId, UserRole.delivery);
 
     return await prisma.$transaction(async (tx) => {
       const orderWithProducts = await tx.order.findUnique({
@@ -150,7 +174,7 @@ export const orderDatasourceImplementation: OrderDatasource = {
       });
 
       if (!orderWithProducts) {
-        throw new BadRequestException('Pedido no encontrado.');
+        throw new BadRequestException(messages.order.notFound());
       }
 
       for (const orderProduct of orderWithProducts.orderProducts) {
@@ -191,6 +215,22 @@ export const orderDatasourceImplementation: OrderDatasource = {
 
     return await prisma.order.delete({
       where: { id },
+    });
+  },
+
+  async findByDelivery(deliveryId: number): Promise<OrderEntity[]> {
+    return await prisma.order.findMany({
+      where: { deliveryId },
+      include: { orderProducts: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  },
+
+  async findByCustomer(customerId: number): Promise<OrderEntity[]> {
+    return await prisma.order.findMany({
+      where: { customerId },
+      include: { orderProducts: true },
+      orderBy: { createdAt: 'desc' },
     });
   },
 

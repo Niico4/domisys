@@ -9,8 +9,10 @@ import { CreateCategory } from '@/domain/use-cases/category/create-category';
 import { GetCategoryById } from '@/domain/use-cases/category/get-category-by-id';
 import { DeleteCategory } from '@/domain/use-cases/category/delete-category';
 import { UpdateCategory } from '@/domain/use-cases/category/update-category';
+
 import { ResponseHandler } from '@/shared/http/response-handler';
 import { validateId } from '@/shared/utils/validate-id';
+import { messages } from '@/shared/messages';
 
 export const categoryController = (categoryRepository: CategoryRepository) => ({
   getAllCategories: async (_req: Request, res: Response) => {
@@ -18,16 +20,12 @@ export const categoryController = (categoryRepository: CategoryRepository) => ({
       const useCase = new GetAllCategories(categoryRepository);
       const data = await useCase.execute();
 
-      return ResponseHandler.ok(
-        res,
-        'Categorías obtenidas correctamente.',
-        data
-      );
+      return ResponseHandler.ok(res, messages.category.getAllSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener las categorías.'
+        messages.category.getAllError()
       );
     }
   },
@@ -39,12 +37,12 @@ export const categoryController = (categoryRepository: CategoryRepository) => ({
       const useCase = new GetCategoryById(categoryRepository);
       const data = await useCase.execute(id);
 
-      return ResponseHandler.ok(res, 'Categoría obtenida correctamente.', data);
+      return ResponseHandler.ok(res, messages.category.getByIdSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        `Error al obtener la categoría.`
+        messages.category.getByIdError()
       );
     }
   },
@@ -58,7 +56,7 @@ export const categoryController = (categoryRepository: CategoryRepository) => ({
 
       return ResponseHandler.ok(
         res,
-        'Categoría creada correctamente.',
+        messages.category.created(data.name),
         data,
         201
       );
@@ -66,7 +64,7 @@ export const categoryController = (categoryRepository: CategoryRepository) => ({
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al crear la categoría.'
+        messages.category.createError()
       );
     }
   },
@@ -74,21 +72,21 @@ export const categoryController = (categoryRepository: CategoryRepository) => ({
   updateCategory: async (req: Request, res: Response) => {
     try {
       const id = validateId(req.params.id);
-      const dto = updateCategoryDto.parse(req.body ?? {});
+      const dto = updateCategoryDto.parse(req.body);
 
       const useCase = new UpdateCategory(categoryRepository);
       const data = await useCase.execute(id, dto);
 
       return ResponseHandler.ok(
         res,
-        'Categoría actualizada correctamente.',
+        messages.category.updated(data.name),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al actualizar la categoría.'
+        messages.category.updateError()
       );
     }
   },
@@ -102,14 +100,14 @@ export const categoryController = (categoryRepository: CategoryRepository) => ({
 
       return ResponseHandler.ok(
         res,
-        'Categoría eliminada correctamente.',
+        messages.category.deleted(data.name),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al eliminar la categoría.'
+        messages.category.deleteError()
       );
     }
   },

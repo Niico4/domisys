@@ -15,6 +15,7 @@ import { GetSalesReport } from '@/domain/use-cases/sale/get-sales-report';
 
 import { ResponseHandler } from '@/shared/http/response-handler';
 import { validateId } from '@/shared/utils/validate-id';
+import { messages } from '@/shared/messages';
 
 export const saleController = (saleRepository: SaleRepository) => ({
   getAllSales: async (_req: Request, res: Response) => {
@@ -22,12 +23,12 @@ export const saleController = (saleRepository: SaleRepository) => ({
       const useCase = new GetAllSales(saleRepository);
       const data = await useCase.execute();
 
-      return ResponseHandler.ok(res, 'Ventas obtenidas correctamente.', data);
+      return ResponseHandler.ok(res, messages.sale.getAllSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener las ventas.'
+        messages.sale.getAllError()
       );
     }
   },
@@ -39,12 +40,12 @@ export const saleController = (saleRepository: SaleRepository) => ({
       const useCase = new GetSaleById(saleRepository);
       const data = await useCase.execute(id);
 
-      return ResponseHandler.ok(res, 'Venta obtenida correctamente.', data);
+      return ResponseHandler.ok(res, messages.sale.getByIdSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener la venta.'
+        messages.sale.getByIdError()
       );
     }
   },
@@ -56,12 +57,12 @@ export const saleController = (saleRepository: SaleRepository) => ({
       const useCase = new CreateSale(saleRepository);
       const data = await useCase.execute(dto);
 
-      return ResponseHandler.ok(res, 'Venta creada correctamente.', data);
+      return ResponseHandler.ok(res, messages.sale.createSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al crear la venta.'
+        messages.sale.createError()
       );
     }
   },
@@ -74,12 +75,12 @@ export const saleController = (saleRepository: SaleRepository) => ({
       const useCase = new CancelSale(saleRepository);
       const data = await useCase.execute(id, dto);
 
-      return ResponseHandler.ok(res, 'Venta cancelada correctamente.', data);
+      return ResponseHandler.ok(res, messages.sale.cancelSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al cancelar la venta.'
+        messages.sale.cancelError()
       );
     }
   },
@@ -91,12 +92,12 @@ export const saleController = (saleRepository: SaleRepository) => ({
       const useCase = new DeleteSale(saleRepository);
       const data = await useCase.execute(id);
 
-      return ResponseHandler.ok(res, 'Venta eliminada correctamente.', data);
+      return ResponseHandler.ok(res, messages.sale.deleteSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al eliminar la venta.'
+        messages.sale.deleteError()
       );
     }
   },
@@ -110,14 +111,14 @@ export const saleController = (saleRepository: SaleRepository) => ({
 
       return ResponseHandler.ok(
         res,
-        'Reporte de ventas obtenido correctamente',
+        messages.sale.reportSuccess(),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener el reporte de ventas.'
+        messages.sale.reportError()
       );
     }
   },

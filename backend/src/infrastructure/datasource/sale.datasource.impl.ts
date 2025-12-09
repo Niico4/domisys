@@ -1,13 +1,23 @@
+import { Prisma } from '@/generated/client';
+import {
+  MovementReason,
+  MovementType,
+  ProductState,
+  SaleState,
+  UserRole,
+} from '@/generated/enums';
 import { prisma } from '@/data/postgresql';
-import { SaleDatasource } from '@/domain/datasources/sale.datasource';
-import { CreateSaleDtoType } from '@/domain/dtos/sales/create-sale.dto';
+
 import { SaleEntity } from '@/domain/entities/sale.entity';
+import { SaleDatasource } from '@/domain/datasources/sale.datasource';
+
+import { CreateSaleDtoType } from '@/domain/dtos/sales/create-sale.dto';
+import { CancelSaleDtoType } from '@/domain/dtos/sales/cancel-sale.dto';
+import { SalesReportDtoType } from '@/domain/dtos/sales/sales-report.dto';
+
 import { UserRoleService } from '../services/user-role.service';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
-import { CancelSaleDtoType } from '@/domain/dtos/sales/cancel-sale.dto';
-import { MovementReason, MovementType, SaleState } from '@/generated/enums';
-import { Prisma } from '@/generated/client';
-import { SalesReportDtoType } from '@/domain/dtos/sales/sales-report.dto';
+import { messages } from '@/shared/messages';
 
 const userRoleService = new UserRoleService(prisma);
 
@@ -24,7 +34,7 @@ export const saleDatasourceImplementation: SaleDatasource = {
       include: { saleProducts: true },
     });
 
-    if (!sale) throw new BadRequestException('No se encontró la venta.');
+    if (!sale) throw new BadRequestException(messages.sale.notFound());
 
     return sale;
   },
@@ -32,18 +42,19 @@ export const saleDatasourceImplementation: SaleDatasource = {
   async createSale(data: CreateSaleDtoType): Promise<SaleEntity> {
     const { products, ...saleData } = data;
 
-    await userRoleService.validateUserRole(saleData.cashierId, 'cashier');
+    await userRoleService.validateUserRole(
+      saleData.cashierId,
+      UserRole.cashier
+    );
 
     const productIds = products.map((p) => p.productId);
     const existingProducts = await prisma.product.findMany({
-      where: { id: { in: productIds }, state: 'active' },
+      where: { id: { in: productIds }, state: ProductState.active },
       select: { id: true, name: true, stock: true, price: true },
     });
 
     if (existingProducts.length !== products.length) {
-      throw new BadRequestException(
-        'Hay productos inválidos o inactivos en la venta.'
-      );
+      throw new BadRequestException(messages.product.invalidOrInactive());
     }
 
     // validar stock para cada producto
@@ -54,19 +65,22 @@ export const saleDatasourceImplementation: SaleDatasource = {
 
       if (!product) {
         throw new BadRequestException(
-          `Producto con ID ${saleProduct.productId} no encontrado.`
+          messages.product.notFoundWithId(saleProduct.productId)
         );
       }
 
       if (product.stock < saleProduct.quantity) {
         throw new BadRequestException(
-          `Stock insuficiente para "${product.name}". Disponible: ${product.stock}, Requerido: ${saleProduct.quantity}`
+          messages.product.insufficientStock(
+            product.name,
+            product.stock,
+            saleProduct.quantity
+          )
         );
       }
     }
 
     return await prisma.$transaction(async (tx) => {
-      // Calcular total automáticamente
       let totalAmount: number = 0;
 
       for (const saleProduct of products) {
@@ -99,7 +113,7 @@ export const saleDatasourceImplementation: SaleDatasource = {
       const newSale = await tx.sale.create({
         data: {
           ...saleData,
-          totalAmount, // Calculado automáticamente
+          totalAmount,
           state: SaleState.sold,
           saleProducts: {
             create: products.map((p) => {
@@ -125,7 +139,7 @@ export const saleDatasourceImplementation: SaleDatasource = {
     await this.findById(id);
     const { cashierId } = dto;
 
-    await userRoleService.validateUserRole(cashierId, 'cashier');
+    await userRoleService.validateUserRole(cashierId, UserRole.cashier);
 
     return await prisma.$transaction(async (tx) => {
       const saleWithProducts = await tx.sale.findUnique({
@@ -134,7 +148,7 @@ export const saleDatasourceImplementation: SaleDatasource = {
       });
 
       if (!saleWithProducts) {
-        throw new BadRequestException('Venta no encontrada.');
+        throw new BadRequestException(messages.sale.notFound());
       }
 
       // devolver stock de cada producto

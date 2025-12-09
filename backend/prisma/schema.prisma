@@ -56,6 +56,19 @@ enum ProductState {
   inactive
 }
 
+enum AccessCodeRole {
+  admin
+  delivery
+  cashier
+}
+
+enum AccessCodeState {
+  active
+  used
+  expired
+  disabled
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   role        UserRole @default(customer)
@@ -74,11 +87,32 @@ model User {
   addresses              Address[]           @relation("UserAddress")
   inventoryMovements     InventoryMovement[] @relation("UserInventory")
   customerDeliveryRating DeliveryRating[]    @relation("CustomerToDeliveryRating")
+  accessCodes            AccessCode[]
 
   @@index([role])
   @@index([name])
   @@index([lastName])
   @@map("user")
+}
+
+model AccessCode {
+  id        Int             @id @default(autoincrement())
+  code      String          @unique @db.VarChar(50)
+  role      AccessCodeRole
+  status    AccessCodeState @default(active)
+  expiresAt DateTime?       @map("expires_at") @db.Timestamp(6)
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Foreign Keys
+  createdBy Int @map("created_by")
+
+  // Relations
+  admin User @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@index([role])
+  @@index([status])
+  @@map("access_code")
 }
 
 model Order {
@@ -92,10 +126,12 @@ model Order {
   // Foreign Keys
   customerId Int? @map("customer_id")
   deliveryId Int? @map("delivery_id")
+  addressId  Int  @map("address_id")
 
   // Relations
-  customer User? @relation("OrderCustomer", fields: [customerId], references: [id], onDelete: SetNull)
-  delivery User? @relation("OrderDelivery", fields: [deliveryId], references: [id], onDelete: SetNull)
+  customer User?    @relation("OrderCustomer", fields: [customerId], references: [id], onDelete: SetNull)
+  delivery User?    @relation("OrderDelivery", fields: [deliveryId], references: [id], onDelete: SetNull)
+  address  Address  @relation("OrderAddress", fields: [addressId], references: [id], onDelete: Restrict)
 
   orderProducts       OrderProduct[]   @relation("OrderToOrderProduct")
   orderDeliveryRating DeliveryRating[] @relation("OrderToDeliveryRating")
@@ -103,6 +139,7 @@ model Order {
   @@index([state])
   @@index([paymentMethod])
   @@index([createdAt])
+  @@index([addressId])
   @@map("order")
 }
 
@@ -121,7 +158,8 @@ model Address {
   userId Int @map("user_id")
 
   // Relations
-  user User @relation("UserAddress", fields: [userId], references: [id], onDelete: Cascade)
+  user   User    @relation("UserAddress", fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[] @relation("OrderAddress")
 
   @@index([alias])
   @@map("address")

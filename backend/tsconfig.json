@@ -12,6 +12,9 @@
     "moduleResolution": "node",
     "types": ["node"],
 
+    // para React Email
+    "jsx": "react-jsx",
+
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,

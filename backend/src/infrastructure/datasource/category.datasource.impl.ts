@@ -4,6 +4,7 @@ import { UpdateCategoryDtoType } from '@/domain/dtos/categories/update-category.
 import { CategoryDatasource } from '@/domain/datasources/category.datasource';
 import { CategoryEntity } from '@/domain/entities/category.entity';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 export const categoryDatasourceImplementation: CategoryDatasource = {
   async getAll(): Promise<CategoryEntity[]> {
@@ -13,8 +14,7 @@ export const categoryDatasourceImplementation: CategoryDatasource = {
   async findById(id: number): Promise<CategoryEntity> {
     const category = await prisma.category.findUnique({ where: { id } });
 
-    if (!category)
-      throw new BadRequestException('No se encontró la categoría.');
+    if (!category) throw new BadRequestException(messages.category.notFound());
 
     return category;
   },

@@ -12,8 +12,8 @@ export const createProviderDto = z.strictObject({
     .max(100, { error: 'El nombre puede tener máximo 100 caracteres.' }),
   nit: z
     .string({ error: 'El NIT debe ser un texto válido.' })
-    .regex(/^[0-9]{10}$/, {
-      error: 'El NIT debe tener exactamente 10 dígitos.',
+    .regex(/^[0-9]{9,10}(-?[0-9])?$/, {
+      error: 'El NIT debe tener entre 9 y 11 dígitos (puede incluir guión).',
     })
     .trim(),
   email: z
@@ -31,7 +31,7 @@ export const createProviderDto = z.strictObject({
   address: z
     .string({ error: 'La dirección debe ser un texto válido.' })
     .trim()
-    .min(10, { error: 'La dirección debe tener mínimo 10 caracteres.' })
+    .min(5, { error: 'La dirección debe tener mínimo 5 caracteres.' })
     .max(100, { error: 'La dirección puede tener máximo 100 caracteres.' }),
 });
 export type CreateProviderDtoType = z.infer<typeof createProviderDto>;

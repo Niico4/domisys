@@ -28,6 +28,7 @@ export class ResponseHandler {
 
       switch (error.code) {
         case 'P2002': // unique constraint
+          status = 409;
           msg = 'Ya existe un registro con estos valores únicos.';
           break;
         case 'P2003': // foreign key

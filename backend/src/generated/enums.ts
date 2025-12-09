@@ -76,3 +76,22 @@ export const ProductState = {
 } as const
 
 export type ProductState = (typeof ProductState)[keyof typeof ProductState]
+
+
+export const AccessCodeRole = {
+  admin: 'admin',
+  delivery: 'delivery',
+  cashier: 'cashier'
+} as const
+
+export type AccessCodeRole = (typeof AccessCodeRole)[keyof typeof AccessCodeRole]
+
+
+export const AccessCodeState = {
+  active: 'active',
+  used: 'used',
+  expired: 'expired',
+  disabled: 'disabled'
+} as const
+
+export type AccessCodeState = (typeof AccessCodeState)[keyof typeof AccessCodeState]

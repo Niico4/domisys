@@ -15,8 +15,12 @@ import { GetOrderById } from '@/domain/use-cases/order/get-order-by-id';
 import { GetOrdersReport } from '@/domain/use-cases/order/get-orders-report';
 import { UpdateOrderState } from '@/domain/use-cases/order/update-order-state';
 
+import { GetMyDeliveries } from '@/domain/use-cases/order/get-my-deliveries';
+import { GetMyOrders } from '@/domain/use-cases/order/get-my-orders';
+
 import { validateId } from '@/shared/utils/validate-id';
 import { ResponseHandler } from '@/shared/http/response-handler';
+import { messages } from '@/shared/messages';
 
 export const orderController = (orderRepository: OrderRepository) => ({
   getAllOrders: async (_req: Request, res: Response) => {
@@ -24,12 +28,12 @@ export const orderController = (orderRepository: OrderRepository) => ({
       const useCase = new GetAllOrders(orderRepository);
       const data = await useCase.execute();
 
-      return ResponseHandler.ok(res, 'Pedidos obtenidos correctamente.', data);
+      return ResponseHandler.ok(res, messages.order.getAllSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener los pedidos.'
+        messages.order.getAllError()
       );
     }
   },
@@ -41,12 +45,12 @@ export const orderController = (orderRepository: OrderRepository) => ({
       const useCase = new GetOrderById(orderRepository);
       const data = await useCase.execute(id);
 
-      return ResponseHandler.ok(res, 'Pedido obtenido correctamente.', data);
+      return ResponseHandler.ok(res, messages.order.getByIdSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al obtener el pedido.'
+        messages.order.getByIdError()
       );
     }
   },
@@ -55,15 +59,17 @@ export const orderController = (orderRepository: OrderRepository) => ({
     try {
       const dto = createOrderDto.parse(req.body);
 
-      const useCase = new CreateOrder(orderRepository);
-      const data = await useCase.execute(dto);
+      const customerId = req.user!.id;
 
-      return ResponseHandler.ok(res, 'Pedido creado correctamente.', data, 201);
+      const useCase = new CreateOrder(orderRepository);
+      const data = await useCase.execute({ ...dto, customerId });
+
+      return ResponseHandler.ok(res, messages.order.createSuccess(), data, 201);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al crear el pedido.'
+        messages.order.createError()
       );
     }
   },
@@ -76,16 +82,12 @@ export const orderController = (orderRepository: OrderRepository) => ({
       const useCase = new UpdateOrderState(orderRepository);
       const data = await useCase.execute(id, state);
 
-      return ResponseHandler.ok(
-        res,
-        'Estado del pedido actualizado correctamente.',
-        data
-      );
+      return ResponseHandler.ok(res, messages.order.updateStateSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al actualizar el estado del pedido.'
+        messages.order.updateStateError()
       );
     }
   },
@@ -97,12 +99,12 @@ export const orderController = (orderRepository: OrderRepository) => ({
       const useCase = new DeleteOrder(orderRepository);
       const data = await useCase.execute(id);
 
-      return ResponseHandler.ok(res, 'Pedido eliminado correctamente.', data);
+      return ResponseHandler.ok(res, messages.order.deleted(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al eliminar el pedido.'
+        messages.order.deleteError()
       );
     }
   },
@@ -115,12 +117,12 @@ export const orderController = (orderRepository: OrderRepository) => ({
       const useCase = new CancelOrder(orderRepository);
       const data = await useCase.execute(id, dto);
 
-      return ResponseHandler.ok(res, 'Pedido cancelado correctamente.', data);
+      return ResponseHandler.ok(res, messages.order.cancelSuccess(), data);
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al cancelar el pedido.'
+        messages.order.cancelError()
       );
     }
   },
@@ -132,16 +134,50 @@ export const orderController = (orderRepository: OrderRepository) => ({
       const useCase = new GetOrdersReport(orderRepository);
       const data = await useCase.execute(dto);
 
+      return ResponseHandler.ok(res, messages.order.reportSuccess(), data);
+    } catch (error) {
+      return ResponseHandler.handleException(
+        res,
+        error,
+        messages.order.reportError()
+      );
+    }
+  },
+
+  getMyDeliveries: async (req: Request, res: Response) => {
+    try {
+      const deliveryId = req.user!.id;
+
+      const useCase = new GetMyDeliveries(orderRepository);
+      const data = await useCase.execute(deliveryId);
+
+      return ResponseHandler.ok(res, messages.order.deliveriesSuccess(), data);
+    } catch (error) {
+      return ResponseHandler.handleException(
+        res,
+        error,
+        messages.order.deliveriesError()
+      );
+    }
+  },
+
+  getMyOrders: async (req: Request, res: Response) => {
+    try {
+      const customerId = req.user!.id;
+
+      const useCase = new GetMyOrders(orderRepository);
+      const data = await useCase.execute(customerId);
+
       return ResponseHandler.ok(
         res,
-        'Reporte de pedidos generado correctamente.',
+        messages.order.customerOrdersSuccess(),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        'Error al generar el reporte de pedidos.'
+        messages.order.customerOrdersError()
       );
     }
   },

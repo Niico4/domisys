@@ -1,5 +1,6 @@
 import { appRoutes } from './presentation/routes';
 import { Server } from './presentation/server';
+import { startCronJobs } from './shared/cron';
 
 (async () => {
   main();
@@ -12,4 +13,6 @@ function main() {
   });
 
   server.start();
+  
+  startCronJobs();
 }

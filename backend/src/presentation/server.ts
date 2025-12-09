@@ -21,10 +21,10 @@ export class Server {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
 
+    this.app.use(this.routes);
+
     this.app.listen(this.port, () => {
       console.log(`Server is running on port ${this.port}`);
     });
-
-    this.app.use(this.routes);
   }
 }

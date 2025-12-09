@@ -1,6 +1,7 @@
 import { PrismaClient, UserRole } from '@/generated/client';
 
 import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 export class UserRoleService {
   constructor(private readonly prisma: PrismaClient) {}
@@ -12,12 +13,12 @@ export class UserRoleService {
     });
 
     if (!user) {
-      throw new BadRequestException(`El usuario ${id} no existe.`);
+      throw new BadRequestException(messages.user.notFoundWithId(id));
     }
 
     if (user.role !== expectedRole) {
       throw new BadRequestException(
-        `El usuario ${id} no tiene rol de ${expectedRole}.`
+        messages.user.doesNotHaveRole(id, expectedRole)
       );
     }
   }

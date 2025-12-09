@@ -4,6 +4,7 @@ import { ProductRepository } from '@/domain/repositories/product.repository';
 import { UpdateProductDtoType } from '@/domain/dtos/products/update-product.dto';
 
 import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 export interface UpdateProductUseCase {
   execute(id: number, dto: UpdateProductDtoType): Promise<ProductEntity>;
@@ -19,9 +20,7 @@ export class UpdateProduct implements UpdateProductUseCase {
       today.setHours(0, 0, 0, 0);
 
       if (expiration <= today) {
-        throw new BadRequestException(
-          'La fecha de vencimiento debe ser mayor a la fecha actual.'
-        );
+        throw new BadRequestException(messages.product.expirationMustBeFuture());
       }
     }
 

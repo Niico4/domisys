@@ -2,9 +2,15 @@ import { AddStockDtoType } from '@/domain/dtos/products/add-stock.dto';
 import { ProductRepository } from '@/domain/repositories/product.repository';
 import { ProviderRepository } from '@/domain/repositories/provider.repository';
 import { MovementType } from '@/generated/enums';
+import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { messages } from '@/shared/messages';
 
 export interface AddStockUseCase {
-  execute(productId: number, dto: AddStockDtoType): Promise<void>;
+  execute(
+    productId: number,
+    dto: AddStockDtoType,
+    adminId: number
+  ): Promise<void>;
 }
 
 export class AddStock implements AddStockUseCase {
@@ -13,15 +19,24 @@ export class AddStock implements AddStockUseCase {
     private readonly providerRepository: ProviderRepository
   ) {}
 
-  async execute(productId: number, dto: AddStockDtoType): Promise<void> {
-    const { quantity, providerId, adminId } = dto;
+  async execute(
+    productId: number,
+    dto: AddStockDtoType,
+    adminId: number
+  ): Promise<void> {
+    const { quantity } = dto;
 
-    await this.productRepository.findById(productId);
-    await this.providerRepository.findById(providerId);
+    const product = await this.productRepository.findById(productId);
+
+    if (!product.providerId) {
+      throw new BadRequestException(messages.product.noProviderAssigned());
+    }
+
+    await this.providerRepository.findById(product.providerId);
 
     await this.productRepository.addStockMovement({
       productId,
-      providerId,
+      providerId: product.providerId,
       quantity,
       type: MovementType.in,
       reason: null,

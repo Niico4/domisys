@@ -262,6 +262,7 @@ export type UserWhereInput = {
   addresses?: Prisma.AddressListRelationFilter
   inventoryMovements?: Prisma.InventoryMovementListRelationFilter
   customerDeliveryRating?: Prisma.DeliveryRatingListRelationFilter
+  accessCodes?: Prisma.AccessCodeListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -281,6 +282,7 @@ export type UserOrderByWithRelationInput = {
   addresses?: Prisma.AddressOrderByRelationAggregateInput
   inventoryMovements?: Prisma.InventoryMovementOrderByRelationAggregateInput
   customerDeliveryRating?: Prisma.DeliveryRatingOrderByRelationAggregateInput
+  accessCodes?: Prisma.AccessCodeOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -303,6 +305,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   addresses?: Prisma.AddressListRelationFilter
   inventoryMovements?: Prisma.InventoryMovementListRelationFilter
   customerDeliveryRating?: Prisma.DeliveryRatingListRelationFilter
+  accessCodes?: Prisma.AccessCodeListRelationFilter
 }, "id" | "username" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -355,6 +358,7 @@ export type UserCreateInput = {
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -374,6 +378,7 @@ export type UserUncheckedCreateInput = {
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserUpdateInput = {
@@ -392,6 +397,7 @@ export type UserUpdateInput = {
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -411,6 +417,7 @@ export type UserUncheckedUpdateInput = {
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -498,14 +505,14 @@ export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
-export type UserNullableScalarRelationFilter = {
-  is?: Prisma.UserWhereInput | null
-  isNot?: Prisma.UserWhereInput | null
-}
-
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -526,6 +533,20 @@ export type IntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type UserCreateNestedOneWithoutAccessCodesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAccessCodesInput, Prisma.UserUncheckedCreateWithoutAccessCodesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccessCodesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAccessCodesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAccessCodesInput, Prisma.UserUncheckedCreateWithoutAccessCodesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAccessCodesInput
+  upsert?: Prisma.UserUpsertWithoutAccessCodesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAccessCodesInput, Prisma.UserUpdateWithoutAccessCodesInput>, Prisma.UserUncheckedUpdateWithoutAccessCodesInput>
 }
 
 export type UserCreateNestedOneWithoutOrdersAsCustomerInput = {
@@ -618,6 +639,96 @@ export type UserUpdateOneRequiredWithoutCustomerDeliveryRatingNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCustomerDeliveryRatingInput, Prisma.UserUpdateWithoutCustomerDeliveryRatingInput>, Prisma.UserUncheckedUpdateWithoutCustomerDeliveryRatingInput>
 }
 
+export type UserCreateWithoutAccessCodesInput = {
+  role?: $Enums.UserRole
+  username: string
+  email: string
+  name: string
+  lastName: string
+  phoneNumber: string
+  password: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ordersAsCustomer?: Prisma.OrderCreateNestedManyWithoutCustomerInput
+  ordersAsDelivery?: Prisma.OrderCreateNestedManyWithoutDeliveryInput
+  salesAsCashier?: Prisma.SaleCreateNestedManyWithoutCashierInput
+  addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
+  inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutAdminInput
+  customerDeliveryRating?: Prisma.DeliveryRatingCreateNestedManyWithoutCustomerInput
+}
+
+export type UserUncheckedCreateWithoutAccessCodesInput = {
+  id?: number
+  role?: $Enums.UserRole
+  username: string
+  email: string
+  name: string
+  lastName: string
+  phoneNumber: string
+  password: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  ordersAsCustomer?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerInput
+  ordersAsDelivery?: Prisma.OrderUncheckedCreateNestedManyWithoutDeliveryInput
+  salesAsCashier?: Prisma.SaleUncheckedCreateNestedManyWithoutCashierInput
+  addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
+  inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutAdminInput
+  customerDeliveryRating?: Prisma.DeliveryRatingUncheckedCreateNestedManyWithoutCustomerInput
+}
+
+export type UserCreateOrConnectWithoutAccessCodesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAccessCodesInput, Prisma.UserUncheckedCreateWithoutAccessCodesInput>
+}
+
+export type UserUpsertWithoutAccessCodesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAccessCodesInput, Prisma.UserUncheckedUpdateWithoutAccessCodesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAccessCodesInput, Prisma.UserUncheckedCreateWithoutAccessCodesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAccessCodesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAccessCodesInput, Prisma.UserUncheckedUpdateWithoutAccessCodesInput>
+}
+
+export type UserUpdateWithoutAccessCodesInput = {
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ordersAsCustomer?: Prisma.OrderUpdateManyWithoutCustomerNestedInput
+  ordersAsDelivery?: Prisma.OrderUpdateManyWithoutDeliveryNestedInput
+  salesAsCashier?: Prisma.SaleUpdateManyWithoutCashierNestedInput
+  addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
+  inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutAdminNestedInput
+  customerDeliveryRating?: Prisma.DeliveryRatingUpdateManyWithoutCustomerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAccessCodesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  username?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ordersAsCustomer?: Prisma.OrderUncheckedUpdateManyWithoutCustomerNestedInput
+  ordersAsDelivery?: Prisma.OrderUncheckedUpdateManyWithoutDeliveryNestedInput
+  salesAsCashier?: Prisma.SaleUncheckedUpdateManyWithoutCashierNestedInput
+  addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
+  inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutAdminNestedInput
+  customerDeliveryRating?: Prisma.DeliveryRatingUncheckedUpdateManyWithoutCustomerNestedInput
+}
+
 export type UserCreateWithoutOrdersAsCustomerInput = {
   role?: $Enums.UserRole
   username: string
@@ -633,6 +744,7 @@ export type UserCreateWithoutOrdersAsCustomerInput = {
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutOrdersAsCustomerInput = {
@@ -651,6 +763,7 @@ export type UserUncheckedCreateWithoutOrdersAsCustomerInput = {
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutOrdersAsCustomerInput = {
@@ -673,6 +786,7 @@ export type UserCreateWithoutOrdersAsDeliveryInput = {
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutOrdersAsDeliveryInput = {
@@ -691,6 +805,7 @@ export type UserUncheckedCreateWithoutOrdersAsDeliveryInput = {
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutOrdersAsDeliveryInput = {
@@ -724,6 +839,7 @@ export type UserUpdateWithoutOrdersAsCustomerInput = {
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersAsCustomerInput = {
@@ -742,6 +858,7 @@ export type UserUncheckedUpdateWithoutOrdersAsCustomerInput = {
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUpsertWithoutOrdersAsDeliveryInput = {
@@ -770,6 +887,7 @@ export type UserUpdateWithoutOrdersAsDeliveryInput = {
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersAsDeliveryInput = {
@@ -788,6 +906,7 @@ export type UserUncheckedUpdateWithoutOrdersAsDeliveryInput = {
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutAddressesInput = {
@@ -805,6 +924,7 @@ export type UserCreateWithoutAddressesInput = {
   salesAsCashier?: Prisma.SaleCreateNestedManyWithoutCashierInput
   inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutAddressesInput = {
@@ -823,6 +943,7 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   salesAsCashier?: Prisma.SaleUncheckedCreateNestedManyWithoutCashierInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutAddressesInput = {
@@ -856,6 +977,7 @@ export type UserUpdateWithoutAddressesInput = {
   salesAsCashier?: Prisma.SaleUpdateManyWithoutCashierNestedInput
   inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAddressesInput = {
@@ -874,6 +996,7 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   salesAsCashier?: Prisma.SaleUncheckedUpdateManyWithoutCashierNestedInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutSalesAsCashierInput = {
@@ -891,6 +1014,7 @@ export type UserCreateWithoutSalesAsCashierInput = {
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutSalesAsCashierInput = {
@@ -909,6 +1033,7 @@ export type UserUncheckedCreateWithoutSalesAsCashierInput = {
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutAdminInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutSalesAsCashierInput = {
@@ -942,6 +1067,7 @@ export type UserUpdateWithoutSalesAsCashierInput = {
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSalesAsCashierInput = {
@@ -960,6 +1086,7 @@ export type UserUncheckedUpdateWithoutSalesAsCashierInput = {
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutAdminNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutInventoryMovementsInput = {
@@ -977,6 +1104,7 @@ export type UserCreateWithoutInventoryMovementsInput = {
   salesAsCashier?: Prisma.SaleCreateNestedManyWithoutCashierInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   customerDeliveryRating?: Prisma.DeliveryRatingCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutInventoryMovementsInput = {
@@ -995,6 +1123,7 @@ export type UserUncheckedCreateWithoutInventoryMovementsInput = {
   salesAsCashier?: Prisma.SaleUncheckedCreateNestedManyWithoutCashierInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedCreateNestedManyWithoutCustomerInput
+  accessCodes?: Prisma.AccessCodeUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutInventoryMovementsInput = {
@@ -1028,6 +1157,7 @@ export type UserUpdateWithoutInventoryMovementsInput = {
   salesAsCashier?: Prisma.SaleUpdateManyWithoutCashierNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInventoryMovementsInput = {
@@ -1046,6 +1176,7 @@ export type UserUncheckedUpdateWithoutInventoryMovementsInput = {
   salesAsCashier?: Prisma.SaleUncheckedUpdateManyWithoutCashierNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   customerDeliveryRating?: Prisma.DeliveryRatingUncheckedUpdateManyWithoutCustomerNestedInput
+  accessCodes?: Prisma.AccessCodeUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutCustomerDeliveryRatingInput = {
@@ -1063,6 +1194,7 @@ export type UserCreateWithoutCustomerDeliveryRatingInput = {
   salesAsCashier?: Prisma.SaleCreateNestedManyWithoutCashierInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutAdminInput
+  accessCodes?: Prisma.AccessCodeCreateNestedManyWithoutAdminInput
 }
 
 export type UserUncheckedCreateWithoutCustomerDeliveryRatingInput = {
@@ -1081,6 +1213,7 @@ export type UserUncheckedCreateWithoutCustomerDeliveryRatingInput = {
   salesAsCashier?: Prisma.SaleUncheckedCreateNestedManyWithoutCashierInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutAdminInput
+  accessCodes?: Prisma.AccessCodeUncheckedCreateNestedManyWithoutAdminInput
 }
 
 export type UserCreateOrConnectWithoutCustomerDeliveryRatingInput = {
@@ -1114,6 +1247,7 @@ export type UserUpdateWithoutCustomerDeliveryRatingInput = {
   salesAsCashier?: Prisma.SaleUpdateManyWithoutCashierNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutAdminNestedInput
+  accessCodes?: Prisma.AccessCodeUpdateManyWithoutAdminNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCustomerDeliveryRatingInput = {
@@ -1132,6 +1266,7 @@ export type UserUncheckedUpdateWithoutCustomerDeliveryRatingInput = {
   salesAsCashier?: Prisma.SaleUncheckedUpdateManyWithoutCashierNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutAdminNestedInput
+  accessCodes?: Prisma.AccessCodeUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 
@@ -1146,6 +1281,7 @@ export type UserCountOutputType = {
   addresses: number
   inventoryMovements: number
   customerDeliveryRating: number
+  accessCodes: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1155,6 +1291,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   addresses?: boolean | UserCountOutputTypeCountAddressesArgs
   inventoryMovements?: boolean | UserCountOutputTypeCountInventoryMovementsArgs
   customerDeliveryRating?: boolean | UserCountOutputTypeCountCustomerDeliveryRatingArgs
+  accessCodes?: boolean | UserCountOutputTypeCountAccessCodesArgs
 }
 
 /**
@@ -1209,6 +1346,13 @@ export type UserCountOutputTypeCountCustomerDeliveryRatingArgs<ExtArgs extends r
   where?: Prisma.DeliveryRatingWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAccessCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AccessCodeWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1227,6 +1371,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   addresses?: boolean | Prisma.User$addressesArgs<ExtArgs>
   inventoryMovements?: boolean | Prisma.User$inventoryMovementsArgs<ExtArgs>
   customerDeliveryRating?: boolean | Prisma.User$customerDeliveryRatingArgs<ExtArgs>
+  accessCodes?: boolean | Prisma.User$accessCodesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1277,6 +1422,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   addresses?: boolean | Prisma.User$addressesArgs<ExtArgs>
   inventoryMovements?: boolean | Prisma.User$inventoryMovementsArgs<ExtArgs>
   customerDeliveryRating?: boolean | Prisma.User$customerDeliveryRatingArgs<ExtArgs>
+  accessCodes?: boolean | Prisma.User$accessCodesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1291,6 +1437,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     addresses: Prisma.$AddressPayload<ExtArgs>[]
     inventoryMovements: Prisma.$InventoryMovementPayload<ExtArgs>[]
     customerDeliveryRating: Prisma.$DeliveryRatingPayload<ExtArgs>[]
+    accessCodes: Prisma.$AccessCodePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1703,6 +1850,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   addresses<T extends Prisma.User$addressesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$addressesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AddressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inventoryMovements<T extends Prisma.User$inventoryMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$inventoryMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   customerDeliveryRating<T extends Prisma.User$customerDeliveryRatingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$customerDeliveryRatingArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeliveryRatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  accessCodes<T extends Prisma.User$accessCodesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accessCodesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccessCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2271,6 +2419,30 @@ export type User$customerDeliveryRatingArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.DeliveryRatingScalarFieldEnum | Prisma.DeliveryRatingScalarFieldEnum[]
+}
+
+/**
+ * User.accessCodes
+ */
+export type User$accessCodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AccessCode
+   */
+  select?: Prisma.AccessCodeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AccessCode
+   */
+  omit?: Prisma.AccessCodeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccessCodeInclude<ExtArgs> | null
+  where?: Prisma.AccessCodeWhereInput
+  orderBy?: Prisma.AccessCodeOrderByWithRelationInput | Prisma.AccessCodeOrderByWithRelationInput[]
+  cursor?: Prisma.AccessCodeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AccessCodeScalarFieldEnum | Prisma.AccessCodeScalarFieldEnum[]
 }
 
 /**
