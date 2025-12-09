@@ -1,0 +1,32 @@
+{
+  "name": "@domisys/frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Este frontend es la interfaz principal del sistema DomiSys: una aplicación moderna y ágil para gestionar domicilios, ventas, inventario y operaciones internas del supermercado. Está construido con React y organizado en módulos claros, lo que facilita el mantenimiento, la escalabilidad y la experiencia del usuario. Todo está pensado para ser rápido, intuitivo y totalmente conectado con la API del proyecto.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "author": "Nicolás Garzón (@Niico4)",
+  "license": "MIT",
+  "dependencies": {
+    "@heroui/react": "^2.8.5",
+    "framer-motion": "^12.23.25",
+    "next": "16.0.8",
+    "react": "19.2.1",
+    "react-dom": "19.2.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22.19.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.8",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5"
+  }
+}

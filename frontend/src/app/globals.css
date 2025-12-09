@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+@plugin './hero.ts';
+@source '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-primary-50: #e9eeed;
+  --color-primary-100: #bbcac6;
+  --color-primary-200: #9ab0aa;
+  --color-primary-300: #6c8c84;
+  --color-primary-400: #4f756c;
+  --color-primary-500: #235347;
+  --color-primary-600: #204c41;
+  --color-primary-700: #193b32;
+  --color-primary-800: #132e27;
+  --color-primary-900: #0f231e;
+
+  --color-secondary-50: #f4f1ef;
+  --color-secondary-100: #dbd2cf;
+  --color-secondary-200: #cabcb7;
+  --color-secondary-300: #b29e96;
+  --color-secondary-400: #a38b82;
+  --color-secondary-500: #8c6e63;
+  --color-secondary-600: #7f645a;
+  --color-secondary-700: #634e46;
+  --color-secondary-800: #4d3d36;
+  --color-secondary-900: #3b2e2a;
+
+  --color-accent-50: #e6f1fd;
+  --color-accent-100: #b0d2fa;
+  --color-accent-200: #8abdf7;
+  --color-accent-300: #549ff4;
+  --color-accent-400: #338cf1;
+  --color-accent-500: #006fee;
+  --color-accent-600: #0065d9;
+  --color-accent-700: #004fa9;
+  --color-accent-800: #003d83;
+  --color-accent-900: #002f64;
+
+  --color-surface-main: #fffff5;
+  --color-surface-alt: #fff5e5;
+
+  --font-mochiy-pop-one: var(--font-mochiy-pop-one);
+  --font-inter: var(--font-inter);
+}
+
+body {
+  background: var(--surface-main);
+  font-family: var(--font-inter);
+}
