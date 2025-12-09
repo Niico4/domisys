@@ -6,11 +6,6 @@ export const createSaleDto = z.strictObject({
     error: 'El método de pago es obligatorio y debe ser válido.',
   }),
 
-  cashierId: z.coerce
-    .number({ error: 'El ID del cajero debe ser un número.' })
-    .int({ error: 'El ID del cajero debe ser un número entero.' })
-    .positive({ error: 'El ID del cajero debe ser un ID válido.' }),
-
   products: z
     .array(
       z.strictObject({

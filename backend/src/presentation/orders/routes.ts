@@ -24,8 +24,6 @@ export const orderRoutes = (): Router => {
     controller.getOrdersReport
   );
 
-  router.get('/', controller.getAllOrders);
-
   router.get(
     '/my-deliveries',
     hasRole(UserRole.delivery),
@@ -33,9 +31,11 @@ export const orderRoutes = (): Router => {
   );
 
   router.get('/my-orders', hasRole(UserRole.customer), controller.getMyOrders);
-  router.post('/', hasRole(UserRole.customer), controller.createOrder);
 
+  router.get('/', controller.getAllOrders);
   router.get('/:id', controller.getOrderById);
+  router.post('/', hasRole(UserRole.customer), controller.createOrder);
+  router.delete('/:id', hasRole(UserRole.admin), controller.deleteOrder);
 
   router.patch(
     '/:id/update-state',
@@ -48,8 +48,6 @@ export const orderRoutes = (): Router => {
     hasRole(UserRole.customer, UserRole.delivery),
     controller.cancelOrder
   );
-
-  router.delete('/:id', hasRole(UserRole.admin), controller.deleteOrder);
 
   return router;
 };

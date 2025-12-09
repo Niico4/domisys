@@ -6,8 +6,8 @@ export const saleRepositoryImplementation = (
 ): SaleRepository => ({
   getAll: () => datasource.getAll(),
   findById: (id: number) => datasource.findById(id),
-  createSale: (data) => datasource.createSale(data),
-  cancelSale: (id: number, dto) => datasource.cancelSale(id, dto),
+  createSale: (data, cashierId: number) => datasource.createSale(data, cashierId),
+  cancelSale: (id: number, cashierId: number) => datasource.cancelSale(id, cashierId),
   deleteSale: (id: number) => datasource.deleteSale(id),
 
   getSalesReport: (dto) => datasource.getSalesReport(dto),

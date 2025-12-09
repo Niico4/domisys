@@ -12,7 +12,6 @@ import { SaleEntity } from '@/domain/entities/sale.entity';
 import { SaleDatasource } from '@/domain/datasources/sale.datasource';
 
 import { CreateSaleDtoType } from '@/domain/dtos/sales/create-sale.dto';
-import { CancelSaleDtoType } from '@/domain/dtos/sales/cancel-sale.dto';
 import { SalesReportDtoType } from '@/domain/dtos/sales/sales-report.dto';
 
 import { UserRoleService } from '../services/user-role.service';
@@ -39,11 +38,11 @@ export const saleDatasourceImplementation: SaleDatasource = {
     return sale;
   },
 
-  async createSale(data: CreateSaleDtoType): Promise<SaleEntity> {
-    const { products, ...saleData } = data;
+  async createSale(data: CreateSaleDtoType, cashierId: number): Promise<SaleEntity> {
+    const { products } = data;
 
     await userRoleService.validateUserRole(
-      saleData.cashierId,
+      cashierId,
       UserRole.cashier
     );
 
@@ -104,7 +103,7 @@ export const saleDatasourceImplementation: SaleDatasource = {
             quantity: saleProduct.quantity,
             movementType: MovementType.out,
             reason: MovementReason.sale,
-            adminId: saleData.cashierId,
+            adminId: cashierId,
             createdAt: new Date(),
           },
         });
@@ -112,7 +111,8 @@ export const saleDatasourceImplementation: SaleDatasource = {
 
       const newSale = await tx.sale.create({
         data: {
-          ...saleData,
+          cashierId,
+          paymentMethod: data.paymentMethod,
           totalAmount,
           state: SaleState.sold,
           saleProducts: {
@@ -135,9 +135,8 @@ export const saleDatasourceImplementation: SaleDatasource = {
     });
   },
 
-  async cancelSale(id: number, dto: CancelSaleDtoType): Promise<SaleEntity> {
+  async cancelSale(id: number, cashierId: number): Promise<SaleEntity> {
     await this.findById(id);
-    const { cashierId } = dto;
 
     await userRoleService.validateUserRole(cashierId, UserRole.cashier);
 

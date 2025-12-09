@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 
 import { OrderRepository } from '@/domain/repositories/order.repository';
 
-import { cancelOrderDto } from '@/domain/dtos/orders/cancel-order.dto';
 import { createOrderDto } from '@/domain/dtos/orders/create-order.dto';
 import { ordersReportDto } from '@/domain/dtos/orders/orders-report.dto';
 import { updateOrderStateDto } from '@/domain/dtos/orders/update-order-state.dto';
@@ -112,10 +111,9 @@ export const orderController = (orderRepository: OrderRepository) => ({
   cancelOrder: async (req: Request, res: Response) => {
     try {
       const id = validateId(req.params.id);
-      const dto = cancelOrderDto.parse(req.body);
 
       const useCase = new CancelOrder(orderRepository);
-      const data = await useCase.execute(id, dto);
+      const data = await useCase.execute(id);
 
       return ResponseHandler.ok(res, messages.order.cancelSuccess(), data);
     } catch (error) {

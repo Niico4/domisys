@@ -1,4 +1,3 @@
-import { CancelOrderDtoType } from '../dtos/orders/cancel-order.dto';
 import { CreateOrderDtoType } from '../dtos/orders/create-order.dto';
 import { OrdersReportDtoType } from '../dtos/orders/orders-report.dto';
 import { OrderEntity } from '../entities/order.entity';
@@ -11,7 +10,7 @@ export interface OrderDatasource {
   findByCustomer(customerId: number): Promise<OrderEntity[]>;
   createOrder(data: CreateOrderDtoType): Promise<OrderEntity>;
   updateState(id: number, state: OrderState): Promise<OrderEntity>;
-  cancelOrder(id: number, dto: CancelOrderDtoType): Promise<OrderEntity>;
+  cancelOrder(id: number): Promise<OrderEntity>;
   deleteOrder(id: number): Promise<OrderEntity>;
   getOrdersReport(dto?: OrdersReportDtoType): Promise<OrderEntity[]>;
 }
