@@ -94,4 +94,28 @@ export const authController = (
       );
     }
   },
+
+  logout: async (_req: Request, res: Response) => {
+    try {
+      res.clearCookie('access_token', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+      });
+
+      res.clearCookie('refresh_token', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+      });
+
+      return ResponseHandler.ok(res, messages.auth.logoutSuccess());
+    } catch (error) {
+      return ResponseHandler.handleException(
+        res,
+        error,
+        messages.general.error()
+      );
+    }
+  },
 });

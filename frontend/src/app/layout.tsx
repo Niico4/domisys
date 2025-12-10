@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { Mochiy_Pop_One, Inter } from 'next/font/google';
 
-import { HeroUIProvider } from './HeroUIProvider';
+import { HeroUIProvider } from '@/components/providers/HeroUIProvider';
+import { AuthInitializer } from '@/components/providers/AuthInitializer';
+import { AxiosProvider } from '@/components/providers/AxiosProvider';
 import './globals.css';
-import { ClientProvider } from './auth/ClientProvider';
-import { UserInitializer } from './UserInitializer';
 
 const mochiyPopOne = Mochiy_Pop_One({
   variable: '--font-mochiy-pop-one',
@@ -33,9 +33,9 @@ export default function RootLayout({
         className={`${mochiyPopOne.variable} ${inter.variable} antialiased custom-theme`}
       >
         <HeroUIProvider>
-          <ClientProvider>
-            <UserInitializer>{children}</UserInitializer>
-          </ClientProvider>
+          <AxiosProvider>
+            <AuthInitializer>{children}</AuthInitializer>
+          </AxiosProvider>
         </HeroUIProvider>
       </body>
     </html>

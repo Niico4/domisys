@@ -1,5 +1,4 @@
 'use client';
-import Router from 'next/router';
 import {
   AxiosError,
   AxiosInstance,
@@ -43,7 +42,13 @@ export function setupAxiosInterceptors(axiosInstance: AxiosInstance) {
 
       const status = error.response.status;
 
-      if (status !== 401 || originalRequest._retry) {
+      // NO  refresh si estamos en endpoints de auth
+      const isAuthEndpoint =
+        originalRequest.url?.includes('/auth/login') ||
+        originalRequest.url?.includes('/auth/register') ||
+        originalRequest.url?.includes('/auth/refresh-token');
+
+      if (isAuthEndpoint || status !== 401 || originalRequest._retry) {
         return Promise.reject(error);
       }
 
@@ -69,7 +74,10 @@ export function setupAxiosInterceptors(axiosInstance: AxiosInstance) {
         const authStore = useAuthStore.getState();
         authStore.logout();
 
-        Router.push('/auth/login');
+        if (typeof window !== 'undefined') {
+          window.location.href = '/auth/login';
+        }
+
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

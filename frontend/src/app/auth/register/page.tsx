@@ -1,7 +1,24 @@
+'use client';
 import Link from 'next/link';
+
+import { useAuth } from '@/hooks/useAuth';
+import Loader from '@/components/shared/loader/Loader';
 import RegisterForm from './RegisterForm';
 
 const RegisterPage = () => {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-dvh">
+        <div className="flex-col-center gap-4">
+          <Loader />
+          <p className="text-sm text-neutral-200">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <article className="flex flex-col gap-10">
       <div className="flex-col-center gap-4">

@@ -7,7 +7,7 @@ export default heroui({
       extend: 'light',
       colors: {
         primary: {
-          50: ' #e9eeed',
+          50: '#e9eeed',
           100: '#bbcac6',
           200: '#9ab0aa',
           300: '#6c8c84',
