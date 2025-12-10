@@ -10,7 +10,7 @@ import { messages } from '@/shared/messages';
 export const refreshTokenController = (authRepository: AuthRepository) => ({
   refreshToken: async (req: Request, res: Response) => {
     try {
-      const { refreshToken } = req.body;
+      const refreshToken = req.cookies['refresh_token'];
 
       if (!refreshToken) {
         return ResponseHandler.handleException(
@@ -26,11 +26,23 @@ export const refreshTokenController = (authRepository: AuthRepository) => ({
 
       const tokens = JwtService.generateTokenPair(user);
 
-      return ResponseHandler.ok(
-        res,
-        messages.auth.tokenRefreshedSuccess(),
-        tokens
-      );
+      res.cookie('access_token', tokens.accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 15, // 15 minutos
+      });
+
+      res.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
+      });
+
+      return ResponseHandler.ok(res, messages.auth.tokenRefreshedSuccess(), {
+        user,
+      });
     } catch (error) {
       return ResponseHandler.handleException(
         res,

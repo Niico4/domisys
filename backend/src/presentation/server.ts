@@ -1,4 +1,8 @@
 import express, { Router } from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+
+import { FRONT_END_URL } from '@/config/env.config';
 
 interface ServerOptions {
   port: number | string;
@@ -18,8 +22,18 @@ export class Server {
   }
 
   public start(): void {
+    this.app.use(
+      cors({
+        origin: FRONT_END_URL,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+      })
+    );
+
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    this.app.use(cookieParser());
 
     this.app.use(this.routes);
 

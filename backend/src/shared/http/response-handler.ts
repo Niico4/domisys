@@ -12,6 +12,14 @@ export class ResponseHandler {
   }
 
   static handleException(res: Response, error: any, fallbackMessage: string) {
+    if (error?.status) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message,
+        error: 'BAD_REQUEST',
+      });
+    }
+
     if (error instanceof ZodError) {
       return res.status(400).json({
         success: false,
@@ -58,8 +66,8 @@ export class ResponseHandler {
     if (error instanceof Error) {
       return res.status(500).json({
         success: false,
-        message: fallbackMessage,
-        error: error.message,
+        message: error.message,
+        error: 'INTERNAL_SERVER_ERROR',
       });
     }
 

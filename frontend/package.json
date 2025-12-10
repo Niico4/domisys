@@ -14,10 +14,16 @@
   "license": "MIT",
   "dependencies": {
     "@heroui/react": "^2.8.5",
+    "@hookform/resolvers": "^5.2.2",
+    "@tabler/icons-react": "^3.35.0",
+    "axios": "^1.13.2",
     "framer-motion": "^12.23.25",
     "next": "16.0.8",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "react-hook-form": "^7.68.0",
+    "zod": "^4.1.13",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
