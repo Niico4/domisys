@@ -3,6 +3,8 @@ import { Mochiy_Pop_One, Inter } from 'next/font/google';
 
 import { HeroUIProvider } from './HeroUIProvider';
 import './globals.css';
+import { ClientProvider } from './auth/ClientProvider';
+import { UserInitializer } from './UserInitializer';
 
 const mochiyPopOne = Mochiy_Pop_One({
   variable: '--font-mochiy-pop-one',
@@ -30,7 +32,11 @@ export default function RootLayout({
       <body
         className={`${mochiyPopOne.variable} ${inter.variable} antialiased custom-theme`}
       >
-        <HeroUIProvider>{children}</HeroUIProvider>
+        <HeroUIProvider>
+          <ClientProvider>
+            <UserInitializer>{children}</UserInitializer>
+          </ClientProvider>
+        </HeroUIProvider>
       </body>
     </html>
   );

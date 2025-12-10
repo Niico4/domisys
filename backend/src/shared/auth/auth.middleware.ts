@@ -22,9 +22,19 @@ export const isAuthenticated = (
   next: NextFunction
 ): void => {
   try {
+    let token: string | undefined;
+
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+
+    if (!token && req.cookies.access_token) {
+      token = req.cookies.access_token;
+    }
+
+    if (!token) {
       res.status(401).json({
         success: false,
         message: messages.auth.noTokenProvided(),
@@ -33,10 +43,7 @@ export const isAuthenticated = (
       return;
     }
 
-    const token = authHeader.substring(7);
-
     const decoded = JwtService.verifyAccessToken(token);
-
     req.user = decoded;
 
     next();

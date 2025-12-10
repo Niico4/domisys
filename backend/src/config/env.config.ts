@@ -24,6 +24,10 @@ const envSchema = z.object({
   EMAIL_USER: z.email({ error: 'EMAIL_USER debe ser un email válido' }),
   EMAIL_PASSWORD: z.string({ error: 'EMAIL_PASSWORD es requerido' }),
   EMAIL_FROM: z.string({ error: 'EMAIL_FROM es obligatorio' }),
+
+  FRONT_END_URL: z
+    .url({ error: 'FRONT_END_URL debe ser una URL válida' })
+    .default('http://localhost:3000'),
 });
 
 const validateEnv = () => {
@@ -58,4 +62,6 @@ export const {
   EMAIL_USER,
   EMAIL_PASSWORD,
   EMAIL_FROM,
+
+  FRONT_END_URL,
 } = validateEnv();

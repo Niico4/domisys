@@ -10,6 +10,7 @@ import { LoginDtoType } from '@/domain/dtos/auth/login.dto';
 import { RegisterDtoType } from '@/domain/dtos/auth/register.dto';
 
 import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { UnauthorizedException } from '@/shared/exceptions/unauthorized';
 import { EmailService } from '@/shared/services/email.service';
 import { messages } from '@/shared/messages';
 
@@ -46,13 +47,13 @@ export const authDatasourceImplementation: AuthDatasource = {
     });
 
     if (!user) {
-      throw new BadRequestException(messages.auth.invalidCredentials());
+      throw new UnauthorizedException(messages.auth.invalidCredentials());
     }
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
 
     if (!isPasswordValid) {
-      throw new BadRequestException(messages.auth.incorrectPassword());
+      throw new UnauthorizedException(messages.auth.incorrectPassword());
     }
 
     return user;
