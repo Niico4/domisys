@@ -41,14 +41,18 @@ const LoginForm = () => {
 
       setUser(data.user);
 
+      // actualizar AuthInitializer
+      window.dispatchEvent(new Event('auth:refresh'));
+
       addToast({
         color: 'success',
         title: '¡Inicio de sesión exitoso!',
         description: `¡Bienvenido de nuevo, ${data.user.name}!`,
+        timeout: 1000,
       });
 
       setTimeout(() => {
-        router.push('/');
+        router.replace('/');
       }, 1500);
     } catch (error) {
       handleApiError(error);

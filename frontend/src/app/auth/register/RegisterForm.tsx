@@ -1,7 +1,6 @@
 'use client';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
 import { addToast, Button, Checkbox, Input, InputOtp } from '@heroui/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,7 +14,6 @@ import { registerPayloadSchema, RegisterPayloadType } from './register.schema';
 const RegisterForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isStaff, setIsStaff] = useState(false);
-  const router = useRouter();
   const { setUser } = useAuth();
 
   const {
@@ -47,14 +45,18 @@ const RegisterForm = () => {
 
       setUser(data?.user);
 
+      // actualizar AuthInitializer
+      window.dispatchEvent(new Event('auth:refresh'));
+
       addToast({
         color: 'success',
         title: '¡Registro exitoso!',
         description: `¡Bienvenido, ${data?.user.name}!`,
+        timeout: 1000,
       });
 
       setTimeout(() => {
-        router.push('/auth/login');
+        window.location.href = '/';
       }, 1500);
     } catch (error) {
       handleApiError(error);

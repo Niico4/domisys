@@ -11,6 +11,7 @@ export const messages = {
     loginSuccess: (name: string) => `Bienvenido de nuevo, ${name}`,
     registerSuccess: (name: string) =>
       `Cuenta creada exitosamente. ¡Bienvenido ${name}!`,
+    logoutSuccess: () => 'Sesión cerrada correctamente',
     invalidAccessCode: () => 'Código de acceso inválido o expirado',
     accessCodeRequired: () => 'Se requiere un código de acceso para este rol',
     unauthorized: () => 'No estás autorizado para realizar esta acción',

@@ -1,6 +1,6 @@
 import { RegisterPayloadType } from '@/app/auth/register/register.schema';
 import { User } from '@/types/user';
-import axiosInstance from '@/utils/axios';
+import axiosInstance from '@/lib/axios';
 import { handleApiError } from '@/utils/error-handler';
 
 interface AxiosResponseWrapper {
@@ -27,7 +27,14 @@ export const authService = {
         }
       );
 
-      return res.data.data;
+      const userData = res.data.data;
+      const user = userData.user;
+
+      if (user.role) {
+        document.cookie = `user_role=${user.role}; path=/; max-age=2592000; SameSite=Lax`;
+      }
+
+      return userData;
     } catch (error) {
       handleApiError(error);
       return null;
@@ -45,10 +52,30 @@ export const authService = {
         '/auth/register',
         payloadToSend
       );
-      return res.data.data;
+
+      const userData = res.data.data;
+      const user = userData.user;
+
+      if (user.role) {
+        document.cookie = `user_role=${user.role}; path=/; max-age=2592000; SameSite=Lax`;
+      }
+
+      return userData;
     } catch (error) {
       handleApiError(error);
       return null;
+    }
+  },
+
+  logout: async () => {
+    try {
+      await axiosInstance.post('/auth/logout');
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      // Limpiar cookie de role
+      document.cookie = 'user_role=; path=/; max-age=0; SameSite=Lax';
+      window.location.href = '/auth/login';
     }
   },
 };

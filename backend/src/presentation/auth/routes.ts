@@ -19,10 +19,10 @@ export const authRoutes = (): Router => {
   const controller = authController(authRepo, accessCodeRepo);
   const refreshController = refreshTokenController(authRepo);
 
-  // Public routes
   router.post('/login', controller.login);
   router.post('/register', controller.register);
   router.post('/refresh-token', refreshController.refreshToken);
+  router.post('/logout', controller.logout);
 
   return router;
 };
