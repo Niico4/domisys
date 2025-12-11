@@ -18,7 +18,8 @@ export const createCategoryDto = z
       .max(255, {
         error: 'La descripción no puede tener más de 255 caracteres.',
       })
-      .optional(),
+      .optional()
+      .or(z.literal('')),
   })
   .strict();
 

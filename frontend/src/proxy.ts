@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-import { UserRole } from './types/user';
+import { UserRole } from './types/inventory/enums/user-role';
 
 const roleHomeRoutes: Record<UserRole, string> = {
   [UserRole.admin]: '/admin/home',

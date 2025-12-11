@@ -4,6 +4,7 @@ import { UserEntity } from '@/domain/entities/user.entity';
 
 export interface UserRepository {
   findById(id: number): Promise<UserEntity | null>;
+  findAllAdmins(): Promise<UserEntity[]>;
   updateProfile(userId: number, dto: UpdateProfileDtoType): Promise<UserEntity>;
   changePassword(userId: number, dto: ChangePasswordDtoType): Promise<void>;
   deleteAccount(userId: number): Promise<void>;

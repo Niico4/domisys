@@ -76,6 +76,8 @@ export const messages = {
     retrieveError: () => 'Error al obtener la información del usuario',
     updateError: () => 'Error al actualizar el perfil',
     changePasswordError: () => 'Error al cambiar la contraseña',
+    getAdminsSuccess: () => 'Administradores obtenidos correctamente',
+    getAdminsError: () => 'Error al obtener los administradores',
   },
 
   address: {
