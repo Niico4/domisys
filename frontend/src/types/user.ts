@@ -1,9 +1,4 @@
-export enum UserRole {
-  admin = 'admin',
-  customer = 'customer',
-  cashier = 'cashier',
-  delivery = 'delivery',
-}
+import { UserRole } from './inventory/enums/user-role';
 
 export interface User {
   id: number;

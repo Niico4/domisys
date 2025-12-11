@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { prisma } from '@/data/postgresql';
+import { UserRole } from '@/generated/enums';
 
 import { UserRepository } from '@/domain/repositories/user.repository';
 import { UserEntity } from '@/domain/entities/user.entity';
@@ -32,6 +33,29 @@ export const userDatasourceImplementation: UserRepository = {
     }
 
     return user as UserEntity;
+  },
+
+  async findAllAdmins(): Promise<UserEntity[]> {
+    const admins = await prisma.user.findMany({
+      where: {
+        role: {
+          in: [UserRole.admin],
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        name: true,
+        lastName: true,
+        phoneNumber: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return admins as UserEntity[];
   },
 
   async updateProfile(

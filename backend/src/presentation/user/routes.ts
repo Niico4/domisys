@@ -13,6 +13,7 @@ export const userRoutes = (): Router => {
   router.use(isAuthenticated);
 
   router.get('/current-user', controller.getCurrentUser);
+  router.get('/admins', controller.getAllAdmins);
   router.put('/update-user', controller.updateProfile);
   router.patch('/change-password', controller.changePassword);
 

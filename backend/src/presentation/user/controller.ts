@@ -5,6 +5,7 @@ import { UserRepository } from '@/domain/repositories/user.repository';
 import { UpdateProfile } from '@/domain/use-cases/user/update-profile';
 import { ChangePassword } from '@/domain/use-cases/user/change-password';
 import { GetCurrentUser } from '@/domain/use-cases/user/get-current-user';
+import { GetAllAdmins } from '@/domain/use-cases/user/get-all-admins';
 
 import { updateProfileSchema } from '@/domain/dtos/user/update-profile.dto';
 import { changePasswordSchema } from '@/domain/dtos/user/change-password.dto';
@@ -26,6 +27,21 @@ export const userController = (userRepository: UserRepository) => ({
         res,
         error,
         messages.user.retrieveError()
+      );
+    }
+  },
+
+  getAllAdmins: async (_req: Request, res: Response) => {
+    try {
+      const useCase = new GetAllAdmins(userRepository);
+      const admins = await useCase.execute();
+
+      return ResponseHandler.ok(res, messages.user.getAdminsSuccess(), admins);
+    } catch (error) {
+      return ResponseHandler.handleException(
+        res,
+        error,
+        messages.user.getAdminsError()
       );
     }
   },
