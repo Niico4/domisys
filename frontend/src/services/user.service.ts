@@ -9,4 +9,11 @@ export const userService = {
     );
     return response.data.data;
   },
+
+  getAllDeliveries: async (): Promise<User[]> => {
+    const response = await axiosInstance.get<ApiResponse<User[]>>(
+      '/users/deliveries'
+    );
+    return response.data.data;
+  },
 };

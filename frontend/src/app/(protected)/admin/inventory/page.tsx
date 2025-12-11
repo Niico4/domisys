@@ -24,7 +24,7 @@ import {
   IconHistory,
 } from '@tabler/icons-react';
 
-import Title from '@/components/shared/Title';
+import Heading from '@/components/shared/Heading';
 import { productService } from '@/services/product.service';
 import { providerService } from '@/services/provider.service';
 import { categoryService } from '@/services/category.service';
@@ -375,10 +375,13 @@ const InventoryPage = () => {
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-8">
-        <Title title="Inventario" />
+        <Heading
+          title="Inventario"
+          subtitle="Administra tu inventario y productos desde aquí"
+        />
         <div className="flex-center gap-4">
           <Button
-            color="default"
+            color="warning"
             size="sm"
             variant="flat"
             startContent={<IconHistory size={18} />}

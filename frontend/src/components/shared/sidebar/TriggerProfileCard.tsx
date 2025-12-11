@@ -12,7 +12,18 @@ import {
   PopoverTrigger,
 } from '@heroui/react';
 import { IconMail, IconLogout } from '@tabler/icons-react';
-import { motion } from 'framer-motion';
+
+const roleConfig: Record<
+  string,
+  {
+    label: string;
+  }
+> = {
+  customer: { label: 'Cliente' },
+  admin: { label: 'Administrador' },
+  delivery: { label: 'Repartidor' },
+  cashier: { label: 'Cajero' },
+};
 
 const ProfileCard = () => {
   const { user, logout } = useAuth();
@@ -88,30 +99,25 @@ const TriggerProfileCard = () => {
   return (
     <Popover showArrow placement="top">
       <PopoverTrigger>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, ease: 'easeOut', delay: 0.15 }}
+        <Button
+          className="w-full justify-start gap-3 p-3 h-auto"
+          variant="flat"
+          color="secondary"
         >
-          <Button
-            className="w-full justify-start gap-3 p-3 h-auto"
-            variant="flat"
-            color="secondary"
-            as={motion.button}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Avatar size="sm" color="primary" />
-            <div className="flex flex-col items-start flex-1 min-w-0 text-left gap-0.5">
-              <p className="text-sm font-semibold text-default-900 truncate w-full">
-                {user?.name} {user?.lastName}
-              </p>
-              <p className="text-xs text-neutral-600 capitalize truncate w-full">
-                {user?.role}
-              </p>
-            </div>
-          </Button>
-        </motion.div>
+          <Avatar
+            size="sm"
+            color="primary"
+            name={`${user?.name} ${user?.lastName}`}
+          />
+          <div className="flex flex-col items-start flex-1 min-w-0 text-left gap-0.5">
+            <p className="text-sm font-semibold text-default-900 truncate w-full">
+              {user?.name} {user?.lastName}
+            </p>
+            <p className="text-xs text-neutral-600 capitalize truncate w-full">
+              {roleConfig[user?.role || '']?.label || user?.role}
+            </p>
+          </div>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="p-3">
         <ProfileCard />

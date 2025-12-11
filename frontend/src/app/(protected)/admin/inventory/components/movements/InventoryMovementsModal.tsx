@@ -289,8 +289,9 @@ export default function InventoryMovementsModal({
                     </span>
                   </TableCell>
                   <TableCell>
-                    {users.find((u) => u.id === item.adminId)?.username ||
-                      `Usuario #${item.adminId}`}
+                    {users.find((u) => u.id === item.adminId)
+                      ? `@${users.find((u) => u.id === item.adminId)?.username}`
+                      : `Usuario #${item.adminId}`}
                   </TableCell>
                 </TableRow>
               )}
