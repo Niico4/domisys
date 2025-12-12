@@ -40,9 +40,12 @@ export const CartItemCard = ({
       <CardBody className="p-4">
         <div className="flex items-start gap-4">
           {/* Product Image */}
-          <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-default-100">
+          <div className="relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-lg overflow-hidden bg-default-100">
             <Image
-              src={imageUrl || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop'}
+              src={
+                imageUrl ||
+                'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop'
+              }
               alt={name}
               fill
               className="object-cover"
@@ -65,7 +68,7 @@ export const CartItemCard = ({
               <Button
                 isIconOnly
                 size="sm"
-                className="bg-red-100 hover:bg-red-200 min-w-unit-8 w-8 h-8 flex-shrink-0"
+                className="bg-red-100 hover:bg-red-200 min-w-unit-8 w-8 h-8 shrink-0"
                 onPress={onRemove}
                 aria-label="Eliminar producto"
               >
@@ -89,9 +92,13 @@ export const CartItemCard = ({
                   onPress={onDecreaseQuantity}
                   aria-label="Disminuir cantidad"
                 >
-                  <IconMinus size={16} className="text-default-600" stroke={2} />
+                  <IconMinus
+                    size={16}
+                    className="text-default-600"
+                    stroke={2}
+                  />
                 </Button>
-                <span className="text-sm font-semibold text-default-900 min-w-[24px] text-center">
+                <span className="text-sm font-semibold text-default-900 min-w-6 text-center">
                   {quantity}
                 </span>
                 <Button

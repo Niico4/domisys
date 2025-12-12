@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { ProductCardSkeleton } from './ProductCardSkeleton';
-import { useCartStore } from '@/store/cart.store';
 import { productService } from '@/services/product.service';
 import { Product } from '@/types/inventory/product';
-import { getProductImage, getProductImageWithUnsplash } from '@/utils/image.utils';
+import {
+  getProductImage,
+  getProductImageWithUnsplash,
+} from '@/utils/image.utils';
 
 interface ProductWithImage extends Product {
   imageUrl?: string;
@@ -88,30 +90,25 @@ export const ProductsSection = () => {
         Lo que tenemos para ti
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        {imagesLoading && products.length > 0 ? (
-          // Show skeletons while images are loading
-          products.map((product) => (
-            <ProductCardSkeleton key={product.id} />
-          ))
-        ) : (
-          // Show actual product cards once images are loaded
-          products.map((product) => {
-            const price = typeof product.price === 'string' 
-              ? parseFloat(product.price) 
-              : product.price;
+        {imagesLoading && products.length > 0
+          ? // Show skeletons while images are loading
+            products.map((product) => <ProductCardSkeleton key={product.id} />)
+          : // Show actual product cards once images are loaded
+            products.map((product) => {
+              const price = Number(product.price) || 0;
 
-            return (
-              <ProductCard
-                key={product.id}
-                id={product.id.toString()}
-                name={product.name}
-                price={price}
-                unit={product.measure}
-                imageUrl={product.imageUrl || getProductImage(product.image)}
-              />
-            );
-          })
-        )}
+              return (
+                <ProductCard
+                  key={product.id}
+                  id={product.id.toString()}
+                  name={product.name}
+                  price={price}
+                  unit={product.measure}
+                  stock={product.stock ?? 0}
+                  imageUrl={product.imageUrl || getProductImage(product.image)}
+                />
+              );
+            })}
       </div>
     </section>
   );

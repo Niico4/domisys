@@ -66,8 +66,11 @@ export default function InventoryMovementsModal({
     if (isOpen) {
       const loadData = async () => {
         try {
-          const usersData = await userService.getAllAdmins();
-          setUsers(usersData);
+          const [adminsData, deliveriesData] = await Promise.all([
+            userService.getAllAdmins(),
+            userService.getAllDeliveries(),
+          ]);
+          setUsers([...adminsData, ...deliveriesData]);
         } catch (error) {
           console.error('Error al cargar usuarios:', error);
         }
@@ -289,9 +292,24 @@ export default function InventoryMovementsModal({
                     </span>
                   </TableCell>
                   <TableCell>
-                    {users.find((u) => u.id === item.adminId)
-                      ? `@${users.find((u) => u.id === item.adminId)?.username}`
-                      : `Usuario #${item.adminId}`}
+                    {(() => {
+                      const user = users.find((u) => u.id === item.adminId);
+                      if (!user) return `Usuario #${item.adminId}`;
+                      const roleLabel =
+                        user.role === 'admin'
+                          ? 'Admin'
+                          : user.role === 'delivery'
+                            ? 'Repartidor'
+                            : 'Usuario';
+                      return (
+                        <div className="flex flex-col">
+                          <span className="font-medium">@{user.username}</span>
+                          <span className="text-xs text-default-400">
+                            {roleLabel}
+                          </span>
+                        </div>
+                      );
+                    })()}
                   </TableCell>
                 </TableRow>
               )}
