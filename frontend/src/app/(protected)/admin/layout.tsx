@@ -8,9 +8,9 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="min-h-dvh w-dvw bg-surface-alt grid grid-cols-[220px_1fr] px-6 py-5 gap-6">
+    <main className="h-dvh w-dvw bg-surface-alt grid grid-cols-[220px_1fr] px-6 py-5 gap-6 overflow-hidden">
       <Sidebar navItems={adminNavItems} />
-      <section className="bg-surface-main rounded-xl overflow-x-auto shadow-md p-10">
+      <section className="bg-surface-main rounded-xl overflow-y-auto shadow-md p-10">
         {children}
       </section>
     </main>

@@ -58,6 +58,29 @@ export const userDatasourceImplementation: UserRepository = {
     return admins as UserEntity[];
   },
 
+  async findAllDeliveries(): Promise<UserEntity[]> {
+    const deliveries = await prisma.user.findMany({
+      where: {
+        role: {
+          in: [UserRole.delivery],
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        name: true,
+        lastName: true,
+        phoneNumber: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return deliveries as UserEntity[];
+  },
+
   async updateProfile(
     userId: number,
     dto: UpdateProfileDtoType

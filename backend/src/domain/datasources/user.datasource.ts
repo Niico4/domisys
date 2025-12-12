@@ -2,7 +2,7 @@ import { UpdateProfileDtoType } from '@/domain/dtos/user/update-profile.dto';
 import { ChangePasswordDtoType } from '@/domain/dtos/user/change-password.dto';
 import { UserEntity } from '@/domain/entities/user.entity';
 
-export interface UserRepository {
+export interface UserDatasource {
   findById(id: number): Promise<UserEntity | null>;
   findAllAdmins(): Promise<UserEntity[]>;
   findAllDeliveries(): Promise<UserEntity[]>;

@@ -78,6 +78,8 @@ export const messages = {
     changePasswordError: () => 'Error al cambiar la contraseña',
     getAdminsSuccess: () => 'Administradores obtenidos correctamente',
     getAdminsError: () => 'Error al obtener los administradores',
+    getDeliveriesSuccess: () => 'Repartidores obtenidos correctamente',
+    getDeliveriesError: () => 'Error al obtener los repartidores',
   },
 
   address: {
