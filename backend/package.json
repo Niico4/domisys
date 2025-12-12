@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "Esta REST API  reúne todo lo que necesita un supermercado para operar: desde los pedidos a domicilio hasta el inventario, las ventas, los usuarios y los reportes. Funciona sobre Node.js + Express y está organizado de forma modular para mantener todo limpio y fácil de escalar.",
   "main": "./src/app.ts",
-  "type": "module",
   "scripts": {
     "dev": "nodemon",
-    "build": "rimraf ./dist && tsc && prisma generate",
+    "build": "rimraf ./dist && tsc && tsc-alias --resolve-full-paths && prisma generate",
     "start": "node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -43,6 +42,7 @@
     "prisma": "^6.19.0",
     "rimraf": "^6.1.0",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
