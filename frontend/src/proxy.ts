@@ -23,6 +23,13 @@ export function proxy(req: NextRequest) {
   const role = req.cookies.get('user_role')?.value as UserRole | undefined;
   const path = req.nextUrl.pathname;
 
+  console.log('🔍 Proxy Debug:', { 
+    path, 
+    hasToken: !!token, 
+    role,
+    allCookies: req.cookies.getAll().map(c => c.name)
+  });
+
   const authPaths = ['/auth/login', '/auth/register'];
   const isAuthPath = authPaths.includes(path);
 

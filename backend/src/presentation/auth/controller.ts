@@ -30,13 +30,6 @@ export const authController = (
         maxAge: 1000 * 60 * 15, // 15 minutos
       });
 
-      res.cookie('refresh_token', data.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
-      });
-
       res.cookie('user_role', data.user.role, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
