@@ -72,57 +72,56 @@ export const OrderCard = ({ order, onDetailsClick }: OrderCardProps) => {
 
         {/* Status Tracker */}
         {!isCanceled && (
-          <div className="space-y-3 pt-2">
-            {/* Step Indicators */}
-            <div className="flex items-center justify-between relative">
+          <div className="pt-2">
+            <div className="flex items-start relative">
+              {/* Connecting Lines - positioned absolutely between circle centers */}
+              {orderStates.slice(0, -1).map((_, index) => {
+                const isCompleted = index < currentStateIndex;
+                // Calculate positions: each step is flex-1, so centers are at (2n+1)/(2*numSteps) * 100%
+                const startPercent = ((2 * index + 1) / (2 * orderStates.length)) * 100;
+                const endPercent = ((2 * (index + 1) + 1) / (2 * orderStates.length)) * 100;
+                const width = endPercent - startPercent;
+                
+                return (
+                  <div
+                    key={`line-${index}`}
+                    className={`absolute h-1 top-[14px] z-0 ${
+                      isCompleted ? 'bg-primary-600' : 'bg-default-200'
+                    }`}
+                    style={{
+                      left: `${startPercent}%`,
+                      width: `${width}%`,
+                    }}
+                  />
+                );
+              })}
+              {/* Step Indicators and Labels */}
               {orderStates.map((state, index) => {
                 const isCompleted = index < currentStateIndex;
                 const isCurrent = index === currentStateIndex;
                 const isActive = index <= currentStateIndex;
 
                 return (
-                  <div key={state} className="flex items-center flex-1 relative z-10">
-                    <div className="flex flex-col items-center flex-1 min-w-0">
-                      <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          isActive
-                            ? 'bg-primary-600 text-white'
-                            : 'bg-default-200 border-2 border-default-300'
-                        }`}
-                      >
-                        {isCompleted && (
-                          <IconCheck size={16} stroke={3} className="text-white" />
-                        )}
-                        {isCurrent && !isCompleted && (
-                          <div className="w-3 h-3 rounded-full bg-white" />
-                        )}
-                      </div>
-                    </div>
-                    {index < orderStates.length - 1 && (
-                      <div
-                        className={`h-1 flex-1 mx-2 ${
-                          isCompleted ? 'bg-primary-600' : 'bg-default-200'
-                        }`}
-                        style={{ minWidth: '20px' }}
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            {/* Step Labels */}
-            <div className="flex items-start justify-between px-1">
-              {orderStates.map((state, index) => {
-                const isCurrent = index === currentStateIndex;
-                const isActive = index <= currentStateIndex;
-
-                return (
                   <div
-                    key={`label-${state}`}
-                    className="flex-1 text-center min-w-0 px-1"
+                    key={state}
+                    className="flex flex-col items-center flex-1 relative z-10"
                   >
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        isActive
+                          ? 'bg-primary-600 text-white'
+                          : 'bg-default-200 border-2 border-default-300'
+                      }`}
+                    >
+                      {isCompleted && (
+                        <IconCheck size={16} stroke={3} className="text-white" />
+                      )}
+                      {isCurrent && !isCompleted && (
+                        <div className="w-3 h-3 rounded-full bg-white" />
+                      )}
+                    </div>
                     <p
-                      className={`text-xs leading-tight ${
+                      className={`text-xs leading-tight mt-2 text-center ${
                         isCurrent
                           ? 'font-semibold text-primary-600'
                           : isActive
