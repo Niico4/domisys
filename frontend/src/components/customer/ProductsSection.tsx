@@ -2,18 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
+import { ProductCardSkeleton } from './ProductCardSkeleton';
 import { useCartStore } from '@/store/cart.store';
 import { productService } from '@/services/product.service';
 import { Product } from '@/types/inventory/product';
-import { getProductImage } from '@/utils/image.utils';
+import { getProductImage, getProductImageWithUnsplash } from '@/utils/image.utils';
+
+interface ProductWithImage extends Product {
+  imageUrl?: string;
+}
 
 export const ProductsSection = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductWithImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [imagesLoading, setImagesLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
+      setImagesLoading(true);
       const data = await productService.getAllProducts();
       if (data) {
         // Filter only active products
@@ -21,19 +28,29 @@ export const ProductsSection = () => {
           (product) => product.state === 'active'
         );
         setProducts(activeProducts);
+
+        // Fetch images from Unsplash for products without images
+        const productsWithImages = await Promise.all(
+          activeProducts.map(async (product) => {
+            const imageUrl = await getProductImageWithUnsplash(
+              product.image,
+              product.name
+            );
+            return {
+              ...product,
+              imageUrl,
+            };
+          })
+        );
+        setProducts(productsWithImages);
+        setImagesLoading(false);
       }
       setIsLoading(false);
+      setImagesLoading(false);
     };
 
     fetchProducts();
   }, []);
-
-  // Note: ProductCard now handles adding to cart internally
-  // This callback is optional and can be used for tracking/analytics
-  const handleAddToCart = (product: Product) => {
-    // ProductCard already handles adding to cart, so we don't need to do it here
-    // This is just a placeholder for future tracking/analytics if needed
-  };
 
   if (isLoading) {
     return (
@@ -71,25 +88,30 @@ export const ProductsSection = () => {
         Lo que tenemos para ti
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-        {products.map((product) => {
-          // Convert price to number if it's a string
-          const price = typeof product.price === 'string' 
-            ? parseFloat(product.price) 
-            : product.price;
+        {imagesLoading && products.length > 0 ? (
+          // Show skeletons while images are loading
+          products.map((product) => (
+            <ProductCardSkeleton key={product.id} />
+          ))
+        ) : (
+          // Show actual product cards once images are loaded
+          products.map((product) => {
+            const price = typeof product.price === 'string' 
+              ? parseFloat(product.price) 
+              : product.price;
 
-          return (
-            <ProductCard
-              key={product.id}
-              id={product.id.toString()}
-              name={product.name}
-              price={price}
-              unit={product.measure}
-              stock={product.stock}
-              imageUrl={getProductImage(product.image)}
-              onAddToCart={() => handleAddToCart(product)}
-            />
-          );
-        })}
+            return (
+              <ProductCard
+                key={product.id}
+                id={product.id.toString()}
+                name={product.name}
+                price={price}
+                unit={product.measure}
+                imageUrl={product.imageUrl || getProductImage(product.image)}
+              />
+            );
+          })
+        )}
       </div>
     </section>
   );
