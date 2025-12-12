@@ -30,6 +30,18 @@ export const orderService = {
     }
   },
 
+  getMyDeliveries: async (): Promise<Order[] | null> => {
+    try {
+      const res = await axiosInstance.get<ApiResponse<Order[]>>(
+        '/orders/my-deliveries'
+      );
+      return res.data.data;
+    } catch (error) {
+      handleApiError(error);
+      return null;
+    }
+  },
+
   getOrderById: async (id: number): Promise<Order | null> => {
     try {
       const res = await axiosInstance.get<ApiResponse<Order>>(`/orders/${id}`);
@@ -72,6 +84,18 @@ export const orderService = {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
         }
+      );
+      return res.data.data;
+    } catch (error) {
+      handleApiError(error);
+      return null;
+    }
+  },
+
+  cancelOrder: async (id: number): Promise<Order | null> => {
+    try {
+      const res = await axiosInstance.patch<ApiResponse<Order>>(
+        `/orders/${id}/cancel`
       );
       return res.data.data;
     } catch (error) {
