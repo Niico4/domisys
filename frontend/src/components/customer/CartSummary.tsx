@@ -1,6 +1,4 @@
-"use client";
-
-import { Card, CardBody } from "@heroui/react";
+'use client';
 
 interface CartSummaryProps {
   totalProducts: number;
@@ -16,9 +14,9 @@ export const CartSummary = ({
   total,
 }: CartSummaryProps) => {
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);

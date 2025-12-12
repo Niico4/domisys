@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { Avatar } from "@heroui/react";
-import { Greeting } from "@/components/customer/Greeting";
-import { SearchBar } from "@/components/shared/SearchBar";
-import { NotificationButton } from "@/components/shared/NotificationButton";
-import { FilterButton } from "@/components/shared/FilterButton";
-import { CategoriesSection } from "@/components/customer/CategoriesSection";
-import { ProductsSection } from "@/components/customer/ProductsSection";
-import { FilteredProductsSection } from "@/components/customer/FilteredProductsSection";
-import { RecentSearches } from "@/components/customer/RecentSearches";
-import { addRecentSearch } from "@/utils/search-storage.utils";
-import { useState } from "react";
+import { Avatar } from '@heroui/react';
+import { Greeting } from '@/components/customer/Greeting';
+import { SearchBar } from '@/components/shared/SearchBar';
+import { NotificationButton } from '@/components/shared/NotificationButton';
+import { FilterButton } from '@/components/shared/FilterButton';
+import { CategoriesSection } from '@/components/customer/CategoriesSection';
+import { ProductsSection } from '@/components/customer/ProductsSection';
+import { FilteredProductsSection } from '@/components/customer/FilteredProductsSection';
+import { RecentSearches } from '@/components/customer/RecentSearches';
+import { addRecentSearch } from '@/utils/search-storage.utils';
+import { useState } from 'react';
 
 const CustomerHomePage = () => {
-  const [searchValue, setSearchValue] = useState("");
-  const [activeSearch, setActiveSearch] = useState("");
+  const [searchValue, setSearchValue] = useState('');
+  const [activeSearch, setActiveSearch] = useState('');
   const [refreshRecentSearches, setRefreshRecentSearches] = useState(0);
 
   const handleSearch = () => {
@@ -23,7 +23,7 @@ const CustomerHomePage = () => {
       setActiveSearch(searchValue.trim());
       setRefreshRecentSearches((prev) => prev + 1);
     } else {
-      setActiveSearch("");
+      setActiveSearch('');
     }
   };
 
@@ -33,11 +33,11 @@ const CustomerHomePage = () => {
   };
 
   const handleFilter = () => {
-    console.log("Opening filters");
+    console.log('Opening filters');
   };
 
   const handleNotifications = () => {
-    console.log("Opening notifications");
+    console.log('Opening notifications');
   };
 
   return (
@@ -46,16 +46,16 @@ const CustomerHomePage = () => {
         <header className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
             <Avatar
-              size="md"
-              className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0"
-              color="default"
+              size="lg"
+              className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 ring-2 ring-primary/20"
+              color="primary"
             />
             <div className="flex-1 min-w-0">
               <Greeting />
             </div>
           </div>
 
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <NotificationButton onClick={handleNotifications} />
           </div>
         </header>
@@ -69,7 +69,7 @@ const CustomerHomePage = () => {
               placeholder="Buscar producto..."
             />
           </div>
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <FilterButton onClick={handleFilter} />
           </div>
         </div>

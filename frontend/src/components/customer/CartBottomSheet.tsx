@@ -5,17 +5,12 @@ import { BottomSheet } from '@/components/shared/BottomSheet';
 import { useCartStore } from '@/store/cart.store';
 import { CartItemCard } from './CartItemCard';
 import { CartSummary } from './CartSummary';
-import { Button } from '@heroui/react';
+import { addToast, Button } from '@heroui/react';
 
 export const CartBottomSheet = () => {
   const router = useRouter();
-  const {
-    isCartOpen,
-    closeCart,
-    items,
-    removeItem,
-    updateQuantity,
-  } = useCartStore();
+  const { isCartOpen, closeCart, items, removeItem, updateQuantity } =
+    useCartStore();
 
   const totalProducts = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce(
@@ -28,7 +23,15 @@ export const CartBottomSheet = () => {
   const handleIncreaseQuantity = (id: string) => {
     const item = items.find((i) => i.id === id);
     if (item) {
-      updateQuantity(id, item.quantity + 1);
+      if (item.quantity < item.stock) {
+        updateQuantity(id, item.quantity + 1);
+      } else {
+        addToast({
+          title: 'Stock insuficiente',
+          description: `Solo hay ${item.stock} unidades disponibles de ${item.name}`,
+          color: 'warning',
+        });
+      }
     }
   };
 
@@ -101,4 +104,3 @@ export const CartBottomSheet = () => {
     </BottomSheet>
   );
 };
-

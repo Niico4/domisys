@@ -2,32 +2,20 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  IconHome,
-  IconSearch,
-  IconShoppingCart,
-  IconClock,
-  IconUser,
-} from '@tabler/icons-react';
+import { IconHome } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import { useCartStore } from '@/store/cart.store';
+import { TriggerProfileButton } from './TriggerProfileButton';
 
-interface NavItem {
+export interface NavItem {
   href?: string;
   icon: typeof IconHome;
   label: string;
   isCart?: boolean;
+  isProfile?: boolean;
 }
 
-const navItems: NavItem[] = [
-  { href: '/customer/home', icon: IconHome, label: 'Inicio' },
-  { href: '/customer/search', icon: IconSearch, label: 'Buscar' },
-  { icon: IconShoppingCart, label: 'Carrito', isCart: true },
-  { href: '/customer/history', icon: IconClock, label: 'Historial' },
-  { href: '/customer/profile', icon: IconUser, label: 'Perfil' },
-];
-
-export const BottomNav = () => {
+export const BottomNav = ({ navItems }: { navItems: NavItem[] }) => {
   const pathname = usePathname();
   const { isCartOpen, openCart } = useCartStore();
 
@@ -35,10 +23,8 @@ export const BottomNav = () => {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-default-200 shadow-lg safe-area-inset-bottom">
       <div className="max-w-7xl mx-auto px-2 sm:px-4">
         <div className="flex items-center justify-around h-16 sm:h-20">
-          {navItems.map((item, index) => {
-            const isActive = item.isCart
-              ? isCartOpen
-              : pathname === item.href;
+          {navItems.map((item) => {
+            const isActive = item.isCart ? isCartOpen : pathname === item.href;
             const Icon = item.icon;
 
             const content = (
@@ -70,6 +56,10 @@ export const BottomNav = () => {
               </motion.div>
             );
 
+            if (item.isProfile) {
+              return <TriggerProfileButton key="profile" />;
+            }
+
             if (item.isCart) {
               return (
                 <button
@@ -98,4 +88,3 @@ export const BottomNav = () => {
     </nav>
   );
 };
-

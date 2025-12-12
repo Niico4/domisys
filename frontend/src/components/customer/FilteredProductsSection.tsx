@@ -101,6 +101,7 @@ export const FilteredProductsSection = ({
               name={product.name}
               price={price}
               unit={product.measure}
+              stock={product.stock}
               imageUrl={getProductImage(product.image)}
               onAddToCart={() => handleAddToCart(product)}
             />
