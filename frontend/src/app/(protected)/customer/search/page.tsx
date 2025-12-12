@@ -1,18 +1,14 @@
 "use client";
 
-import { Avatar } from "@heroui/react";
-import { Greeting } from "@/components/customer/Greeting";
+import { useState } from "react";
 import { SearchBar } from "@/components/shared/SearchBar";
-import { NotificationButton } from "@/components/shared/NotificationButton";
 import { FilterButton } from "@/components/shared/FilterButton";
 import { CategoriesSection } from "@/components/customer/CategoriesSection";
-import { ProductsSection } from "@/components/customer/ProductsSection";
-import { FilteredProductsSection } from "@/components/customer/FilteredProductsSection";
 import { RecentSearches } from "@/components/customer/RecentSearches";
+import { FilteredProductsSection } from "@/components/customer/FilteredProductsSection";
 import { addRecentSearch } from "@/utils/search-storage.utils";
-import { useState } from "react";
 
-const CustomerHomePage = () => {
+export default function CustomerSearchPage() {
   const [searchValue, setSearchValue] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
   const [refreshRecentSearches, setRefreshRecentSearches] = useState(0);
@@ -36,30 +32,9 @@ const CustomerHomePage = () => {
     console.log("Opening filters");
   };
 
-  const handleNotifications = () => {
-    console.log("Opening notifications");
-  };
-
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
-        <header className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-            <Avatar
-              size="md"
-              className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0"
-              color="default"
-            />
-            <div className="flex-1 min-w-0">
-              <Greeting />
-            </div>
-          </div>
-
-          <div className="flex-shrink-0">
-            <NotificationButton onClick={handleNotifications} />
-          </div>
-        </header>
-
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex-1 min-w-0">
             <SearchBar
@@ -74,24 +49,15 @@ const CustomerHomePage = () => {
           </div>
         </div>
 
-        {activeSearch && (
-          <RecentSearches
-            onSearchClick={handleRecentSearchClick}
-            refreshTrigger={refreshRecentSearches}
-          />
-        )}
+        <RecentSearches
+          onSearchClick={handleRecentSearchClick}
+          refreshTrigger={refreshRecentSearches}
+        />
 
-        <main className="mt-6 sm:mt-8 space-y-8 sm:space-y-12">
-          <CategoriesSection />
-          {activeSearch ? (
-            <FilteredProductsSection searchQuery={activeSearch} />
-          ) : (
-            <ProductsSection />
-          )}
-        </main>
+        <CategoriesSection />
+
+        <FilteredProductsSection searchQuery={activeSearch} />
       </div>
     </div>
   );
-};
-
-export default CustomerHomePage;
+}
