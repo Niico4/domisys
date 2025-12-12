@@ -3,7 +3,6 @@ import {
   IconDeviceAnalytics,
   IconPackage,
   IconUsersGroup,
-  IconSettings,
 } from '@tabler/icons-react';
 
 export const adminNavItems: NavItem[] = [
@@ -32,9 +31,9 @@ export const adminNavItems: NavItem[] = [
     href: '/admin/users',
     icon: IconUsersGroup,
   },
-  {
-    name: 'Configuración',
-    href: '/admin/settings',
-    icon: IconSettings,
-  },
+  // {
+  //   name: 'Configuración',
+  //   href: '/admin/settings',
+  //   icon: IconSettings,
+  // },
 ];

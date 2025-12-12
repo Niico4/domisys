@@ -6,6 +6,7 @@ import { UpdateProfile } from '@/domain/use-cases/user/update-profile';
 import { ChangePassword } from '@/domain/use-cases/user/change-password';
 import { GetCurrentUser } from '@/domain/use-cases/user/get-current-user';
 import { GetAllAdmins } from '@/domain/use-cases/user/get-all-admins';
+import { GetAllDeliveries } from '@/domain/use-cases/user/get-all-deliveries';
 
 import { updateProfileSchema } from '@/domain/dtos/user/update-profile.dto';
 import { changePasswordSchema } from '@/domain/dtos/user/change-password.dto';
@@ -42,6 +43,21 @@ export const userController = (userRepository: UserRepository) => ({
         res,
         error,
         messages.user.getAdminsError()
+      );
+    }
+  },
+
+  getAllDeliveries: async (_req: Request, res: Response) => {
+    try {
+      const useCase = new GetAllDeliveries(userRepository);
+      const deliveries = await useCase.execute();
+
+      return ResponseHandler.ok(res, messages.user.getDeliveriesSuccess(), deliveries);
+    } catch (error) {
+      return ResponseHandler.handleException(
+        res,
+        error,
+        messages.user.getDeliveriesError()
       );
     }
   },
