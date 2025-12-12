@@ -1,11 +1,9 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
-  NEXT_PUBLIC_API_BASE_URL: z
-    .url({
-      error: 'NEXT_PUBLIC_API_BASE_URL debe ser una URL válida',
-    })
-    .default('http://localhost:4000/api'),
+  NEXT_PUBLIC_API_BASE_URL: z.url({
+    error: 'NEXT_PUBLIC_API_BASE_URL debe ser una URL válida',
+  }),
 });
 
 const validateEnv = () => {
