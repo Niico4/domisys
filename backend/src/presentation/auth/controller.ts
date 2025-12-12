@@ -24,17 +24,10 @@ export const authController = (
       const data = await useCase.execute(dto);
 
       res.cookie('access_token', data.token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 1000 * 60 * 15, // 15 minutos
-      });
-
-      res.cookie('user_role', data.user.role, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
       });
 
       const resData = {
@@ -64,21 +57,14 @@ export const authController = (
       const data = await useCase.execute(dto);
 
       res.cookie('access_token', data.token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 1000 * 60 * 15, // 15 minutos
       });
 
       res.cookie('refresh_token', data.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
-      });
-
-      res.cookie('user_role', data.user.role, {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
@@ -105,19 +91,19 @@ export const authController = (
   logout: async (_req: Request, res: Response) => {
     try {
       res.clearCookie('access_token', {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       });
 
       res.clearCookie('refresh_token', {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       });
 
       res.clearCookie('user_role', {
-        httpOnly: true,
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       });
