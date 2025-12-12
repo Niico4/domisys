@@ -7,6 +7,7 @@ export interface CartItem {
   price: number;
   unit: string;
   quantity: number;
+  stock: number;
   imageUrl?: string;
 }
 
@@ -38,12 +39,17 @@ export const useCartStore = create<CartStore>()(
           const existingItem = state.items.find((i) => i.id === item.id);
           let newItems;
           if (existingItem) {
-            // If item exists, increment quantity (ensure it's at least 1)
-            newItems = state.items.map((i) =>
-              i.id === item.id
-                ? { ...i, quantity: Math.max(1, i.quantity + 1) }
-                : i
-            );
+            // Check if we can add more
+            if (existingItem.quantity < item.stock) {
+              newItems = state.items.map((i) =>
+                i.id === item.id
+                  ? { ...i, quantity: Math.max(1, i.quantity + 1), stock: item.stock }
+                  : i
+              );
+            } else {
+              // Can't add more, return current state
+              return state;
+            }
           } else {
             // New item always starts with quantity 1
             newItems = [...state.items, { ...item, quantity: 1 }];
@@ -58,9 +64,15 @@ export const useCartStore = create<CartStore>()(
             // Remove item if quantity is 0 or less
             return { items: state.items.filter((item) => item.id !== id) };
           }
+          const item = state.items.find((i) => i.id === id);
+          if (!item) return state;
+          
+          // Validate against stock
+          const validQuantity = Math.min(quantity, item.stock);
+          
           return {
             items: state.items.map((item) =>
-              item.id === id ? { ...item, quantity } : item
+              item.id === id ? { ...item, quantity: validQuantity } : item
             ),
           };
         }),

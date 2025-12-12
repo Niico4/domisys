@@ -10,6 +10,7 @@ interface ProductCardProps {
   name: string;
   price: number;
   unit: string;
+  stock: number;
   imageUrl?: string;
   onAddToCart?: () => void;
 }
@@ -19,11 +20,12 @@ export const ProductCard = ({
   name,
   price,
   unit,
+  stock,
   imageUrl,
   onAddToCart,
 }: ProductCardProps) => {
   const { addItem, updateQuantity } = useCartStore();
-  
+
   // Subscribe to this specific item's quantity in the cart
   // Ensure quantity is always at least 1 if item exists in cart
   const quantity = useCartStore((state) => {
@@ -50,6 +52,7 @@ export const ProductCard = ({
       name,
       price,
       unit,
+      stock,
       imageUrl,
     });
     // Call optional callback if provided (for tracking/analytics, etc.)
@@ -60,13 +63,17 @@ export const ProductCard = ({
   };
 
   const handleIncrease = () => {
+    if (quantity >= stock) {
+      return;
+    }
+
     if (quantity === 0) {
-      // Add item with quantity 1
       addItem({
         id,
         name,
         price,
         unit,
+        stock,
         imageUrl,
       });
     } else {
@@ -88,7 +95,10 @@ export const ProductCard = ({
         {/* Image Container with Price Badge */}
         <div className="relative w-full aspect-square rounded-t-lg overflow-hidden bg-default-100">
           <Image
-            src={imageUrl || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop'}
+            src={
+              imageUrl ||
+              'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop'
+            }
             alt={name}
             fill
             className="object-cover"
@@ -108,7 +118,14 @@ export const ProductCard = ({
           <p className="text-sm text-default-500">{unit}</p>
 
           {/* Quantity Selector or Add to Cart Button */}
-          {quantity > 0 ? (
+          {stock === 0 ? (
+            <Button
+              className="w-full bg-default-200 text-default-500 font-medium rounded-lg mt-2"
+              isDisabled
+            >
+              Sin stock
+            </Button>
+          ) : quantity > 0 ? (
             <div className="flex items-center justify-center gap-2 bg-white rounded-full px-3 py-2 shadow-sm mt-2">
               <Button
                 isIconOnly
@@ -120,7 +137,7 @@ export const ProductCard = ({
               >
                 <IconMinus size={18} className="text-default-600" stroke={2} />
               </Button>
-              <span className="text-base font-semibold text-default-900 min-w-[32px] text-center">
+              <span className="text-base font-semibold text-default-900 min-w-8 text-center">
                 {quantity}
               </span>
               <Button
@@ -129,9 +146,16 @@ export const ProductCard = ({
                 variant="light"
                 className="min-w-unit-8 w-8 h-8"
                 onPress={handleIncrease}
+                isDisabled={quantity >= stock}
                 aria-label="Aumentar cantidad"
               >
-                <IconPlus size={18} className="text-default-600" stroke={2} />
+                <IconPlus
+                  size={18}
+                  className={
+                    quantity >= stock ? 'text-default-300' : 'text-default-600'
+                  }
+                  stroke={2}
+                />
               </Button>
             </div>
           ) : (

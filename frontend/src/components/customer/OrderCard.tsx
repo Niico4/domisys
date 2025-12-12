@@ -1,13 +1,16 @@
 'use client';
 
-import { Card, CardBody, Button } from '@heroui/react';
-import { IconCheck, IconReceipt } from '@tabler/icons-react';
+import { Card, CardBody, Button, Avatar } from '@heroui/react';
+import { IconCheck, IconReceipt, IconX } from '@tabler/icons-react';
 import { Order, OrderState } from '@/types/order';
 import { formatPrice } from '@/utils/format.utils';
 
 interface OrderCardProps {
   order: Order;
   onDetailsClick?: (orderId: number) => void;
+  viewMode?: 'customer' | 'delivery';
+  onUpdateState?: (orderId: number, newState: OrderState) => void;
+  onCancelOrder?: (orderId: number) => void;
 }
 
 const OrderStateLabels: Record<OrderState, string> = {
@@ -25,26 +28,78 @@ const orderStates: OrderState[] = [
   OrderState.DELIVERED,
 ];
 
-export const OrderCard = ({ order, onDetailsClick }: OrderCardProps) => {
+export const OrderCard = ({
+  order,
+  onDetailsClick,
+  viewMode = 'customer',
+  onUpdateState,
+  onCancelOrder,
+}: OrderCardProps) => {
   const currentStateIndex = orderStates.indexOf(order.state);
   const isCanceled = order.state === OrderState.CANCEL;
 
-  const getDeliveryPersonInfo = () => {
-    if (order.deliveryId) {
+  const getNextStateButton = () => {
+    if (isCanceled || order.state === OrderState.DELIVERED) return null;
+
+    const stateActions: Record<
+      OrderState,
+      { label: string; nextState: OrderState } | null
+    > = {
+      [OrderState.PENDING]: {
+        label: 'Confirmar pedido',
+        nextState: OrderState.CONFIRMED,
+      },
+      [OrderState.CONFIRMED]: {
+        label: 'Entregar pedido',
+        nextState: OrderState.SHIPPED,
+      },
+      [OrderState.SHIPPED]: {
+        label: 'Pedido completado',
+        nextState: OrderState.DELIVERED,
+      },
+      [OrderState.DELIVERED]: null,
+      [OrderState.CANCEL]: null,
+    };
+
+    return stateActions[order.state];
+  };
+
+  const nextAction = getNextStateButton();
+
+  const getPersonInfo = () => {
+    if (viewMode === 'delivery') {
+      // Vista de repartidor: mostrar cliente
+      if (order.customer) {
+        return {
+          label: 'Cliente',
+          name: `${order.customer.name} ${order.customer.lastName}`,
+          identifier: order.customer.phoneNumber,
+        };
+      }
       return {
-        hasDelivery: true,
-        name: 'Repartidor asignado',
-        identifier: 'XXXXXXXXXX',
+        label: 'Cliente',
+        name: 'Sin información',
+        identifier: 'N/A',
       };
     }
+
+    // Vista de cliente: mostrar repartidor
+    if (order.delivery) {
+      return {
+        label: 'Repartidor',
+        name: `${order.delivery.name} ${order.delivery.lastName}`,
+        identifier: order.delivery.phoneNumber,
+      };
+    }
+
     return {
-      hasDelivery: false,
-      name: 'Sin repartidor',
-      identifier: 'XXXXXXXXXX',
+      label: 'Repartidor',
+      name: 'Sin asignar',
+      identifier: 'N/A',
     };
   };
 
-  const deliveryInfo = getDeliveryPersonInfo();
+  const personInfo = getPersonInfo();
 
   return (
     <Card className="w-full bg-[#F1F1F1] shadow-sm">
@@ -52,17 +107,25 @@ export const OrderCard = ({ order, onDetailsClick }: OrderCardProps) => {
         {/* Delivery Person and Order Info */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-10 h-10 rounded-full bg-default-300 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs text-default-600">DP</span>
+            <div className="w-10 h-10 rounded-full bg-default-300 flex items-center justify-center shrink-0">
+              {/* <span className="text-xs text-default-600 font-semibold">
+                {viewMode === 'delivery' ? 'C' : 'R'}
+              </span> */}
+              <Avatar name={`${personInfo.name} `} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-default-900">
-                {deliveryInfo.name}
+              <p className="text-xs text-default-500 mb-0.5">
+                {personInfo.label}
               </p>
-              <p className="text-xs text-default-500">{deliveryInfo.identifier}</p>
+              <p className="text-sm font-medium text-default-900">
+                {personInfo.name}
+              </p>
+              <p className="text-xs text-default-500">
+                {personInfo.identifier}
+              </p>
             </div>
           </div>
-          <div className="text-right flex-shrink-0">
+          <div className="text-right shrink-0">
             <p className="text-xs text-default-500 mb-1">NO. {order.id}</p>
             <p className="text-lg font-bold text-default-900">
               {formatPrice(order.totalAmount)}
@@ -78,14 +141,16 @@ export const OrderCard = ({ order, onDetailsClick }: OrderCardProps) => {
               {orderStates.slice(0, -1).map((_, index) => {
                 const isCompleted = index < currentStateIndex;
                 // Calculate positions: each step is flex-1, so centers are at (2n+1)/(2*numSteps) * 100%
-                const startPercent = ((2 * index + 1) / (2 * orderStates.length)) * 100;
-                const endPercent = ((2 * (index + 1) + 1) / (2 * orderStates.length)) * 100;
+                const startPercent =
+                  ((2 * index + 1) / (2 * orderStates.length)) * 100;
+                const endPercent =
+                  ((2 * (index + 1) + 1) / (2 * orderStates.length)) * 100;
                 const width = endPercent - startPercent;
-                
+
                 return (
                   <div
                     key={`line-${index}`}
-                    className={`absolute h-1 top-[14px] z-0 ${
+                    className={`absolute h-1 top-3.5 z-0 ${
                       isCompleted ? 'bg-primary-600' : 'bg-default-200'
                     }`}
                     style={{
@@ -107,14 +172,18 @@ export const OrderCard = ({ order, onDetailsClick }: OrderCardProps) => {
                     className="flex flex-col items-center flex-1 relative z-10"
                   >
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
                         isActive
                           ? 'bg-primary-600 text-white'
                           : 'bg-default-200 border-2 border-default-300'
                       }`}
                     >
                       {isCompleted && (
-                        <IconCheck size={16} stroke={3} className="text-white" />
+                        <IconCheck
+                          size={16}
+                          stroke={3}
+                          className="text-white"
+                        />
                       )}
                       {isCurrent && !isCompleted && (
                         <div className="w-3 h-3 rounded-full bg-white" />
@@ -154,6 +223,30 @@ export const OrderCard = ({ order, onDetailsClick }: OrderCardProps) => {
         >
           Detalles
         </Button>
+
+        {/* Delivery Actions */}
+        {viewMode === 'delivery' && !isCanceled && (
+          <div className="flex gap-2">
+            {nextAction && (
+              <Button
+                className="flex-1 bg-primary-600 text-white font-medium rounded-lg py-2"
+                onPress={() => onUpdateState?.(order.id, nextAction.nextState)}
+              >
+                {nextAction.label}
+              </Button>
+            )}
+            {order.state !== OrderState.DELIVERED && (
+              <Button
+                className="bg-danger-600 text-white font-medium rounded-lg py-2"
+                onPress={() => onCancelOrder?.(order.id)}
+                startContent={<IconX size={18} />}
+                isIconOnly={!!nextAction}
+              >
+                {!nextAction && 'Cancelar'}
+              </Button>
+            )}
+          </div>
+        )}
       </CardBody>
     </Card>
   );

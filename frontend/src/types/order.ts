@@ -12,7 +12,7 @@ export interface OrderProduct {
   id: number;
   productId: number;
   quantity: number;
-  price: number;
+  unitPrice: number;
   product?: {
     id: number;
     name: string;
@@ -38,6 +38,18 @@ export interface Order {
     neighborhood: string;
     street: string;
     details?: string | null;
+  };
+  customer?: {
+    id: number;
+    name: string;
+    lastName: string;
+    phoneNumber: string;
+  };
+  delivery?: {
+    id: number;
+    name: string;
+    lastName: string;
+    phoneNumber: string;
   };
 }
 

@@ -1,14 +1,18 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { DateInput } from '@heroui/react';
-import { parseDate, CalendarDate } from '@internationalized/date';
+import { DateInput, Avatar, Spinner } from '@heroui/react';
+import { CalendarDate } from '@internationalized/date';
 import { Select, SelectItem } from '@heroui/react';
 import { IconCalendar } from '@tabler/icons-react';
-import { Spinner } from '@heroui/react';
 import { orderService } from '@/services/order.service';
 import { Order, OrderState } from '@/types/order';
 import { OrderCard } from '@/components/customer/OrderCard';
+import { OrderDetailModal } from '@/components/customer/OrderDetailModal';
+import { Greeting } from '@/components/customer/Greeting';
+import { NotificationButton } from '@/components/shared/NotificationButton';
+import { userService } from '@/services/user.service';
+import { User } from '@/types/user';
 
 const stateOptions = [
   { key: 'all', label: 'Todos' },
@@ -21,22 +25,35 @@ const stateOptions = [
 
 export default function CustomerHistoryPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [, setDeliveries] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<CalendarDate | null>(null);
   const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  // const fetchOrders = async () => {
+  //   setIsLoading(true);
+  //   const data = await orderService.getMyOrders();
+  //   if (data) {
+  //     setOrders(data);
+  //   }
+  //   setIsLoading(false);
+  // };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const fetchData = async () => {
+      const [ordersData, deliveriesData] = await Promise.all([
+        orderService.getMyOrders(),
+        userService.getAllDeliveries(),
+      ]);
 
-  const fetchOrders = async () => {
-    setIsLoading(true);
-    const data = await orderService.getMyOrders();
-    if (data) {
-      setOrders(data);
-    }
-    setIsLoading(false);
-  };
+      if (ordersData) setOrders(ordersData);
+      if (deliveriesData) setDeliveries(deliveriesData);
+      setIsLoading(false);
+    };
+    fetchData();
+  }, []);
 
   const filteredOrders = useMemo(() => {
     let filtered = [...orders];
@@ -71,29 +88,49 @@ export default function CustomerHistoryPage() {
   }, [orders, selectedDate, selectedState]);
 
   const handleDetailsClick = (orderId: number) => {
-    // TODO: Navigate to order details page or open modal
-    console.log('View details for order:', orderId);
+    const order = orders.find((o) => o.id === orderId);
+    if (order) {
+      setSelectedOrder(order);
+      setIsDetailModalOpen(true);
+    }
+  };
+
+  const handleNotifications = () => {
+    console.log('Opening notifications');
   };
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-screen">
       <div className="max-w-2xl mx-auto">
-        {/* Title */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-primary-600 text-center mb-6">
-          Mis Pedidos
-        </h1>
+        {/* Header */}
+        <header className="flex items-start justify-between gap-4 mb-6">
+          <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+            <Avatar
+              size="md"
+              className="w-10 h-10 sm:w-12 sm:h-12 shrink-0"
+              color="default"
+            />
+            <div className="flex-1 min-w-0">
+              <Greeting />
+            </div>
+          </div>
+
+          <div className="shrink-0">
+            <NotificationButton onClick={handleNotifications} />
+          </div>
+        </header>
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <DateInput
             label="Fecha"
-            placeholder="mm/dd/yyyy"
             value={selectedDate}
             onChange={setSelectedDate}
-            startContent={<IconCalendar size={18} className="text-default-400" />}
+            startContent={
+              <IconCalendar size={18} className="text-default-400" />
+            }
             className="flex-1"
             variant="bordered"
-            isClearable
           />
 
           <Select
@@ -108,9 +145,7 @@ export default function CustomerHistoryPage() {
             variant="bordered"
           >
             {stateOptions.map((option) => (
-              <SelectItem key={option.key} value={option.key}>
-                {option.label}
-              </SelectItem>
+              <SelectItem key={option.key}>{option.label}</SelectItem>
             ))}
           </Select>
         </div>
@@ -135,10 +170,19 @@ export default function CustomerHistoryPage() {
                 key={order.id}
                 order={order}
                 onDetailsClick={handleDetailsClick}
+                viewMode="customer"
               />
             ))}
           </div>
         )}
+
+        {/* Order Detail Modal */}
+        <OrderDetailModal
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          order={selectedOrder}
+          viewerRole="customer"
+        />
       </div>
     </div>
   );

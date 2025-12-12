@@ -215,7 +215,35 @@ export const orderDatasourceImplementation: OrderDatasource = {
   async findByDelivery(deliveryId: number): Promise<OrderEntity[]> {
     return await prisma.order.findMany({
       where: { deliveryId },
-      include: { orderProducts: true },
+      include: {
+        orderProducts: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+            phoneNumber: true,
+          },
+        },
+        delivery: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+            phoneNumber: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   },
@@ -223,7 +251,27 @@ export const orderDatasourceImplementation: OrderDatasource = {
   async findByCustomer(customerId: number): Promise<OrderEntity[]> {
     return await prisma.order.findMany({
       where: { customerId },
-      include: { orderProducts: true },
+      include: {
+        orderProducts: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
+        delivery: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+            phoneNumber: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
   },
