@@ -25,15 +25,15 @@ export const authController = (
 
       res.cookie('access_token', data.token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 1000 * 60 * 15, // 15 minutos
       });
 
       res.cookie('refresh_token', data.refreshToken, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
       });
 
@@ -65,15 +65,15 @@ export const authController = (
 
       res.cookie('access_token', data.token, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 1000 * 60 * 15, // 15 minutos
       });
 
       res.cookie('refresh_token', data.refreshToken, {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 7, // 7 días
       });
 
@@ -99,14 +99,14 @@ export const authController = (
     try {
       res.clearCookie('access_token', {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       });
 
       res.clearCookie('refresh_token', {
         httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       });
 
       return ResponseHandler.ok(res, messages.auth.logoutSuccess());
