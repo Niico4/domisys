@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { NEXT_PUBLIC_API_BASE_URL } from '@/config/env.config';
+
+const isServer = typeof window === 'undefined';
+const baseURL = isServer 
+  ? process.env.NEXT_PUBLIC_API_BASE_URL 
+  : '/api';
 
 const axiosInstance = axios.create({
-  baseURL: NEXT_PUBLIC_API_BASE_URL,
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },

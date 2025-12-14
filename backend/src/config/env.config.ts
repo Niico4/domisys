@@ -25,9 +25,7 @@ const envSchema = z.object({
   EMAIL_PASSWORD: z.string({ error: 'EMAIL_PASSWORD es requerido' }),
   EMAIL_FROM: z.string({ error: 'EMAIL_FROM es obligatorio' }),
 
-  FRONT_END_URL: z
-    .url({ error: 'FRONT_END_URL debe ser una URL válida' })
-    .default('http://localhost:3000'),
+  FRONT_END_URL: z.url({ error: 'FRONT_END_URL debe ser una URL válida' }),
 });
 
 const validateEnv = () => {

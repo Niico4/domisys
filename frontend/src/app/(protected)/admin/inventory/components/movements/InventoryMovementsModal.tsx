@@ -287,7 +287,7 @@ export default function InventoryMovementsModal({
                           : 'text-danger'
                       }`}
                     >
-                      {item.movementType === MovementType.out ? '+' : '-'}
+                      {item.movementType === MovementType.out ? '-' : '+'}
                       {item.quantity || 0}
                     </span>
                   </TableCell>
@@ -299,8 +299,8 @@ export default function InventoryMovementsModal({
                         user.role === 'admin'
                           ? 'Admin'
                           : user.role === 'delivery'
-                            ? 'Repartidor'
-                            : 'Usuario';
+                          ? 'Repartidor'
+                          : 'Usuario';
                       return (
                         <div className="flex flex-col">
                           <span className="font-medium">@{user.username}</span>

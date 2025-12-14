@@ -1,10 +1,10 @@
 'use client';
 
 import { Button } from '@heroui/react';
-import { Icon } from '@tabler/icons-react';
+import { Icon as TablerIcon } from '@tabler/icons-react';
 
 interface CategoryButtonProps {
-  icon: typeof Icon;
+  icon: React.ComponentType<{ size?: number; stroke?: number; className?: string }>;
   label: string;
   onClick?: () => void;
 }

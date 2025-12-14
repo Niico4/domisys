@@ -13,6 +13,12 @@ interface AuthResponseData {
   success: boolean;
 }
 
+const setCookie = (name: string, value: string, maxAge: number) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const sameSite = isProduction ? 'None; Secure' : 'Lax';
+  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=${sameSite}`;
+};
+
 export const authService = {
   login: async (
     emailOrUsername: string,
@@ -31,7 +37,7 @@ export const authService = {
       const user = userData.user;
 
       if (user.role) {
-        document.cookie = `user_role=${user.role}; path=/; max-age=2592000; SameSite=Lax`;
+        setCookie('user_role', user.role, 2592000);
       }
 
       return userData;
@@ -57,7 +63,7 @@ export const authService = {
       const user = userData.user;
 
       if (user.role) {
-        document.cookie = `user_role=${user.role}; path=/; max-age=2592000; SameSite=Lax`;
+        setCookie('user_role', user.role, 2592000);
       }
 
       return userData;
@@ -74,7 +80,7 @@ export const authService = {
       handleApiError(error);
     } finally {
       // Limpiar cookie de role
-      document.cookie = 'user_role=; path=/; max-age=0; SameSite=Lax';
+      setCookie('user_role', '', 0);
       window.location.href = '/auth/login';
     }
   },
