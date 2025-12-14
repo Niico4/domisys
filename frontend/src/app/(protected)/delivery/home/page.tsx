@@ -6,23 +6,19 @@ import {
   CardBody,
   Spinner,
   Avatar,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
 } from '@heroui/react';
 import {
   IconPackage,
   IconTruck,
   IconCash,
-  IconAlertTriangle,
 } from '@tabler/icons-react';
 import { orderService } from '@/services/order.service';
+import { orderTrackingService } from '@/services/order-tracking.service';
 import { Order, OrderState } from '@/types/order';
 import { OrderCard } from '@/components/customer/OrderCard';
 import { OrderDetailModal } from '@/components/customer/OrderDetailModal';
+import { CancelOrderModal } from '@/components/customer/CancelOrderModal';
+import { StateChangeModal } from '@/components/customer/StateChangeModal';
 import { formatPrice } from '@/utils/format.utils';
 import { handleApiError } from '@/utils/error-handler';
 import { Greeting } from '@/components/customer/Greeting';
@@ -46,6 +42,12 @@ export default function DeliveryHomePage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<number | null>(null);
+  const [isStateChangeModalOpen, setIsStateChangeModalOpen] = useState(false);
+  const [stateChangeData, setStateChangeData] = useState<{
+    orderId: number;
+    currentState: OrderState;
+    nextState: OrderState;
+  } | null>(null);
 
   const handleNotifications = () => {
     // TODO: Implement notifications
@@ -90,13 +92,37 @@ export default function DeliveryHomePage() {
     }
   };
 
-  const handleUpdateState = async (orderId: number, newState: OrderState) => {
+  const handleUpdateState = (orderId: number, newState: OrderState) => {
+    const order = activeOrders.find((o) => o.id === orderId);
+    if (order) {
+      setStateChangeData({
+        orderId,
+        currentState: order.state,
+        nextState: newState,
+      });
+      setIsStateChangeModalOpen(true);
+    }
+  };
+
+  const confirmStateChange = async (note?: string) => {
+    if (!stateChangeData) return;
+
     try {
+      const { orderId, currentState, nextState } = stateChangeData;
       const result = await orderService.updateOrderState(orderId, {
-        state: newState,
+        state: nextState,
       });
 
       if (result) {
+        orderTrackingService.addStateChange(
+          orderId,
+          currentState,
+          nextState,
+          'delivery',
+          note
+        );
+        setIsStateChangeModalOpen(false);
+        setStateChangeData(null);
         await loadData();
       }
     } catch (error) {
@@ -109,13 +135,21 @@ export default function DeliveryHomePage() {
     setIsCancelModalOpen(true);
   };
 
-  const confirmCancelOrder = async () => {
+  const confirmCancelOrder = async (reason: string) => {
     if (!orderToCancel) return;
 
     try {
+      const order = activeOrders.find((o) => o.id === orderToCancel);
       const result = await orderService.cancelOrder(orderToCancel);
 
       if (result) {
+        orderTrackingService.addStateChange(
+          orderToCancel,
+          order?.state || null,
+          OrderState.CANCEL,
+          'delivery',
+          reason
+        );
         setIsCancelModalOpen(false);
         setOrderToCancel(null);
         await loadData();
@@ -287,51 +321,29 @@ export default function DeliveryHomePage() {
           viewerRole="delivery"
         />
 
-        {/* Cancel Order Confirmation Modal */}
-        <Modal
+        {/* Cancel Order Modal with Reason */}
+        <CancelOrderModal
           isOpen={isCancelModalOpen}
           onClose={() => {
             setIsCancelModalOpen(false);
             setOrderToCancel(null);
           }}
-          size="sm"
-        >
-          <ModalContent>
-            {(onClose) => (
-              <>
-                <ModalHeader className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-full bg-danger-100">
-                      <IconAlertTriangle
-                        size={24}
-                        className="text-danger-600"
-                      />
-                    </div>
-                    <span>Cancelar Pedido</span>
-                  </div>
-                </ModalHeader>
-                <ModalBody>
-                  <p className="text-default-600">
-                    ¿Estás seguro de que deseas cancelar este pedido? Esta
-                    acción no se puede deshacer.
-                  </p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button variant="light" onPress={onClose}>
-                    No, mantener
-                  </Button>
-                  <Button
-                    color="danger"
-                    onPress={confirmCancelOrder}
-                    startContent={<IconAlertTriangle size={18} />}
-                  >
-                    Sí, cancelar
-                  </Button>
-                </ModalFooter>
-              </>
-            )}
-          </ModalContent>
-        </Modal>
+          onConfirm={confirmCancelOrder}
+          orderId={orderToCancel}
+        />
+
+        {/* State Change Confirmation Modal */}
+        <StateChangeModal
+          isOpen={isStateChangeModalOpen}
+          onClose={() => {
+            setIsStateChangeModalOpen(false);
+            setStateChangeData(null);
+          }}
+          onConfirm={confirmStateChange}
+          orderId={stateChangeData?.orderId || null}
+          currentState={stateChangeData?.currentState || null}
+          nextState={stateChangeData?.nextState || null}
+        />
       </div>
     </div>
   );
