@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Card, CardBody, Button, Avatar } from '@heroui/react';
 import { IconCheck, IconReceipt, IconX } from '@tabler/icons-react';
 import { Order, OrderState } from '@/types/order';
 import { formatPrice } from '@/utils/format.utils';
+import { orderTrackingService } from '@/services/order-tracking.service';
 
 interface OrderCardProps {
   order: Order;
@@ -35,8 +37,16 @@ export const OrderCard = ({
   onUpdateState,
   onCancelOrder,
 }: OrderCardProps) => {
+  const [cancellationReason, setCancellationReason] = useState<string>();
   const currentStateIndex = orderStates.indexOf(order.state);
   const isCanceled = order.state === OrderState.CANCEL;
+
+  useEffect(() => {
+    if (isCanceled) {
+      const reason = orderTrackingService.getCancellationReason(order.id);
+      setCancellationReason(reason);
+    }
+  }, [isCanceled, order.id]);
 
   const getNextStateButton = () => {
     if (isCanceled || order.state === OrderState.DELIVERED) return null;
@@ -208,10 +218,15 @@ export const OrderCard = ({
         )}
 
         {isCanceled && (
-          <div className="text-center py-2">
-            <p className="text-sm font-semibold text-red-600">
+          <div className="py-2 px-3 bg-danger-50 rounded-lg border border-danger-200">
+            <p className="text-sm font-semibold text-danger-600 text-center">
               {OrderStateLabels[OrderState.CANCEL]}
             </p>
+            {cancellationReason && (
+              <p className="text-xs text-danger-500 mt-1 text-center">
+                Motivo: {cancellationReason}
+              </p>
+            )}
           </div>
         )}
 

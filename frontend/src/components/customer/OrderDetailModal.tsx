@@ -10,7 +10,8 @@ import {
 } from '@heroui/react';
 import { Order, OrderState } from '@/types/order';
 import { formatPrice } from '@/utils/format.utils';
-import { IconReceipt } from '@tabler/icons-react';
+import { IconReceipt, IconHistory } from '@tabler/icons-react';
+import { OrderHistoryTimeline } from './OrderHistoryTimeline';
 
 interface OrderDetailModalProps {
   isOpen: boolean;
@@ -242,6 +243,16 @@ export const OrderDetailModal = ({
                   </span>
                 </div>
               </div>
+            </div>
+
+            {/* Historial de Cambios */}
+            <Divider />
+            <div>
+              <h4 className="text-sm font-semibold text-default-700 mb-3 flex items-center gap-2">
+                <IconHistory size={18} />
+                Historial del Pedido
+              </h4>
+              <OrderHistoryTimeline orderId={order.id} currentState={order.state} />
             </div>
           </div>
         </ModalBody>
