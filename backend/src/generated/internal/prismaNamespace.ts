@@ -15,7 +15,7 @@
  * model files in the `model` directory!
  */
 
-import * as runtime from "@prisma/client/runtime/library"
+import * as runtime from "@prisma/client/runtime/client"
 import type * as Prisma from "../models.js"
 import { type PrismaClient } from "./class.js"
 
@@ -65,14 +65,6 @@ export type Decimal = runtime.Decimal
 export type DecimalJsLike = runtime.DecimalJsLike
 
 /**
- * Metrics
- */
-export type Metrics = runtime.Metrics
-export type Metric<T> = runtime.Metric<T>
-export type MetricHistogram = runtime.MetricHistogram
-export type MetricHistogramBucket = runtime.MetricHistogramBucket
-
-/**
 * Extensions
 */
 export type Extension = runtime.Types.Extensions.UserArgs
@@ -88,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 6.19.0
- * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
+ * Prisma Client JS version: 7.1.0
+ * Query Engine version: ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba
  */
 export const prismaVersion: PrismaVersion = {
-  client: "6.19.0",
-  engine: "2ba551f319ab1df4bc874a89965d8b3641056773"
+  client: "7.1.0",
+  engine: "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba"
 }
 
 /**
@@ -110,28 +102,30 @@ export type InputJsonValue = runtime.InputJsonValue
 
 
 export const NullTypes = {
-  DbNull: runtime.objectEnumValues.classes.DbNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.DbNull),
-  JsonNull: runtime.objectEnumValues.classes.JsonNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.JsonNull),
-  AnyNull: runtime.objectEnumValues.classes.AnyNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.AnyNull),
+  DbNull: runtime.NullTypes.DbNull as (new (secret: never) => typeof runtime.DbNull),
+  JsonNull: runtime.NullTypes.JsonNull as (new (secret: never) => typeof runtime.JsonNull),
+  AnyNull: runtime.NullTypes.AnyNull as (new (secret: never) => typeof runtime.AnyNull),
 }
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const DbNull = runtime.objectEnumValues.instances.DbNull
+export const DbNull = runtime.DbNull
+
 /**
  * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const JsonNull = runtime.objectEnumValues.instances.JsonNull
+export const JsonNull = runtime.JsonNull
+
 /**
  * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const AnyNull = runtime.objectEnumValues.instances.AnyNull
+export const AnyNull = runtime.AnyNull
 
 
 type SelectAndInclude = {
@@ -400,8 +394,7 @@ export const ModelName = {
   Sale: 'Sale',
   SaleProduct: 'SaleProduct',
   OrderProduct: 'OrderProduct',
-  InventoryMovement: 'InventoryMovement',
-  DeliveryRating: 'DeliveryRating'
+  InventoryMovement: 'InventoryMovement'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "accessCode" | "order" | "address" | "provider" | "category" | "product" | "sale" | "saleProduct" | "orderProduct" | "inventoryMovement" | "deliveryRating"
+    modelProps: "user" | "accessCode" | "order" | "address" | "provider" | "category" | "product" | "sale" | "saleProduct" | "orderProduct" | "inventoryMovement"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1235,80 +1228,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    DeliveryRating: {
-      payload: Prisma.$DeliveryRatingPayload<ExtArgs>
-      fields: Prisma.DeliveryRatingFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.DeliveryRatingFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.DeliveryRatingFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>
-        }
-        findFirst: {
-          args: Prisma.DeliveryRatingFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.DeliveryRatingFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>
-        }
-        findMany: {
-          args: Prisma.DeliveryRatingFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>[]
-        }
-        create: {
-          args: Prisma.DeliveryRatingCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>
-        }
-        createMany: {
-          args: Prisma.DeliveryRatingCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.DeliveryRatingCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>[]
-        }
-        delete: {
-          args: Prisma.DeliveryRatingDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>
-        }
-        update: {
-          args: Prisma.DeliveryRatingUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>
-        }
-        deleteMany: {
-          args: Prisma.DeliveryRatingDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.DeliveryRatingUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.DeliveryRatingUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>[]
-        }
-        upsert: {
-          args: Prisma.DeliveryRatingUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$DeliveryRatingPayload>
-        }
-        aggregate: {
-          args: Prisma.DeliveryRatingAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateDeliveryRating>
-        }
-        groupBy: {
-          args: Prisma.DeliveryRatingGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DeliveryRatingGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.DeliveryRatingCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.DeliveryRatingCountAggregateOutputType> | number
-        }
-      }
-    }
   }
 } & {
   other: {
@@ -1370,9 +1289,12 @@ export const AccessCodeScalarFieldEnum = {
   role: 'role',
   status: 'status',
   expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  disabledAt: 'disabledAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  createdBy: 'createdBy'
+  createdBy: 'createdBy',
+  disabledBy: 'disabledBy',
+  usedBy: 'usedBy'
 } as const
 
 export type AccessCodeScalarFieldEnum = (typeof AccessCodeScalarFieldEnum)[keyof typeof AccessCodeScalarFieldEnum]
@@ -1384,7 +1306,10 @@ export const OrderScalarFieldEnum = {
   paymentMethod: 'paymentMethod',
   totalAmount: 'totalAmount',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
+  confirmedAt: 'confirmedAt',
+  shippedAt: 'shippedAt',
+  deliveredAt: 'deliveredAt',
+  cancelledAt: 'cancelledAt',
   customerId: 'customerId',
   deliveryId: 'deliveryId',
   addressId: 'addressId'
@@ -1459,6 +1384,7 @@ export const SaleScalarFieldEnum = {
   state: 'state',
   totalAmount: 'totalAmount',
   createdAt: 'createdAt',
+  cancelledAt: 'cancelledAt',
   cashierId: 'cashierId'
 } as const
 
@@ -1467,7 +1393,7 @@ export type SaleScalarFieldEnum = (typeof SaleScalarFieldEnum)[keyof typeof Sale
 
 export const SaleProductScalarFieldEnum = {
   quantity: 'quantity',
-  unitPrice: 'unitPrice',
+  price: 'price',
   createdAt: 'createdAt',
   saleId: 'saleId',
   productId: 'productId'
@@ -1478,7 +1404,7 @@ export type SaleProductScalarFieldEnum = (typeof SaleProductScalarFieldEnum)[key
 
 export const OrderProductScalarFieldEnum = {
   quantity: 'quantity',
-  unitPrice: 'unitPrice',
+  price: 'price',
   createdAt: 'createdAt',
   orderId: 'orderId',
   productId: 'productId'
@@ -1494,22 +1420,11 @@ export const InventoryMovementScalarFieldEnum = {
   quantity: 'quantity',
   createdAt: 'createdAt',
   productId: 'productId',
-  adminId: 'adminId'
+  adminId: 'adminId',
+  providerId: 'providerId'
 } as const
 
 export type InventoryMovementScalarFieldEnum = (typeof InventoryMovementScalarFieldEnum)[keyof typeof InventoryMovementScalarFieldEnum]
-
-
-export const DeliveryRatingScalarFieldEnum = {
-  id: 'id',
-  rating: 'rating',
-  comment: 'comment',
-  createdAt: 'createdAt',
-  orderId: 'orderId',
-  customerId: 'customerId'
-} as const
-
-export type DeliveryRatingScalarFieldEnum = (typeof DeliveryRatingScalarFieldEnum)[keyof typeof DeliveryRatingScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1751,26 +1666,22 @@ export type BatchPayload = {
   count: number
 }
 
-
-export type Datasource = {
-  url?: string
-}
-export type Datasources = {
-  db?: Datasource
-}
-
 export const defineExtension = runtime.Extensions.defineExtension as unknown as runtime.Types.Extensions.ExtendsHook<"define", TypeMapCb, runtime.Types.Extensions.DefaultArgs>
 export type DefaultPrismaClient = PrismaClient
 export type ErrorFormat = 'pretty' | 'colorless' | 'minimal'
-export interface PrismaClientOptions {
+export type PrismaClientOptions = ({
   /**
-   * Overwrites the datasource url from your schema.prisma file
+   * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-pg`.
    */
-  datasources?: Datasources
+  adapter: runtime.SqlDriverAdapterFactory
+  accelerateUrl?: never
+} | {
   /**
-   * Overwrites the datasource url from your schema.prisma file
+   * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
    */
-  datasourceUrl?: string
+  accelerateUrl: string
+  adapter?: never
+}) & {
   /**
    * @default "colorless"
    */
@@ -1797,7 +1708,7 @@ export interface PrismaClientOptions {
    *  { emit: 'stdout', level: 'error' }
    * 
    * ```
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+   * Read more in our [docs](https://pris.ly/d/logging).
    */
   log?: (LogLevel | LogDefinition)[]
   /**
@@ -1810,10 +1721,6 @@ export interface PrismaClientOptions {
     timeout?: number
     isolationLevel?: TransactionIsolationLevel
   }
-  /**
-   * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
-   */
-  adapter?: runtime.SqlDriverAdapterFactory | null
   /**
    * Global configuration for omitting model fields by default.
    * 
@@ -1829,6 +1736,22 @@ export interface PrismaClientOptions {
    * ```
    */
   omit?: GlobalOmitConfig
+  /**
+   * SQL commenter plugins that add metadata to SQL queries as comments.
+   * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
+   * 
+   * @example
+   * ```
+   * const prisma = new PrismaClient({
+   *   adapter,
+   *   comments: [
+   *     traceContext(),
+   *     queryInsights(),
+   *   ],
+   * })
+   * ```
+   */
+  comments?: runtime.SqlCommenterPlugin[]
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
@@ -1842,7 +1765,6 @@ export type GlobalOmitConfig = {
   saleProduct?: Prisma.SaleProductOmit
   orderProduct?: Prisma.OrderProductOmit
   inventoryMovement?: Prisma.InventoryMovementOmit
-  deliveryRating?: Prisma.DeliveryRatingOmit
 }
 
 /* Types for Logging */

@@ -24,28 +24,30 @@ export const Decimal = runtime.Decimal
 
 
 export const NullTypes = {
-  DbNull: runtime.objectEnumValues.classes.DbNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.DbNull),
-  JsonNull: runtime.objectEnumValues.classes.JsonNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.JsonNull),
-  AnyNull: runtime.objectEnumValues.classes.AnyNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.AnyNull),
+  DbNull: runtime.NullTypes.DbNull as (new (secret: never) => typeof runtime.DbNull),
+  JsonNull: runtime.NullTypes.JsonNull as (new (secret: never) => typeof runtime.JsonNull),
+  AnyNull: runtime.NullTypes.AnyNull as (new (secret: never) => typeof runtime.AnyNull),
 }
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const DbNull = runtime.objectEnumValues.instances.DbNull
+export const DbNull = runtime.DbNull
+
 /**
  * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const JsonNull = runtime.objectEnumValues.instances.JsonNull
+export const JsonNull = runtime.JsonNull
+
 /**
  * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const AnyNull = runtime.objectEnumValues.instances.AnyNull
+export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
@@ -59,8 +61,7 @@ export const ModelName = {
   Sale: 'Sale',
   SaleProduct: 'SaleProduct',
   OrderProduct: 'OrderProduct',
-  InventoryMovement: 'InventoryMovement',
-  DeliveryRating: 'DeliveryRating'
+  InventoryMovement: 'InventoryMovement'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -69,12 +70,12 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  * Enums
  */
 
-export const TransactionIsolationLevel = runtime.makeStrictEnum({
+export const TransactionIsolationLevel = {
   ReadUncommitted: 'ReadUncommitted',
   ReadCommitted: 'ReadCommitted',
   RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
-} as const)
+} as const
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
@@ -101,9 +102,12 @@ export const AccessCodeScalarFieldEnum = {
   role: 'role',
   status: 'status',
   expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  disabledAt: 'disabledAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  createdBy: 'createdBy'
+  createdBy: 'createdBy',
+  disabledBy: 'disabledBy',
+  usedBy: 'usedBy'
 } as const
 
 export type AccessCodeScalarFieldEnum = (typeof AccessCodeScalarFieldEnum)[keyof typeof AccessCodeScalarFieldEnum]
@@ -115,7 +119,10 @@ export const OrderScalarFieldEnum = {
   paymentMethod: 'paymentMethod',
   totalAmount: 'totalAmount',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
+  confirmedAt: 'confirmedAt',
+  shippedAt: 'shippedAt',
+  deliveredAt: 'deliveredAt',
+  cancelledAt: 'cancelledAt',
   customerId: 'customerId',
   deliveryId: 'deliveryId',
   addressId: 'addressId'
@@ -190,6 +197,7 @@ export const SaleScalarFieldEnum = {
   state: 'state',
   totalAmount: 'totalAmount',
   createdAt: 'createdAt',
+  cancelledAt: 'cancelledAt',
   cashierId: 'cashierId'
 } as const
 
@@ -198,7 +206,7 @@ export type SaleScalarFieldEnum = (typeof SaleScalarFieldEnum)[keyof typeof Sale
 
 export const SaleProductScalarFieldEnum = {
   quantity: 'quantity',
-  unitPrice: 'unitPrice',
+  price: 'price',
   createdAt: 'createdAt',
   saleId: 'saleId',
   productId: 'productId'
@@ -209,7 +217,7 @@ export type SaleProductScalarFieldEnum = (typeof SaleProductScalarFieldEnum)[key
 
 export const OrderProductScalarFieldEnum = {
   quantity: 'quantity',
-  unitPrice: 'unitPrice',
+  price: 'price',
   createdAt: 'createdAt',
   orderId: 'orderId',
   productId: 'productId'
@@ -225,22 +233,11 @@ export const InventoryMovementScalarFieldEnum = {
   quantity: 'quantity',
   createdAt: 'createdAt',
   productId: 'productId',
-  adminId: 'adminId'
+  adminId: 'adminId',
+  providerId: 'providerId'
 } as const
 
 export type InventoryMovementScalarFieldEnum = (typeof InventoryMovementScalarFieldEnum)[keyof typeof InventoryMovementScalarFieldEnum]
-
-
-export const DeliveryRatingScalarFieldEnum = {
-  id: 'id',
-  rating: 'rating',
-  comment: 'comment',
-  createdAt: 'createdAt',
-  orderId: 'orderId',
-  customerId: 'customerId'
-} as const
-
-export type DeliveryRatingScalarFieldEnum = (typeof DeliveryRatingScalarFieldEnum)[keyof typeof DeliveryRatingScalarFieldEnum]
 
 
 export const SortOrder = {

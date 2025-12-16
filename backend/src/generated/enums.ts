@@ -9,27 +9,6 @@
 * 🟢 You can import this file directly.
 */
 
-export const UserRole = {
-  admin: 'admin',
-  customer: 'customer',
-  cashier: 'cashier',
-  delivery: 'delivery'
-} as const
-
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
-
-
-export const OrderState = {
-  pending: 'pending',
-  confirmed: 'confirmed',
-  shipped: 'shipped',
-  delivered: 'delivered',
-  cancel: 'cancel'
-} as const
-
-export type OrderState = (typeof OrderState)[keyof typeof OrderState]
-
-
 export const PaymentMethod = {
   nequi: 'nequi',
   daviplata: 'daviplata',
@@ -40,42 +19,14 @@ export const PaymentMethod = {
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
 
 
-export const SaleState = {
-  sold: 'sold',
-  cancel: 'cancel'
+export const UserRole = {
+  admin: 'admin',
+  customer: 'customer',
+  cashier: 'cashier',
+  delivery: 'delivery'
 } as const
 
-export type SaleState = (typeof SaleState)[keyof typeof SaleState]
-
-
-export const MovementType = {
-  in: 'in',
-  out: 'out',
-  adjustment: 'adjustment'
-} as const
-
-export type MovementType = (typeof MovementType)[keyof typeof MovementType]
-
-
-export const MovementReason = {
-  expired: 'expired',
-  return_to_supplier: 'return_to_supplier',
-  sale: 'sale',
-  manual_error: 'manual_error',
-  damaged_product: 'damaged_product',
-  return: 'return',
-  other: 'other'
-} as const
-
-export type MovementReason = (typeof MovementReason)[keyof typeof MovementReason]
-
-
-export const ProductState = {
-  active: 'active',
-  inactive: 'inactive'
-} as const
-
-export type ProductState = (typeof ProductState)[keyof typeof ProductState]
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
 export const AccessCodeRole = {
@@ -95,3 +46,57 @@ export const AccessCodeState = {
 } as const
 
 export type AccessCodeState = (typeof AccessCodeState)[keyof typeof AccessCodeState]
+
+
+export const MovementType = {
+  in: 'in',
+  out: 'out',
+  adjustment: 'adjustment'
+} as const
+
+export type MovementType = (typeof MovementType)[keyof typeof MovementType]
+
+
+export const MovementReason = {
+  purchase: 'purchase',
+  return_from_customer: 'return_from_customer',
+  replace_from_supplier: 'replace_from_supplier',
+  sale: 'sale',
+  expired: 'expired',
+  damaged_product: 'damaged_product',
+  return_to_supplier: 'return_to_supplier',
+  manual_error: 'manual_error',
+  inventory_count: 'inventory_count',
+  other: 'other'
+} as const
+
+export type MovementReason = (typeof MovementReason)[keyof typeof MovementReason]
+
+
+export const OrderState = {
+  pending: 'pending',
+  confirmed: 'confirmed',
+  shipped: 'shipped',
+  delivered: 'delivered',
+  cancelled: 'cancelled'
+} as const
+
+export type OrderState = (typeof OrderState)[keyof typeof OrderState]
+
+
+export const ProductState = {
+  active: 'active',
+  disabled: 'disabled',
+  out_of_stock: 'out_of_stock',
+  expired: 'expired'
+} as const
+
+export type ProductState = (typeof ProductState)[keyof typeof ProductState]
+
+
+export const SaleState = {
+  sold: 'sold',
+  cancelled: 'cancelled'
+} as const
+
+export type SaleState = (typeof SaleState)[keyof typeof SaleState]
