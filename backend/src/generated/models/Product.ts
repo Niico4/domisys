@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
+import type * as runtime from "@prisma/client/runtime/client"
 import type * as $Enums from "../enums.js"
 import type * as Prisma from "../internal/prismaNamespace.js"
 
@@ -296,11 +296,11 @@ export type ProductWhereInput = {
   state?: Prisma.EnumProductStateFilter<"Product"> | $Enums.ProductState
   providerId?: Prisma.IntNullableFilter<"Product"> | number | null
   categoryId?: Prisma.IntNullableFilter<"Product"> | number | null
-  provider?: Prisma.XOR<Prisma.ProviderNullableScalarRelationFilter, Prisma.ProviderWhereInput> | null
   category?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
+  provider?: Prisma.XOR<Prisma.ProviderNullableScalarRelationFilter, Prisma.ProviderWhereInput> | null
+  inventoryMovements?: Prisma.InventoryMovementListRelationFilter
   orderProducts?: Prisma.OrderProductListRelationFilter
   saleProducts?: Prisma.SaleProductListRelationFilter
-  inventoryMovements?: Prisma.InventoryMovementListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -317,16 +317,16 @@ export type ProductOrderByWithRelationInput = {
   state?: Prisma.SortOrder
   providerId?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
-  provider?: Prisma.ProviderOrderByWithRelationInput
   category?: Prisma.CategoryOrderByWithRelationInput
+  provider?: Prisma.ProviderOrderByWithRelationInput
+  inventoryMovements?: Prisma.InventoryMovementOrderByRelationAggregateInput
   orderProducts?: Prisma.OrderProductOrderByRelationAggregateInput
   saleProducts?: Prisma.SaleProductOrderByRelationAggregateInput
-  inventoryMovements?: Prisma.InventoryMovementOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  name_lot_measure?: Prisma.ProductNameLotMeasureCompoundUniqueInput
+  unique_product_name_lot_measure_idx?: Prisma.ProductUnique_product_name_lot_measure_idxCompoundUniqueInput
   AND?: Prisma.ProductWhereInput | Prisma.ProductWhereInput[]
   OR?: Prisma.ProductWhereInput[]
   NOT?: Prisma.ProductWhereInput | Prisma.ProductWhereInput[]
@@ -342,12 +342,12 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   state?: Prisma.EnumProductStateFilter<"Product"> | $Enums.ProductState
   providerId?: Prisma.IntNullableFilter<"Product"> | number | null
   categoryId?: Prisma.IntNullableFilter<"Product"> | number | null
-  provider?: Prisma.XOR<Prisma.ProviderNullableScalarRelationFilter, Prisma.ProviderWhereInput> | null
   category?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
+  provider?: Prisma.XOR<Prisma.ProviderNullableScalarRelationFilter, Prisma.ProviderWhereInput> | null
+  inventoryMovements?: Prisma.InventoryMovementListRelationFilter
   orderProducts?: Prisma.OrderProductListRelationFilter
   saleProducts?: Prisma.SaleProductListRelationFilter
-  inventoryMovements?: Prisma.InventoryMovementListRelationFilter
-}, "id" | "name_lot_measure">
+}, "id" | "unique_product_name_lot_measure_idx">
 
 export type ProductOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -400,11 +400,11 @@ export type ProductCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   state?: $Enums.ProductState
-  provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
   category?: Prisma.CategoryCreateNestedOneWithoutProductsInput
+  provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
+  inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutProductInput
   orderProducts?: Prisma.OrderProductCreateNestedManyWithoutProductInput
   saleProducts?: Prisma.SaleProductCreateNestedManyWithoutProductInput
-  inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -421,9 +421,9 @@ export type ProductUncheckedCreateInput = {
   state?: $Enums.ProductState
   providerId?: number | null
   categoryId?: number | null
+  inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutProductInput
   orderProducts?: Prisma.OrderProductUncheckedCreateNestedManyWithoutProductInput
   saleProducts?: Prisma.SaleProductUncheckedCreateNestedManyWithoutProductInput
-  inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -437,11 +437,11 @@ export type ProductUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
-  provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutProductsNestedInput
+  provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
+  inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutProductNestedInput
   orderProducts?: Prisma.OrderProductUpdateManyWithoutProductNestedInput
   saleProducts?: Prisma.SaleProductUpdateManyWithoutProductNestedInput
-  inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -458,9 +458,9 @@ export type ProductUncheckedUpdateInput = {
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
   providerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutProductNestedInput
   orderProducts?: Prisma.OrderProductUncheckedUpdateManyWithoutProductNestedInput
   saleProducts?: Prisma.SaleProductUncheckedUpdateManyWithoutProductNestedInput
-  inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -518,7 +518,7 @@ export type ProductOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ProductNameLotMeasureCompoundUniqueInput = {
+export type ProductUnique_product_name_lot_measure_idxCompoundUniqueInput = {
   name: string
   lot: string
   measure: string
@@ -735,9 +735,9 @@ export type ProductCreateWithoutProviderInput = {
   updatedAt?: Date | string
   state?: $Enums.ProductState
   category?: Prisma.CategoryCreateNestedOneWithoutProductsInput
+  inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutProductInput
   orderProducts?: Prisma.OrderProductCreateNestedManyWithoutProductInput
   saleProducts?: Prisma.SaleProductCreateNestedManyWithoutProductInput
-  inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutProviderInput = {
@@ -753,9 +753,9 @@ export type ProductUncheckedCreateWithoutProviderInput = {
   updatedAt?: Date | string
   state?: $Enums.ProductState
   categoryId?: number | null
+  inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutProductInput
   orderProducts?: Prisma.OrderProductUncheckedCreateNestedManyWithoutProductInput
   saleProducts?: Prisma.SaleProductUncheckedCreateNestedManyWithoutProductInput
-  inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutProviderInput = {
@@ -815,9 +815,9 @@ export type ProductCreateWithoutCategoryInput = {
   updatedAt?: Date | string
   state?: $Enums.ProductState
   provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
+  inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutProductInput
   orderProducts?: Prisma.OrderProductCreateNestedManyWithoutProductInput
   saleProducts?: Prisma.SaleProductCreateNestedManyWithoutProductInput
-  inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutCategoryInput = {
@@ -833,9 +833,9 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   updatedAt?: Date | string
   state?: $Enums.ProductState
   providerId?: number | null
+  inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutProductInput
   orderProducts?: Prisma.OrderProductUncheckedCreateNestedManyWithoutProductInput
   saleProducts?: Prisma.SaleProductUncheckedCreateNestedManyWithoutProductInput
-  inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutCategoryInput = {
@@ -875,10 +875,10 @@ export type ProductCreateWithoutSaleProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   state?: $Enums.ProductState
-  provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
   category?: Prisma.CategoryCreateNestedOneWithoutProductsInput
-  orderProducts?: Prisma.OrderProductCreateNestedManyWithoutProductInput
+  provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
   inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutProductInput
+  orderProducts?: Prisma.OrderProductCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutSaleProductsInput = {
@@ -895,8 +895,8 @@ export type ProductUncheckedCreateWithoutSaleProductsInput = {
   state?: $Enums.ProductState
   providerId?: number | null
   categoryId?: number | null
-  orderProducts?: Prisma.OrderProductUncheckedCreateNestedManyWithoutProductInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutProductInput
+  orderProducts?: Prisma.OrderProductUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutSaleProductsInput = {
@@ -926,10 +926,10 @@ export type ProductUpdateWithoutSaleProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
-  provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutProductsNestedInput
-  orderProducts?: Prisma.OrderProductUpdateManyWithoutProductNestedInput
+  provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
   inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutProductNestedInput
+  orderProducts?: Prisma.OrderProductUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutSaleProductsInput = {
@@ -946,8 +946,8 @@ export type ProductUncheckedUpdateWithoutSaleProductsInput = {
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
   providerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  orderProducts?: Prisma.OrderProductUncheckedUpdateManyWithoutProductNestedInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutProductNestedInput
+  orderProducts?: Prisma.OrderProductUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutOrderProductsInput = {
@@ -961,10 +961,10 @@ export type ProductCreateWithoutOrderProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   state?: $Enums.ProductState
-  provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
   category?: Prisma.CategoryCreateNestedOneWithoutProductsInput
-  saleProducts?: Prisma.SaleProductCreateNestedManyWithoutProductInput
+  provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
   inventoryMovements?: Prisma.InventoryMovementCreateNestedManyWithoutProductInput
+  saleProducts?: Prisma.SaleProductCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutOrderProductsInput = {
@@ -981,8 +981,8 @@ export type ProductUncheckedCreateWithoutOrderProductsInput = {
   state?: $Enums.ProductState
   providerId?: number | null
   categoryId?: number | null
-  saleProducts?: Prisma.SaleProductUncheckedCreateNestedManyWithoutProductInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedCreateNestedManyWithoutProductInput
+  saleProducts?: Prisma.SaleProductUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutOrderProductsInput = {
@@ -1012,10 +1012,10 @@ export type ProductUpdateWithoutOrderProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
-  provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutProductsNestedInput
-  saleProducts?: Prisma.SaleProductUpdateManyWithoutProductNestedInput
+  provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
   inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutProductNestedInput
+  saleProducts?: Prisma.SaleProductUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutOrderProductsInput = {
@@ -1032,8 +1032,8 @@ export type ProductUncheckedUpdateWithoutOrderProductsInput = {
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
   providerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  saleProducts?: Prisma.SaleProductUncheckedUpdateManyWithoutProductNestedInput
   inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutProductNestedInput
+  saleProducts?: Prisma.SaleProductUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateWithoutInventoryMovementsInput = {
@@ -1047,8 +1047,8 @@ export type ProductCreateWithoutInventoryMovementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   state?: $Enums.ProductState
-  provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
   category?: Prisma.CategoryCreateNestedOneWithoutProductsInput
+  provider?: Prisma.ProviderCreateNestedOneWithoutProductsInput
   orderProducts?: Prisma.OrderProductCreateNestedManyWithoutProductInput
   saleProducts?: Prisma.SaleProductCreateNestedManyWithoutProductInput
 }
@@ -1098,8 +1098,8 @@ export type ProductUpdateWithoutInventoryMovementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
-  provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutProductsNestedInput
+  provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
   orderProducts?: Prisma.OrderProductUpdateManyWithoutProductNestedInput
   saleProducts?: Prisma.SaleProductUpdateManyWithoutProductNestedInput
 }
@@ -1149,9 +1149,9 @@ export type ProductUpdateWithoutProviderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
   category?: Prisma.CategoryUpdateOneWithoutProductsNestedInput
+  inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutProductNestedInput
   orderProducts?: Prisma.OrderProductUpdateManyWithoutProductNestedInput
   saleProducts?: Prisma.SaleProductUpdateManyWithoutProductNestedInput
-  inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutProviderInput = {
@@ -1167,9 +1167,9 @@ export type ProductUncheckedUpdateWithoutProviderInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
   categoryId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutProductNestedInput
   orderProducts?: Prisma.OrderProductUncheckedUpdateManyWithoutProductNestedInput
   saleProducts?: Prisma.SaleProductUncheckedUpdateManyWithoutProductNestedInput
-  inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutProviderInput = {
@@ -1214,9 +1214,9 @@ export type ProductUpdateWithoutCategoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
   provider?: Prisma.ProviderUpdateOneWithoutProductsNestedInput
+  inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutProductNestedInput
   orderProducts?: Prisma.OrderProductUpdateManyWithoutProductNestedInput
   saleProducts?: Prisma.SaleProductUpdateManyWithoutProductNestedInput
-  inventoryMovements?: Prisma.InventoryMovementUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutCategoryInput = {
@@ -1232,9 +1232,9 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   state?: Prisma.EnumProductStateFieldUpdateOperationsInput | $Enums.ProductState
   providerId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutProductNestedInput
   orderProducts?: Prisma.OrderProductUncheckedUpdateManyWithoutProductNestedInput
   saleProducts?: Prisma.SaleProductUncheckedUpdateManyWithoutProductNestedInput
-  inventoryMovements?: Prisma.InventoryMovementUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutCategoryInput = {
@@ -1258,15 +1258,15 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
  */
 
 export type ProductCountOutputType = {
+  inventoryMovements: number
   orderProducts: number
   saleProducts: number
-  inventoryMovements: number
 }
 
 export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  inventoryMovements?: boolean | ProductCountOutputTypeCountInventoryMovementsArgs
   orderProducts?: boolean | ProductCountOutputTypeCountOrderProductsArgs
   saleProducts?: boolean | ProductCountOutputTypeCountSaleProductsArgs
-  inventoryMovements?: boolean | ProductCountOutputTypeCountInventoryMovementsArgs
 }
 
 /**
@@ -1282,6 +1282,13 @@ export type ProductCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
 /**
  * ProductCountOutputType without action
  */
+export type ProductCountOutputTypeCountInventoryMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InventoryMovementWhereInput
+}
+
+/**
+ * ProductCountOutputType without action
+ */
 export type ProductCountOutputTypeCountOrderProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OrderProductWhereInput
 }
@@ -1291,13 +1298,6 @@ export type ProductCountOutputTypeCountOrderProductsArgs<ExtArgs extends runtime
  */
 export type ProductCountOutputTypeCountSaleProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.SaleProductWhereInput
-}
-
-/**
- * ProductCountOutputType without action
- */
-export type ProductCountOutputTypeCountInventoryMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.InventoryMovementWhereInput
 }
 
 
@@ -1315,11 +1315,11 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   state?: boolean
   providerId?: boolean
   categoryId?: boolean
-  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
   category?: boolean | Prisma.Product$categoryArgs<ExtArgs>
+  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
+  inventoryMovements?: boolean | Prisma.Product$inventoryMovementsArgs<ExtArgs>
   orderProducts?: boolean | Prisma.Product$orderProductsArgs<ExtArgs>
   saleProducts?: boolean | Prisma.Product$saleProductsArgs<ExtArgs>
-  inventoryMovements?: boolean | Prisma.Product$inventoryMovementsArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -1337,8 +1337,8 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   state?: boolean
   providerId?: boolean
   categoryId?: boolean
-  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
   category?: boolean | Prisma.Product$categoryArgs<ExtArgs>
+  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
 export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1355,8 +1355,8 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   state?: boolean
   providerId?: boolean
   categoryId?: boolean
-  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
   category?: boolean | Prisma.Product$categoryArgs<ExtArgs>
+  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
 export type ProductSelectScalar = {
@@ -1377,30 +1377,30 @@ export type ProductSelectScalar = {
 
 export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "stock" | "measure" | "lot" | "expirationDate" | "image" | "createdAt" | "updatedAt" | "state" | "providerId" | "categoryId", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
   category?: boolean | Prisma.Product$categoryArgs<ExtArgs>
+  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
+  inventoryMovements?: boolean | Prisma.Product$inventoryMovementsArgs<ExtArgs>
   orderProducts?: boolean | Prisma.Product$orderProductsArgs<ExtArgs>
   saleProducts?: boolean | Prisma.Product$saleProductsArgs<ExtArgs>
-  inventoryMovements?: boolean | Prisma.Product$inventoryMovementsArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
   category?: boolean | Prisma.Product$categoryArgs<ExtArgs>
+  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
 }
 export type ProductIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
   category?: boolean | Prisma.Product$categoryArgs<ExtArgs>
+  provider?: boolean | Prisma.Product$providerArgs<ExtArgs>
 }
 
 export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Product"
   objects: {
-    provider: Prisma.$ProviderPayload<ExtArgs> | null
     category: Prisma.$CategoryPayload<ExtArgs> | null
+    provider: Prisma.$ProviderPayload<ExtArgs> | null
+    inventoryMovements: Prisma.$InventoryMovementPayload<ExtArgs>[]
     orderProducts: Prisma.$OrderProductPayload<ExtArgs>[]
     saleProducts: Prisma.$SaleProductPayload<ExtArgs>[]
-    inventoryMovements: Prisma.$InventoryMovementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1810,11 +1810,11 @@ readonly fields: ProductFieldRefs;
  */
 export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  provider<T extends Prisma.Product$providerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$providerArgs<ExtArgs>>): Prisma.Prisma__ProviderClient<runtime.Types.Result.GetResult<Prisma.$ProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   category<T extends Prisma.Product$categoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$categoryArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  provider<T extends Prisma.Product$providerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$providerArgs<ExtArgs>>): Prisma.Prisma__ProviderClient<runtime.Types.Result.GetResult<Prisma.$ProviderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  inventoryMovements<T extends Prisma.Product$inventoryMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$inventoryMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orderProducts<T extends Prisma.Product$orderProductsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$orderProductsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   saleProducts<T extends Prisma.Product$saleProductsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$saleProductsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SaleProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  inventoryMovements<T extends Prisma.Product$inventoryMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$inventoryMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2253,6 +2253,25 @@ export type ProductDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * Product.category
+ */
+export type Product$categoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Category
+   */
+  select?: Prisma.CategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Category
+   */
+  omit?: Prisma.CategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CategoryInclude<ExtArgs> | null
+  where?: Prisma.CategoryWhereInput
+}
+
+/**
  * Product.provider
  */
 export type Product$providerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2272,22 +2291,27 @@ export type Product$providerArgs<ExtArgs extends runtime.Types.Extensions.Intern
 }
 
 /**
- * Product.category
+ * Product.inventoryMovements
  */
-export type Product$categoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Product$inventoryMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Category
+   * Select specific fields to fetch from the InventoryMovement
    */
-  select?: Prisma.CategorySelect<ExtArgs> | null
+  select?: Prisma.InventoryMovementSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Category
+   * Omit specific fields from the InventoryMovement
    */
-  omit?: Prisma.CategoryOmit<ExtArgs> | null
+  omit?: Prisma.InventoryMovementOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.CategoryInclude<ExtArgs> | null
-  where?: Prisma.CategoryWhereInput
+  include?: Prisma.InventoryMovementInclude<ExtArgs> | null
+  where?: Prisma.InventoryMovementWhereInput
+  orderBy?: Prisma.InventoryMovementOrderByWithRelationInput | Prisma.InventoryMovementOrderByWithRelationInput[]
+  cursor?: Prisma.InventoryMovementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InventoryMovementScalarFieldEnum | Prisma.InventoryMovementScalarFieldEnum[]
 }
 
 /**
@@ -2336,30 +2360,6 @@ export type Product$saleProductsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.SaleProductScalarFieldEnum | Prisma.SaleProductScalarFieldEnum[]
-}
-
-/**
- * Product.inventoryMovements
- */
-export type Product$inventoryMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the InventoryMovement
-   */
-  select?: Prisma.InventoryMovementSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the InventoryMovement
-   */
-  omit?: Prisma.InventoryMovementOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.InventoryMovementInclude<ExtArgs> | null
-  where?: Prisma.InventoryMovementWhereInput
-  orderBy?: Prisma.InventoryMovementOrderByWithRelationInput | Prisma.InventoryMovementOrderByWithRelationInput[]
-  cursor?: Prisma.InventoryMovementWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.InventoryMovementScalarFieldEnum | Prisma.InventoryMovementScalarFieldEnum[]
 }
 
 /**

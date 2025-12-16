@@ -1,15 +1,13 @@
-import { z } from 'zod';
+import { config } from 'dotenv';
+import z from 'zod';
+
+config();
 
 const envSchema = z.object({
-  PORT: z
-    .string({ error: 'PORT es obligatorio' })
-    .default('4000')
-    .transform(Number),
-  NODE_ENV: z
-    .enum(['development', 'production'], {
-      error: 'NODE_ENV debe ser development o production',
-    })
-    .default('development'),
+  PORT: z.string({ error: 'PORT es obligatorio' }).transform(Number),
+  NODE_ENV: z.enum(['development', 'production'], {
+    error: 'NODE_ENV debe ser development o production',
+  }),
 
   POSTGRES_URL: z.url({ error: 'POSTGRES_URL debe ser una URL válida' }),
   POSTGRES_USER: z.string({ error: 'POSTGRES_USER es requerido' }),
@@ -18,16 +16,14 @@ const envSchema = z.object({
 
   JWT_SECRET: z.string({ error: 'JWT_SECRET es requerido' }),
   JWT_REFRESH_SECRET: z.string({ error: 'JWT_REFRESH_SECRET es requerido' }),
-  JWT_EXPIRES_IN: z.string().default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  JWT_EXPIRES_IN: z.string(),
+  JWT_REFRESH_EXPIRES_IN: z.string(),
 
   EMAIL_USER: z.email({ error: 'EMAIL_USER debe ser un email válido' }),
   EMAIL_PASSWORD: z.string({ error: 'EMAIL_PASSWORD es requerido' }),
   EMAIL_FROM: z.string({ error: 'EMAIL_FROM es obligatorio' }),
 
-  FRONT_END_URL: z
-    .url({ error: 'FRONT_END_URL debe ser una URL válida' })
-    .default('http://localhost:3000'),
+  FRONT_END_URL: z.url({ error: 'FRONT_END_URL debe ser una URL válida' }),
 });
 
 const validateEnv = () => {

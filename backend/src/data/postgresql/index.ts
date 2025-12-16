@@ -1,18 +1,11 @@
-import 'dotenv/config';
+import { Pool } from 'pg';
 import { PrismaClient } from '@/generated/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-import { BadRequestException } from '@/shared/exceptions/bad-request';
+import { POSTGRES_URL } from '@/config/env.config';
 
-const connectionString = process.env.POSTGRES_URL;
+const pool = new Pool({ connectionString: POSTGRES_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter, log: ['error'] });
 
-if (!connectionString)
-  throw new BadRequestException('La variable de entorno no está definida');
-
-export const prisma = new PrismaClient({
-  log: ['error', 'info', 'warn'],
-  datasources: {
-    db: {
-      url: connectionString,
-    },
-  },
-});
+export { prisma };

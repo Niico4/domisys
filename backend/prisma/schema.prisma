@@ -5,22 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_URL")
-}
-
-enum UserRole {
-  admin
-  customer
-  cashier
-  delivery
-}
-
-enum OrderState {
-  pending
-  confirmed
-  shipped
-  delivered
-  cancel
 }
 
 enum PaymentMethod {
@@ -30,30 +14,11 @@ enum PaymentMethod {
   credit_card
 }
 
-enum SaleState {
-  sold
-  cancel
-}
-
-enum MovementType {
-  in
-  out
-  adjustment
-}
-
-enum MovementReason {
-  expired
-  return_to_supplier
-  sale
-  manual_error
-  damaged_product
-  return
-  other
-}
-
-enum ProductState {
-  active
-  inactive
+enum UserRole {
+  admin
+  customer
+  cashier
+  delivery
 }
 
 enum AccessCodeRole {
@@ -69,11 +34,53 @@ enum AccessCodeState {
   disabled
 }
 
+enum MovementType {
+  in
+  out
+  adjustment
+}
+
+enum MovementReason {
+  purchase
+  return_from_customer
+  replace_from_supplier
+
+  sale
+  expired
+  damaged_product
+  return_to_supplier
+
+  manual_error
+  inventory_count
+
+  other
+}
+
+enum OrderState {
+  pending
+  confirmed
+  shipped
+  delivered
+  cancelled
+}
+
+enum ProductState {
+  active
+  disabled
+  out_of_stock
+  expired
+}
+
+enum SaleState {
+  sold
+  cancelled
+}
+
 model User {
   id          Int      @id @default(autoincrement())
   role        UserRole @default(customer)
-  username    String   @unique @db.VarChar(20)
-  email       String   @unique @db.VarChar(100)
+  username    String   @unique @db.VarChar(30)
+  email       String   @unique @db.VarChar(255)
   name        String   @db.VarChar(50)
   lastName    String   @map("last_name") @db.VarChar(50)
   phoneNumber String   @map("phone_number") @db.VarChar(20)
@@ -81,37 +88,43 @@ model User {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
 
-  ordersAsCustomer       Order[]             @relation("OrderCustomer")
-  ordersAsDelivery       Order[]             @relation("OrderDelivery")
-  salesAsCashier         Sale[]              @relation("SaleCashier")
-  addresses              Address[]           @relation("UserAddress")
-  inventoryMovements     InventoryMovement[] @relation("UserInventory")
-  customerDeliveryRating DeliveryRating[]    @relation("CustomerToDeliveryRating")
-  accessCodes            AccessCode[]
+  addresses          Address[]           @relation("UserAddress")
+  inventoryMovements InventoryMovement[] @relation("UserInventoryMovements")
+  customerOrders     Order[]             @relation("OrderCustomer")
+  deliveryOrders     Order[]             @relation("OrderDelivery")
+  cashierSales       Sale[]              @relation("SaleCashier")
 
-  @@index([role])
-  @@index([name])
-  @@index([lastName])
+  accessCodesCreated  AccessCode[] @relation("AccessCodeCreatedBy")
+  accessCodesDisabled AccessCode[] @relation("AccessCodeDisabledBy")
+  accessCodesUsed     AccessCode[] @relation("AccessCodeUsedBy")
+
+  @@index([role], name: "user_role_idx")
+  @@index([name, lastName], name: "user_full_name_idx")
   @@map("user")
 }
 
 model AccessCode {
-  id        Int             @id @default(autoincrement())
-  code      String          @unique @db.VarChar(50)
-  role      AccessCodeRole
-  status    AccessCodeState @default(active)
-  expiresAt DateTime?       @map("expires_at") @db.Timestamp(6)
-  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
+  id         Int             @id @default(autoincrement())
+  code       String          @unique @db.VarChar(32)
+  role       AccessCodeRole
+  status     AccessCodeState @default(active)
+  expiresAt  DateTime        @map("expires_at") @db.Timestamp(6)
+  usedAt     DateTime?       @map("used_at") @db.Timestamp(6)
+  disabledAt DateTime?       @map("disabled_at") @db.Timestamp(6)
+  createdAt  DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
 
-  // Foreign Keys
-  createdBy Int @map("created_by")
+  createdBy  Int  @map("created_by")
+  disabledBy Int? @map("disabled_by")
+  usedBy     Int? @map("used_by")
 
-  // Relations
-  admin User @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  userCreated  User  @relation("AccessCodeCreatedBy", fields: [createdBy], references: [id], onDelete: Restrict)
+  userDisabled User? @relation("AccessCodeDisabledBy", fields: [disabledBy], references: [id], onDelete: SetNull)
+  userUsed     User? @relation("AccessCodeUsedBy", fields: [usedBy], references: [id], onDelete: SetNull)
 
-  @@index([role])
-  @@index([status])
+  @@index([role], name: "access_code_role_idx")
+  @@index([status, createdAt], name: "access_code_status_created_at_idx")
+  @@index([createdBy], name: "access_code_created_by_idx")
+  @@index([usedBy], name: "access_code_used_by_idx")
   @@map("access_code")
 }
 
@@ -121,25 +134,29 @@ model Order {
   paymentMethod PaymentMethod @map("payment_method")
   totalAmount   Decimal       @map("total_amount") @db.Decimal(10, 2)
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamp(6)
+  confirmedAt   DateTime?     @map("confirmed_at") @db.Timestamp(6)
+  shippedAt     DateTime?     @map("shipped_at") @db.Timestamp(6)
+  deliveredAt   DateTime?     @map("delivered_at") @db.Timestamp(6)
+  cancelledAt   DateTime?     @map("cancelled_at") @db.Timestamp(6)
 
-  // Foreign Keys
-  customerId Int? @map("customer_id")
+  customerId Int  @map("customer_id")
   deliveryId Int? @map("delivery_id")
   addressId  Int  @map("address_id")
 
-  // Relations
-  customer User?    @relation("OrderCustomer", fields: [customerId], references: [id], onDelete: SetNull)
-  delivery User?    @relation("OrderDelivery", fields: [deliveryId], references: [id], onDelete: SetNull)
-  address  Address  @relation("OrderAddress", fields: [addressId], references: [id], onDelete: Restrict)
+  address  Address @relation("OrderAddress", fields: [addressId], references: [id])
+  customer User    @relation("OrderCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  delivery User?   @relation("OrderDelivery", fields: [deliveryId], references: [id])
 
-  orderProducts       OrderProduct[]   @relation("OrderToOrderProduct")
-  orderDeliveryRating DeliveryRating[] @relation("OrderToDeliveryRating")
+  orderProducts OrderProduct[] @relation("OrderProduct")
 
-  @@index([state])
-  @@index([paymentMethod])
-  @@index([createdAt])
-  @@index([addressId])
+  @@index([state], name: "order_state_idx")
+  @@index([paymentMethod], name: "order_payment_method_idx")
+  @@index([customerId], name: "order_customer_id_idx")
+  @@index([deliveryId], name: "order_delivery_id_idx")
+  @@index([addressId], name: "order_address_id_idx")
+  @@index([state, createdAt], name: "order_state_created_at_idx")
+  @@index([state, paymentMethod], name: "order_state_payment_method_idx")
+  @@index([deliveredAt], name: "order_delivered_at_idx")
   @@map("order")
 }
 
@@ -148,45 +165,48 @@ model Address {
   alias        String   @db.VarChar(100)
   city         String   @db.VarChar(50)
   neighborhood String   @db.VarChar(50)
-  street       String   @db.VarChar(50)
-  details      String?  @db.Text
+  street       String   @db.VarChar(100)
+  details      String?
   isDefault    Boolean  @default(false) @map("is_default")
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+  userId       Int      @map("user_id")
 
-  // Foreign Keys
-  userId Int @map("user_id")
-
-  // Relations
   user   User    @relation("UserAddress", fields: [userId], references: [id], onDelete: Cascade)
   orders Order[] @relation("OrderAddress")
 
-  @@index([alias])
+  @@index([alias], name: "address_alias_idx")
+  @@index([userId], name: "address_user_id_idx")
+  @@index([city, neighborhood], name: "address_city_neighborhood_idx")
   @@map("address")
 }
 
 model Provider {
-  id            Int       @id @default(autoincrement())
-  name          String    @db.VarChar(100)
-  nit           String    @unique @db.VarChar(20)
-  email         String    @unique @db.VarChar(100)
-  contactNumber String    @map("contact_number") @db.VarChar(20)
-  address       String    @db.VarChar(100)
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
-  products      Product[]
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(100)
+  nit           String   @unique @db.VarChar(20)
+  email         String   @unique @db.VarChar(255)
+  contactNumber String   @map("contact_number") @db.VarChar(20)
+  address       String   @db.VarChar(150)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
 
-  @@index([name])
+  products           Product[]           @relation("ProviderProducts")
+  inventoryMovements InventoryMovement[] @relation("ProviderInventoryMovements")
+
+  @@index([name], name: "provider_name_idx")
+  @@index([nit, name], name: "provider_nit_name_idx")
   @@map("provider")
 }
 
 model Category {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique @db.VarChar(30)
-  description String?   @db.Text
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
-  products    Product[]
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(50)
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  products Product[] @relation("CategoryProducts")
 
   @@map("category")
 }
@@ -196,32 +216,31 @@ model Product {
   name           String       @db.VarChar(100)
   price          Decimal      @db.Decimal(10, 2)
   stock          Int          @default(0)
-  measure        String       @db.VarChar(20)
-  lot            String       @db.VarChar(15)
+  measure        String       @db.VarChar(32)
+  lot            String       @db.VarChar(30)
   expirationDate DateTime?    @map("expiration_date") @db.Date
-  image          String?      @db.VarChar(200)
+  image          String?      @db.VarChar(255)
   createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamp(6)
   state          ProductState @default(active)
 
-  // Foreign Keys
   providerId Int? @map("provider_id")
   categoryId Int? @map("category_id")
 
-  // Relations
-  provider Provider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
-  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  category Category? @relation("CategoryProducts", fields: [categoryId], references: [id])
+  provider Provider? @relation("ProviderProducts", fields: [providerId], references: [id])
 
+  inventoryMovements InventoryMovement[] @relation("ProductInventory")
   orderProducts      OrderProduct[]      @relation("ProductToOrderProduct")
   saleProducts       SaleProduct[]       @relation("ProductToSaleProduct")
-  inventoryMovements InventoryMovement[] @relation("ProductInventory")
 
-  @@unique([name, lot, measure])
-  @@index([providerId])
-  @@index([name])
-  @@index([expirationDate])
-  @@index([categoryId])
-  @@index([categoryId, providerId])
+  @@unique([name, lot, measure], name: "unique_product_name_lot_measure_idx")
+  @@index([name], name: "product_name_idx")
+  @@index([state], name: "product_state_idx")
+  @@index([expirationDate], name: "product_expiration_date_idx")
+  @@index([providerId], name: "product_provider_id_idx")
+  @@index([categoryId], name: "product_category_id_idx")
+  @@index([categoryId, providerId], name: "product_category_provider_id_idx")
   @@map("product")
 }
 
@@ -232,88 +251,73 @@ model Sale {
   totalAmount   Decimal       @map("total_amount") @db.Decimal(10, 2)
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
 
-  // Foreign Keys
-  cashierId Int? @map("cashier_id")
+  cancelledAt DateTime? @map("cancelled_at") @db.Timestamp(6)
 
-  // Relations
-  cashier User? @relation("SaleCashier", fields: [cashierId], references: [id], onDelete: SetNull)
+  cashierId Int @map("cashier_id")
 
+  cashier      User          @relation("SaleCashier", fields: [cashierId], references: [id], onDelete: Restrict)
   saleProducts SaleProduct[] @relation("SaleToSaleProduct")
 
-  @@index([cashierId])
-  @@index([createdAt])
+  @@index([state], name: "sale_state_idx")
+  @@index([cashierId], name: "sale_cashier_id_idx")
+  @@index([createdAt], name: "sale_created_at_idx")
+  @@index([cancelledAt], name: "sale_cancelled_at_idx")
+  @@index([state, createdAt], name: "sale_state_created_at_idx")
+  @@index([paymentMethod], name: "sale_payment_method_idx")
   @@map("sale")
 }
 
 model SaleProduct {
   quantity  Int
-  unitPrice Decimal  @map("unit_price") @db.Decimal(10, 2)
+  price     Decimal  @map("price") @db.Decimal(10, 2)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
-  // Foreign Keys
   saleId    Int @map("sale_id")
   productId Int @map("product_id")
 
-  // Relations
-  sale    Sale    @relation("SaleToSaleProduct", fields: [saleId], references: [id], onDelete: Cascade)
   product Product @relation("ProductToSaleProduct", fields: [productId], references: [id], onDelete: Cascade)
+  sale    Sale    @relation("SaleToSaleProduct", fields: [saleId], references: [id], onDelete: Cascade)
 
-  @@id([saleId, productId])
+  @@id([saleId, productId], name: "sale_product_pkey")
   @@map("sale_product")
 }
 
 model OrderProduct {
   quantity  Int
-  unitPrice Decimal  @map("unit_price") @db.Decimal(10, 2)
+  price     Decimal  @map("price") @db.Decimal(10, 2)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
-  // Foreign Keys
   orderId   Int @map("order_id")
   productId Int @map("product_id")
 
-  // Relations
-  order   Order   @relation("OrderToOrderProduct", fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order   @relation("OrderProduct", fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation("ProductToOrderProduct", fields: [productId], references: [id], onDelete: Cascade)
 
-  @@id([orderId, productId])
+  @@id([orderId, productId], name: "order_product_pkey")
   @@map("order_product")
 }
 
 model InventoryMovement {
-  id           Int             @id @default(autoincrement())
-  movementType MovementType    @map("movement_type")
-  reason       MovementReason?
+  id           Int            @id @default(autoincrement())
+  movementType MovementType   @map("movement_type")
+  reason       MovementReason
   quantity     Int?
-  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamp(6)
 
-  // Foreign Keys
-  productId Int @map("product_id")
-  adminId   Int @map("admin_id")
+  productId  Int  @map("product_id")
+  adminId    Int? @map("admin_id")
+  providerId Int? @map("provider_id")
 
-  // Relations
-  product Product @relation("ProductInventory", fields: [productId], references: [id], onDelete: Cascade)
-  admin   User    @relation("UserInventory", fields: [adminId], references: [id], onDelete: Cascade)
+  admin    User?     @relation("UserInventoryMovements", fields: [adminId], references: [id], onDelete: SetNull)
+  provider Provider? @relation("ProviderInventoryMovements", fields: [providerId], references: [id], onDelete: SetNull)
+  product  Product   @relation("ProductInventory", fields: [productId], references: [id], onDelete: Restrict)
 
-  @@index([movementType])
-  @@index([reason])
-  @@index([createdAt])
+  @@index([movementType], name: "movement_type_idx")
+  @@index([reason], name: "movement_reason_idx")
+  @@index([createdAt], name: "movement_created_at_idx")
+  @@index([productId], name: "movement_product_id_idx")
+  @@index([adminId], name: "movement_admin_id_idx")
+  @@index([providerId], name: "movement_provider_id_idx")
+  @@index([movementType, reason], name: "movement_type_reason_idx")
   @@map("inventory_movement")
-}
-
-model DeliveryRating {
-  id        Int      @id @default(autoincrement())
-  rating    Int
-  comment   String?  @db.Text
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-
-  // Foreign Keys
-  orderId    Int @map("order_id")
-  customerId Int @map("customer_id")
-
-  // Relations
-  order    Order @relation("OrderToDeliveryRating", fields: [orderId], references: [id], onDelete: Cascade)
-  customer User  @relation("CustomerToDeliveryRating", fields: [customerId], references: [id], onDelete: Cascade)
-
-  @@unique([orderId, customerId])
-  @@map("delivery_rating")
 }

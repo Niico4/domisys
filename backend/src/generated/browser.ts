@@ -72,8 +72,3 @@ export type OrderProduct = Prisma.OrderProductModel
  * 
  */
 export type InventoryMovement = Prisma.InventoryMovementModel
-/**
- * Model DeliveryRating
- * 
- */
-export type DeliveryRating = Prisma.DeliveryRatingModel
