@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { createCodeDto } from '@/domain/dtos/access-codes/create-code.dto';
 import { AccessCodeRepository } from '@/domain/repositories/access-code.repository';
 
+import { DisableCode } from '@/domain/use-cases/access-code/disable-code';
 import { CreateAccessCode } from '@/domain/use-cases/access-code/create-code';
 
 import { ResponseHandler } from '@/shared/http/response-handler';
@@ -71,7 +72,10 @@ export const accessCodeController = (
   disableCode: async (req: Request, res: Response) => {
     try {
       const id = validateId(req.params.id);
-      const data = await accessCodeRepository.disableCode(id);
+      const adminId = req.user!.id;
+
+      const useCase = new DisableCode(accessCodeRepository);
+      const data = await useCase.execute(id, adminId);
 
       return ResponseHandler.ok(
         res,

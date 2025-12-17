@@ -6,7 +6,6 @@ import { CreateCodeDtoType } from '../dtos/access-codes/create-code.dto';
 export interface AccessCodeRepository {
   getAll(): Promise<AccessCodeEntity[]>;
   findById(id: number): Promise<AccessCodeEntity>;
-  findByCode(code: string): Promise<AccessCodeEntity | null>;
   findActiveByCode(code: string): Promise<AccessCodeEntity | null>;
 
   createCode(
@@ -17,5 +16,6 @@ export interface AccessCodeRepository {
     state: AccessCodeState,
     expiresAt?: Date
   ): Promise<AccessCodeEntity>;
-  disableCode(id: number): Promise<AccessCodeEntity>;
+  markAsUsed(id: number, userId: number): Promise<AccessCodeEntity>;
+  disableCode(id: number, adminId: number): Promise<AccessCodeEntity>;
 }

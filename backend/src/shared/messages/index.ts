@@ -34,8 +34,6 @@ export const messages = {
   },
 
   accessCode: {
-    created: () => 'Código de acceso generado exitosamente',
-    disabled: () => 'Código de acceso desactivado exitosamente',
     notFound: () => 'Código de acceso no encontrado',
     alreadyUsed: () => 'Este código ya ha sido utilizado',
     expired: () => 'Este código ha expirado',
