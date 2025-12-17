@@ -6,9 +6,13 @@ export class AccessCodeEntity {
     public readonly code: string,
     public readonly role: AccessCodeRole,
     public readonly status: AccessCodeState,
-    public readonly expiresAt: Date | null,
+    public readonly expiresAt: Date,
+    public readonly usedAt: Date | null,
+    public readonly disabledAt: Date | null,
     public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-    public readonly createdBy: number | null
+
+    public readonly createdBy: number,
+    public readonly disabledBy: number | null,
+    public readonly usedBy: number | null
   ) {}
 }

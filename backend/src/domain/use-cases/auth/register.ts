@@ -64,13 +64,22 @@ export class Register implements RegisterUseCase {
 
       userRole = this.mapAccessCodeRoleToUserRole(accessCode.role);
 
-      await this.accessCodeRepository.updateState(
-        accessCode.id,
-        AccessCodeState.used,
-        now
-      );
+      const user = await this.authRepository.register(dto, userRole);
+
+      await this.accessCodeRepository.markAsUsed(accessCode.id, user.id);
+
+      // Generar tokens y retornar
+      const { accessToken, refreshToken } = JwtService.generateTokenPair(user);
+      const { password, ...userWithoutPassword } = user;
+
+      return {
+        user: userWithoutPassword as UserEntity,
+        token: accessToken,
+        refreshToken,
+      };
     }
 
+    // Si no hay código o es primer usuario
     const user = await this.authRepository.register(dto, userRole);
 
     const { accessToken, refreshToken } = JwtService.generateTokenPair(user);

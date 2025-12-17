@@ -9,25 +9,38 @@ import { CreateCodeDtoType } from '@/domain/dtos/access-codes/create-code.dto';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
 import { messages } from '@/shared/messages';
 
+const userSelectBasic = {
+  id: true,
+  username: true,
+  name: true,
+  lastName: true,
+} as const;
+
+const withUserRelations = {
+  userCreated: { select: userSelectBasic },
+  userUsed: { select: userSelectBasic },
+  userDisabled: { select: userSelectBasic },
+} as const;
+
 export const accessCodeDatasourceImplementation: AccessCodeDatasource = {
   async getAll(): Promise<AccessCodeEntity[]> {
     return await prisma.accessCode.findMany({
       orderBy: { createdAt: 'desc' },
+      include: withUserRelations,
     });
   },
 
   async findById(id: number): Promise<AccessCodeEntity> {
-    const accessCode = await prisma.accessCode.findUnique({ where: { id } });
+    const accessCode = await prisma.accessCode.findUnique({
+      where: { id },
+      include: withUserRelations,
+    });
 
     if (!accessCode) {
       throw new BadRequestException(messages.accessCode.notFound());
     }
 
     return accessCode;
-  },
-
-  async findByCode(code: string): Promise<AccessCodeEntity | null> {
-    return await prisma.accessCode.findUnique({ where: { code } });
   },
 
   async findActiveByCode(code: string): Promise<AccessCodeEntity | null> {
@@ -47,9 +60,10 @@ export const accessCodeDatasourceImplementation: AccessCodeDatasource = {
         code: data.code,
         role: data.role,
         expiresAt: data.expiresAt,
-        admin: {
-          connect: { id: data.adminId },
-        },
+        createdBy: data.adminId,
+      },
+      include: {
+        userCreated: { select: userSelectBasic },
       },
     });
   },
@@ -59,8 +73,6 @@ export const accessCodeDatasourceImplementation: AccessCodeDatasource = {
     state: AccessCodeState,
     expiresAt?: Date
   ): Promise<AccessCodeEntity> {
-    await this.findById(id);
-
     return await prisma.accessCode.update({
       where: { id },
       data: {
@@ -70,24 +82,28 @@ export const accessCodeDatasourceImplementation: AccessCodeDatasource = {
     });
   },
 
-  async disableCode(id: number): Promise<AccessCodeEntity> {
-    const code = await this.findById(id);
+  async markAsUsed(id: number, userId: number): Promise<AccessCodeEntity> {
+    return await prisma.accessCode.update({
+      where: { id },
+      data: {
+        status: AccessCodeState.used,
+        usedBy: userId,
+        usedAt: new Date(),
+      },
+    });
+  },
 
-    if (code.status === AccessCodeState.disabled) {
-      throw new BadRequestException(messages.accessCode.alreadyDisabled());
-    }
-
-    if (code.status !== AccessCodeState.active) {
-      throw new BadRequestException(
-        messages.accessCode.cannotDisableNonActive()
-      );
-    }
-
+  async disableCode(id: number, adminId: number): Promise<AccessCodeEntity> {
     return await prisma.accessCode.update({
       where: { id },
       data: {
         status: AccessCodeState.disabled,
-        expiresAt: new Date(),
+        disabledBy: adminId,
+        disabledAt: new Date(),
+      },
+      include: {
+        userCreated: { select: userSelectBasic },
+        userDisabled: { select: userSelectBasic },
       },
     });
   },

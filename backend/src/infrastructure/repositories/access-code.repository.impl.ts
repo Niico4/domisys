@@ -8,14 +8,16 @@ export const accessCodeRepositoryImplementation = (
 ): AccessCodeRepository => ({
   getAll: () => datasource.getAll(),
   findById: (id: number) => datasource.findById(id),
-  findByCode: (code: string) => datasource.findByCode(code),
   findActiveByCode: (code: string) => datasource.findActiveByCode(code),
 
-  createCode: (data: CreateCodeDtoType & { code: string; expiresAt: Date }) =>
-    datasource.createCode(data),
+  createCode: (
+    data: CreateCodeDtoType & { code: string; expiresAt: Date; adminId: number }
+  ) => datasource.createCode(data),
 
   updateState: (id: number, state: AccessCodeState, expiresAt?: Date) =>
     datasource.updateState(id, state, expiresAt),
 
-  disableCode: (id: number) => datasource.disableCode(id),
+  markAsUsed: (id: number, userId: number) => datasource.markAsUsed(id, userId),
+  disableCode: (id: number, adminId: number) =>
+    datasource.disableCode(id, adminId),
 });
