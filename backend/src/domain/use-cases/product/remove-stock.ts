@@ -1,7 +1,6 @@
 import { MovementReason, MovementType } from '@/generated/enums';
 
 import { ProductRepository } from '@/domain/repositories/product.repository';
-import { ProviderRepository } from '@/domain/repositories/provider.repository';
 
 import { RemoveStockDtoType } from '@/domain/dtos/products/remove-stock.dto';
 
@@ -17,27 +16,16 @@ export interface RemoveStockUseCase {
 }
 
 export class RemoveStock implements RemoveStockUseCase {
-  constructor(
-    private readonly productRepository: ProductRepository,
-    private readonly providerRepository: ProviderRepository
-  ) {}
+  constructor(private readonly productRepository: ProductRepository) {}
 
   async execute(
     productId: number,
     dto: RemoveStockDtoType,
     adminId: number
   ): Promise<void> {
-    const { quantity, reason } = dto;
-
     const product = await this.productRepository.findById(productId);
 
-    if (!product.providerId) {
-      throw new BadRequestException(messages.product.noProviderAssigned());
-    }
-
-    await this.providerRepository.findById(product.providerId);
-
-    if (reason === MovementReason.expired) {
+    if (dto.reason === MovementReason.expired) {
       if (!product.expirationDate) {
         throw new BadRequestException(messages.product.noExpirationDate());
       }
@@ -52,11 +40,11 @@ export class RemoveStock implements RemoveStockUseCase {
 
     await this.productRepository.addStockMovement({
       productId,
-      providerId: product.providerId,
       adminId,
-      quantity,
+      providerId: dto.providerId,
+      quantity: dto.quantity,
       type: MovementType.out,
-      reason: reason as MovementReason,
+      reason: dto.reason,
       date: new Date(),
     });
   }

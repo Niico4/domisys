@@ -17,6 +17,8 @@ export const providerRoutes = (): Router => {
 
   router.use(isAuthenticated);
 
+  router.get('/report', hasRole(UserRole.admin), controller.getProviderReport);
+  
   router.get('/', controller.getAllProviders);
   router.get('/:id', controller.getProviderById);
 

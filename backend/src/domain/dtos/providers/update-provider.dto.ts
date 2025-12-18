@@ -1,3 +1,6 @@
+import parsePhoneNumberFromString, {
+  isValidPhoneNumber,
+} from 'libphonenumber-js';
 import { z } from 'zod';
 
 export const updateProviderDto = z
@@ -20,16 +23,43 @@ export const updateProviderDto = z
       .optional(),
 
     contactNumber: z
-      .string({ error: 'El número de contacto debe ser un texto válido.' })
-      .regex(/^[0-9]{10}$/, {
+      .string({ error: 'El número de contacto es obligatorio.' })
+      .length(10, {
         error: 'El número de contacto debe tener exactamente 10 dígitos.',
+      })
+      .trim()
+      .refine(
+        (phoneNumber) => {
+          try {
+            return isValidPhoneNumber(phoneNumber, 'CO');
+          } catch (error) {
+            return false;
+          }
+        },
+        {
+          error: 'El número de contacto debe ser un número válido de Colombia.',
+        }
+      )
+      .refine(
+        (phoneNumber) => {
+          const digits = phoneNumber.replace(/\D/g, '');
+          return !/^(\d)\1+$/.test(digits);
+        },
+        {
+          error: 'El número de contacto debe ser un número válido.',
+        }
+      )
+      .transform((phoneNumber) => {
+        const parsed = parsePhoneNumberFromString(phoneNumber, 'CO');
+
+        return String(parsed?.number);
       })
       .optional(),
 
     address: z
       .string({ error: 'La dirección debe ser un texto válido.' })
       .min(10, { error: 'La dirección debe tener mínimo 10 caracteres.' })
-      .max(100, { error: 'La dirección puede tener máximo 100 caracteres.' })
+      .max(150, { error: 'La dirección puede tener máximo 150 caracteres.' })
       .optional(),
   })
   .refine(

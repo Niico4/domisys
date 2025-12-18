@@ -5,8 +5,6 @@ import { productRepositoryImplementation } from '@/infrastructure/repositories/p
 
 import { productController } from './controller';
 import { productDatasourceImplementation } from '@/infrastructure/datasource/product.datasource.impl';
-import { providerRepositoryImplementation } from '@/infrastructure/repositories/provider.repository.impl';
-import { providerDatasourceImplementation } from '@/infrastructure/datasource/provider.datasource.impl';
 import { isAuthenticated, hasRole } from '@/shared/auth/auth.middleware';
 
 export const productRoutes = (): Router => {
@@ -15,11 +13,8 @@ export const productRoutes = (): Router => {
   const productRepository = productRepositoryImplementation(
     productDatasourceImplementation
   );
-  const providerRepository = providerRepositoryImplementation(
-    providerDatasourceImplementation
-  );
 
-  const controller = productController(productRepository, providerRepository);
+  const controller = productController(productRepository);
 
   router.use(isAuthenticated);
 
@@ -29,9 +24,9 @@ export const productRoutes = (): Router => {
     controller.inventoryReport
   );
   router.get(
-    '/reports/inventory-movement',
+    '/inventory/movements',
     hasRole(UserRole.admin),
-    controller.getInventoryMovementReport
+    controller.getInventoryMovements
   );
   router.get(
     '/alerts/low-stock',

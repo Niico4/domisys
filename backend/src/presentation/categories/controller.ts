@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import { createCategoryDto } from '@/domain/dtos/categories/create-category.dto';
 import { updateCategoryDto } from '@/domain/dtos/categories/update-category.dto';
+import { categoryReportDto } from '@/domain/dtos/categories/category-report.dto';
 import { CategoryRepository } from '@/domain/repositories/category.repository';
 
 import { GetAllCategories } from '@/domain/use-cases/category/get-all-categories';
@@ -9,6 +10,7 @@ import { CreateCategory } from '@/domain/use-cases/category/create-category';
 import { GetCategoryById } from '@/domain/use-cases/category/get-category-by-id';
 import { DeleteCategory } from '@/domain/use-cases/category/delete-category';
 import { UpdateCategory } from '@/domain/use-cases/category/update-category';
+import { GetCategoryReport } from '@/domain/use-cases/category/get-category-report';
 
 import { ResponseHandler } from '@/shared/http/response-handler';
 import { validateId } from '@/shared/utils/validate-id';
@@ -108,6 +110,23 @@ export const categoryController = (categoryRepository: CategoryRepository) => ({
         res,
         error,
         messages.category.deleteError()
+      );
+    }
+  },
+
+  getCategoryReport: async (req: Request, res: Response) => {
+    try {
+      const dto = categoryReportDto.parse(req.query);
+
+      const useCase = new GetCategoryReport(categoryRepository);
+      const data = await useCase.execute(dto);
+
+      return ResponseHandler.ok(res, messages.category.reportSuccess(), data);
+    } catch (error) {
+      return ResponseHandler.handleException(
+        res,
+        error,
+        messages.category.reportError()
       );
     }
   },

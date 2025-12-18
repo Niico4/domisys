@@ -6,10 +6,9 @@ import { removeStockDto } from '@/domain/dtos/products/remove-stock.dto';
 import { stockAlertDto } from '@/domain/dtos/products/inventory/stock-alert.dto';
 import { addStockDto } from '@/domain/dtos/products/add-stock.dto';
 import { inventoryReportDto } from '@/domain/dtos/products/inventory/product-report.dto';
-import { inventoryMovementReportDto } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
+import { inventoryMovementsDto } from '@/domain/dtos/products/inventory/inventory-movements.dto';
 import { updateProductStateDto } from '@/domain/dtos/products/update-product-state.dto';
 
-import { ProviderRepository } from '@/domain/repositories/provider.repository';
 import { ProductRepository } from '@/domain/repositories/product.repository';
 
 import { CreateProduct } from '@/domain/use-cases/product/create-product';
@@ -19,7 +18,7 @@ import { GetProductById } from '@/domain/use-cases/product/get-product-by-id';
 import { UpdateProduct } from '@/domain/use-cases/product/update-product';
 import { RemoveStock } from '@/domain/use-cases/product/remove-stock';
 import { GetInventoryReport } from '@/domain/use-cases/product/inventory/get-product-report';
-import { GetInventoryMovementReport } from '@/domain/use-cases/product/inventory/get-inventory-movement-report';
+import { GetInventoryMovements } from '@/domain/use-cases/product/inventory/get-inventory-movements';
 import { GetStockAlerts } from '@/domain/use-cases/product/inventory/get-stock-alerts';
 import { AddStock } from '@/domain/use-cases/product/add-stock';
 import { UpdateProductState } from '@/domain/use-cases/product/update-product-state';
@@ -28,8 +27,7 @@ import { validateId } from '@/shared/utils/validate-id';
 import { messages } from '@/shared/messages';
 
 export const productController = (
-  productRepository: ProductRepository,
-  providerRepository: ProviderRepository
+  productRepository: ProductRepository
 ) => ({
   getAllProducts: async (_req: Request, res: Response) => {
     try {
@@ -129,7 +127,7 @@ export const productController = (
 
       const adminId = req.user!.id;
 
-      const useCase = new AddStock(productRepository, providerRepository);
+      const useCase = new AddStock(productRepository);
       const data = await useCase.execute(id, dto, adminId);
 
       return ResponseHandler.ok(res, messages.product.addStockSuccess(), data);
@@ -149,7 +147,7 @@ export const productController = (
 
       const adminId = req.user!.id;
 
-      const useCase = new RemoveStock(productRepository, providerRepository);
+      const useCase = new RemoveStock(productRepository);
       const data = await useCase.execute(id, dto, adminId);
 
       return ResponseHandler.ok(
@@ -208,23 +206,23 @@ export const productController = (
     }
   },
 
-  getInventoryMovementReport: async (req: Request, res: Response) => {
+  getInventoryMovements: async (req: Request, res: Response) => {
     try {
-      const dto = inventoryMovementReportDto.parse(req.query);
+      const dto = inventoryMovementsDto.parse(req.query);
 
-      const useCase = new GetInventoryMovementReport(productRepository);
+      const useCase = new GetInventoryMovements(productRepository);
       const data = await useCase.execute(dto);
 
       return ResponseHandler.ok(
         res,
-        messages.product.movementReportSuccess(),
+        messages.product.movementsSuccess(),
         data
       );
     } catch (error) {
       return ResponseHandler.handleException(
         res,
         error,
-        messages.product.movementReportError()
+        messages.product.movementsError()
       );
     }
   },

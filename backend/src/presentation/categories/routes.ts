@@ -18,6 +18,8 @@ export const categoriesRoutes = (): Router => {
 
   router.use(isAuthenticated);
 
+  router.get('/report', hasRole(UserRole.admin), controller.getCategoryReport);
+  
   router.get('/', controller.getAllCategories);
   router.get('/:id', controller.getCategoryById);
 

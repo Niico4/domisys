@@ -148,15 +148,11 @@ export const messages = {
   },
 
   product: {
-    created: (name: string) => `Producto "${name}" creado exitosamente`,
-    updated: (name: string) => `Producto "${name}" actualizado exitosamente`,
-    deleted: (name: string) => `Producto "${name}" eliminado exitosamente`,
     notFound: () => 'Producto no encontrado',
     notFoundWithId: (id: number) => `Producto con ID ${id} no encontrado`,
     insufficientStock: (name: string, available: number, required: number) =>
       `Stock insuficiente para "${name}". Disponible: ${available}, Requerido: ${required}`,
     insufficientStockGeneric: () => 'Stock insuficiente',
-    outOfStock: () => 'Producto sin stock',
     invalidOrInactive: () => 'Hay productos inválidos o inactivos',
     invalidAssociatedValue: () => 'Uno de los valores asociados no es válido',
     alreadyInState: (state: string) =>
@@ -174,8 +170,7 @@ export const messages = {
     removeStockSuccess: () => 'Cantidad retirada correctamente.',
     updateStateSuccess: () => 'Estado actualizado correctamente.',
     stockAlertsSuccess: () => 'Alertas de stock obtenidas correctamente.',
-    movementReportSuccess: () =>
-      'Reporte de movimientos de inventario generado correctamente.',
+    movementsSuccess: () => 'Movimientos de inventario obtenidos con éxito.',
     inventoryReportSuccess: () =>
       'Reporte de productos generado correctamente.',
     getAllError: () => 'Error al obtener los productos',
@@ -187,10 +182,8 @@ export const messages = {
     removeStockError: () => 'Error al retirar la cantidad.',
     updateStateError: () => 'Error al actualizar el estado del producto.',
     stockAlertsError: () => 'Error al obtener alertas de stock',
-    movementReportError: () =>
-      'Error al generar el reporte de movimientos de inventario.',
+    movementsError: () => 'Error al obtener los movimientos de inventario.',
     inventoryReportError: () => 'Error al generar el reporte de productos.',
-    noProviderAssigned: () => 'El producto no tiene un proveedor asignado',
   },
 
   provider: {
@@ -204,11 +197,13 @@ export const messages = {
     createSuccess: () => 'Proveedor creado correctamente.',
     updateSuccess: () => 'Proveedor actualizado correctamente.',
     deleteSuccess: () => 'Proveedor eliminado correctamente.',
+    reportSuccess: () => 'Reporte de proveedores generado correctamente.',
     getAllError: () => 'Error al obtener los proveedores.',
     getByIdError: () => 'Error al obtener el proveedor.',
     createError: () => 'Error al crear el proveedor.',
     updateError: () => 'Error al actualizar el proveedor.',
     deleteError: () => 'Error al eliminar el proveedor.',
+    reportError: () => 'Error al generar el reporte de proveedores.',
   },
 
   category: {
@@ -219,11 +214,13 @@ export const messages = {
     alreadyExists: (name: string) => `La categoría "${name}" ya existe`,
     getAllSuccess: () => 'Categorías obtenidas correctamente',
     getByIdSuccess: () => 'Categoría obtenida correctamente',
+    reportSuccess: () => 'Reporte de categorías generado correctamente',
     createError: () => 'Error al crear la categoría',
     updateError: () => 'Error al actualizar la categoría',
     deleteError: () => 'Error al eliminar la categoría',
     getAllError: () => 'Error al obtener las categorías',
     getByIdError: () => 'Error al obtener la categoría',
+    reportError: () => 'Error al generar el reporte de categorías',
   },
 
   sale: {

@@ -12,12 +12,6 @@ export const createProductDto = z.strictObject({
     .number({ error: 'El precio es obligatorio y debe ser un número.' })
     .nonnegative({ error: 'El precio no puede ser negativo.' }),
 
-  stock: z.coerce
-    .number({ error: 'El stock es obligatorio y debe ser un número.' })
-    .int({ error: 'El stock debe ser un número entero.' })
-    .nonnegative({ error: 'El stock no puede ser negativo.' })
-    .optional(),
-
   measure: z
     .string({ error: 'La unidad de medida es obligatoria.' })
     .trim()
@@ -32,7 +26,7 @@ export const createProductDto = z.strictObject({
     .min(6, { error: 'El lote debe tener al menos 6 caracteres.' })
     .max(15, { error: 'El lote no puede superar los 15 caracteres.' }),
 
-  expirationDate: z.iso
+  expirationDate: z.coerce
     .date({ error: 'El formato de la fecha debe ser válido' })
     .nullable()
     .optional(),

@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-export const inventoryMovementReportDto = z.object({
-  startDate: z.iso
-    .date({ error: 'El formato de la fecha debe ser válido.' })
+export const inventoryMovementsDto = z.object({
+  startDate: z.coerce
+    .date({ message: 'El formato de la fecha debe ser válido.' })
     .optional(),
-  endDate: z.iso
-    .date({ error: 'El formato de la fecha debe ser válido.' })
+  endDate: z.coerce
+    .date({ message: 'El formato de la fecha debe ser válido.' })
     .optional(),
   productId: z.coerce
     .number({
@@ -16,6 +16,6 @@ export const inventoryMovementReportDto = z.object({
     .optional(),
 });
 
-export type InventoryMovementReportDtoType = z.infer<
-  typeof inventoryMovementReportDto
+export type InventoryMovementsDtoType = z.infer<
+  typeof inventoryMovementsDto
 >;

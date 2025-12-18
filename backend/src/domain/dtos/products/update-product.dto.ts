@@ -15,12 +15,6 @@ export const updateProductDto = z
       .nonnegative({ error: 'El precio no puede ser negativo.' })
       .optional(),
 
-    stock: z.coerce
-      .number({ error: 'El stock es obligatorio y debe ser un número.' })
-      .int({ error: 'El stock debe ser un número entero.' })
-      .nonnegative({ error: 'El stock no puede ser negativo.' })
-      .optional(),
-
     measure: z
       .string({ error: 'La unidad de medida es obligatoria.' })
       .trim()
@@ -30,14 +24,7 @@ export const updateProductDto = z
       })
       .optional(),
 
-    lot: z
-      .string({ error: 'El lote es obligatorio.' })
-      .trim()
-      .min(9, { error: 'El lote debe tener al menos 9 caracteres.' })
-      .max(15, { error: 'El lote no puede superar los 15 caracteres.' })
-      .optional(),
-
-    expirationDate: z.iso
+    expirationDate: z.coerce
       .date({ error: 'El formato de la fecha debe ser válido' })
       .nullable()
       .optional(),

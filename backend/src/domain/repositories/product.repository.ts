@@ -3,7 +3,7 @@ import { MovementReason, MovementType, ProductState } from '@/generated/enums';
 
 import { CreateProductDtoType } from '../dtos/products/create-product.dto';
 import { UpdateProductDtoType } from '../dtos/products/update-product.dto';
-import { InventoryMovementReportDtoType } from '../dtos/products/inventory/inventory-movement-report.dto';
+import { InventoryMovementsDtoType } from '../dtos/products/inventory/inventory-movements.dto';
 import { StockAlertDtoType } from '../dtos/products/inventory/stock-alert.dto';
 import { ProductReportDtoType } from '../dtos/products/inventory/product-report.dto';
 
@@ -24,12 +24,12 @@ export interface ProductRepository {
     quantity: number;
     type: MovementType;
     date: Date;
-    reason: MovementReason | null;
+    reason: MovementReason;
   }): Promise<void>;
 
   getStockAlerts(dto?: StockAlertDtoType): Promise<ProductEntity[]>;
-  getInventoryMovementReport(
-    dto: InventoryMovementReportDtoType
+  getInventoryMovements(
+    dto: InventoryMovementsDtoType
   ): Promise<InventoryMovement[]>;
   getInventoryReport(dto?: ProductReportDtoType): Promise<ProductEntity[]>;
 }

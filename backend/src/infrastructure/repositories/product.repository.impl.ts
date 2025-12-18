@@ -5,7 +5,7 @@ import { ProductDatasource } from '@/domain/datasources/product.datasource';
 import { ProductRepository } from '@/domain/repositories/product.repository';
 
 import { CreateProductDtoType } from '@/domain/dtos/products/create-product.dto';
-import { InventoryMovementReportDtoType } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
+import { InventoryMovementsDtoType } from '@/domain/dtos/products/inventory/inventory-movements.dto';
 import { ProductReportDtoType } from '@/domain/dtos/products/inventory/product-report.dto';
 import { StockAlertDtoType } from '@/domain/dtos/products/inventory/stock-alert.dto';
 import { UpdateProductDtoType } from '@/domain/dtos/products/update-product.dto';
@@ -28,15 +28,15 @@ export const productRepositoryImplementation = (
     quantity: number;
     type: MovementType;
     date: Date;
-    reason: MovementReason | null;
+    reason: MovementReason;
   }) => datasource.addStockMovement(params),
 
   updateState: (id: number, state: ProductState) =>
     datasource.updateState(id, state),
 
   getStockAlerts: (data?: StockAlertDtoType) => datasource.getStockAlerts(data),
-  getInventoryMovementReport: (data: InventoryMovementReportDtoType) =>
-    datasource.getInventoryMovementReport(data),
+  getInventoryMovements: (data: InventoryMovementsDtoType) =>
+    datasource.getInventoryMovements(data),
   getInventoryReport: (dto: ProductReportDtoType) =>
     datasource.getInventoryReport(dto),
 });
