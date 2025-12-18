@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import { AddressRepository } from '@/domain/repositories/address.repository';
+import { AuthRepository } from '@/domain/repositories/auth.repository';
 
 import { CreateAddress } from '@/domain/use-cases/address/create-address';
 import { GetUserAddresses } from '@/domain/use-cases/address/get-user-addresses';
@@ -14,13 +15,16 @@ import { ResponseHandler } from '@/shared/http/response-handler';
 import { validateId } from '@/shared/utils/validate-id';
 import { messages } from '@/shared/messages';
 
-export const addressController = (addressRepo: AddressRepository) => ({
+export const addressController = (
+  addressRepo: AddressRepository,
+  authRepo: AuthRepository
+) => ({
   create: async (req: Request, res: Response) => {
     try {
       const dto = createAddressDto.parse(req.body);
       const userId = req.user!.id;
 
-      const useCase = new CreateAddress(addressRepo);
+      const useCase = new CreateAddress(addressRepo, authRepo);
       const data = await useCase.execute(dto, userId);
 
       return ResponseHandler.ok(res, messages.address.created(), data, 201);

@@ -11,7 +11,7 @@ import { ProductEntity } from '@/domain/entities/product.entity';
 import { ProductDatasource } from '@/domain/datasources/product.datasource';
 
 import { CreateProductDtoType } from '@/domain/dtos/products/create-product.dto';
-import { InventoryMovementReportDtoType } from '@/domain/dtos/products/inventory/inventory-movement-report.dto';
+import { InventoryMovementsDtoType } from '@/domain/dtos/products/inventory/inventory-movements.dto';
 import { ProductReportDtoType } from '@/domain/dtos/products/inventory/product-report.dto';
 import { StockAlertDtoType } from '@/domain/dtos/products/inventory/stock-alert.dto';
 import { UpdateProductDtoType } from '@/domain/dtos/products/update-product.dto';
@@ -20,15 +20,36 @@ import { BadRequestException } from '@/shared/exceptions/bad-request';
 import { UserRoleService } from '../services/user-role.service';
 import { messages } from '@/shared/messages';
 
+const providerSelect = {
+  id: true,
+  name: true,
+  contactNumber: true,
+} as const;
+
+const categorySelect = {
+  id: true,
+  name: true,
+} as const;
+
+const withRelations = {
+  provider: { select: providerSelect },
+  category: { select: categorySelect },
+} as const;
+
 const userRoleService = new UserRoleService(prisma);
 
 export const productDatasourceImplementation: ProductDatasource = {
   async getAll(): Promise<ProductEntity[]> {
-    return await prisma.product.findMany();
+    return await prisma.product.findMany({
+      include: withRelations,
+    });
   },
 
   async findById(id: number): Promise<ProductEntity> {
-    const product = await prisma.product.findUnique({ where: { id } });
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: withRelations,
+    });
 
     if (!product) {
       throw new BadRequestException(messages.product.notFound());
@@ -46,17 +67,16 @@ export const productDatasourceImplementation: ProductDatasource = {
           ...rest,
           image: image ?? null,
           expirationDate: expirationDate ? new Date(expirationDate) : null,
-          stock: data.stock ?? 0,
+          stock: 0,
         },
+        include: withRelations,
       });
-    } catch (error: any) {
+    } catch (error) {
       throw new BadRequestException(messages.product.invalidAssociatedValue());
     }
   },
 
   async update(id: number, data: UpdateProductDtoType): Promise<ProductEntity> {
-    await this.findById(id);
-
     try {
       const filteredData = Object.fromEntries(
         Object.entries(data).filter(([_key, value]) => value !== undefined)
@@ -77,21 +97,21 @@ export const productDatasourceImplementation: ProductDatasource = {
       return await prisma.product.update({
         where: { id },
         data: updateData,
+        include: withRelations,
       });
-    } catch (error: any) {
+    } catch (error) {
       throw new BadRequestException(messages.product.invalidAssociatedValue());
     }
   },
 
   async delete(id: number): Promise<ProductEntity> {
-    await this.findById(id);
-
-    return await prisma.product.delete({ where: { id } });
+    return await prisma.product.delete({
+      where: { id },
+      include: withRelations,
+    });
   },
 
   async updateState(id: number, state: ProductState): Promise<ProductEntity> {
-    await this.findById(id);
-
     return await prisma.product.update({
       where: { id },
       data: { state },
@@ -105,7 +125,7 @@ export const productDatasourceImplementation: ProductDatasource = {
     quantity: number;
     type: MovementType;
     date: Date;
-    reason: MovementReason | null;
+    reason: MovementReason;
   }): Promise<void> {
     await userRoleService.validateUserRole(params.adminId, UserRole.admin);
 
@@ -138,6 +158,7 @@ export const productDatasourceImplementation: ProductDatasource = {
         data: {
           productId: params.productId,
           adminId: params.adminId,
+          providerId: params.providerId,
           movementType: params.type,
           quantity: params.quantity,
           reason: params.reason,
@@ -155,8 +176,8 @@ export const productDatasourceImplementation: ProductDatasource = {
     });
   },
 
-  async getInventoryMovementReport(
-    dto: InventoryMovementReportDtoType
+  async getInventoryMovements(
+    dto: InventoryMovementsDtoType
   ): Promise<InventoryMovement[]> {
     const where: Prisma.InventoryMovementWhereInput = {};
 
@@ -176,11 +197,18 @@ export const productDatasourceImplementation: ProductDatasource = {
       }
     }
 
-    if (dto.productId) where.productId = dto.productId; //TODO: revisar y ajustar filtrado
+    if (dto.productId) where.productId = dto.productId;
 
     return await prisma.inventoryMovement.findMany({
       where,
       orderBy: { createdAt: 'desc' },
+      include: {
+        provider: { select: providerSelect },
+        product: { select: { id: true, name: true } },
+        admin: {
+          select: { id: true, name: true, lastName: true, username: true },
+        },
+      },
     });
   },
 

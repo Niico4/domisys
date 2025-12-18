@@ -1,5 +1,4 @@
 import { prisma } from '@/data/postgresql';
-import { UserRole } from '@/generated/enums';
 
 import { AddressEntity } from '@/domain/entities/address.entity';
 import { AddressDatasource } from '@/domain/datasources/address.datasource';
@@ -15,54 +14,49 @@ export const addressDatasourceImplementation: AddressDatasource = {
     dto: CreateAddressDtoType,
     userId: number
   ): Promise<AddressEntity> {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { role: true },
+    return prisma.$transaction(async (tx) => {
+      const addressCount = await tx.address.count({
+        where: { userId },
+      });
+
+      const shouldBeDefault = addressCount === 0 || dto.isDefault;
+
+      if (shouldBeDefault) {
+        await tx.address.updateMany({
+          where: { userId, isDefault: true },
+          data: { isDefault: false },
+        });
+      }
+
+      return tx.address.create({
+        data: {
+          alias: dto.alias,
+          city: dto.city,
+          neighborhood: dto.neighborhood,
+          street: dto.street,
+          details: dto.details || null,
+          isDefault: shouldBeDefault,
+          userId,
+        },
+      });
     });
+  },
 
-    if (!user) {
-      throw new BadRequestException(messages.user.notFound());
-    }
-
-    const userAddresses = await prisma.address.count({
+  async countByUser(userId: number): Promise<number> {
+    return prisma.address.count({
       where: { userId },
     });
-
-    if (user.role !== UserRole.customer && userAddresses >= 1) {
-      throw new BadRequestException(messages.address.onlyCustomerMultiple());
-    }
-
-    if (dto.isDefault) {
-      await prisma.address.updateMany({
-        where: { userId, isDefault: true },
-        data: { isDefault: false },
-      });
-    }
-
-    const address = await prisma.address.create({
-      data: {
-        alias: dto.alias,
-        city: dto.city,
-        neighborhood: dto.neighborhood,
-        street: dto.street,
-        details: dto.details || null,
-        isDefault: dto.isDefault || false,
-        userId,
-      },
-    });
-
-    return address;
   },
 
   async findByUser(userId: number): Promise<AddressEntity[]> {
-    return await prisma.address.findMany({
+    return prisma.address.findMany({
       where: { userId },
       orderBy: { isDefault: 'desc' },
     });
   },
 
   async findById(id: number, userId: number): Promise<AddressEntity | null> {
-    return await prisma.address.findFirst({
+    return prisma.address.findFirst({
       where: { id, userId },
     });
   },
@@ -72,47 +66,67 @@ export const addressDatasourceImplementation: AddressDatasource = {
     dto: UpdateAddressDtoType,
     userId: number
   ): Promise<AddressEntity> {
-    const address = await this.findById(id, userId);
-
-    if (!address) {
-      throw new BadRequestException(messages.address.notFound());
-    }
-
-    if (dto.isDefault) {
-      await prisma.address.updateMany({
-        where: {
-          userId,
-          isDefault: true,
-          id: { not: id },
-        },
-        data: { isDefault: false },
+    return prisma.$transaction(async (tx) => {
+      const address = await tx.address.findFirst({
+        where: { id, userId },
       });
-    }
 
-    const updateData: any = {};
-    if (dto.alias !== undefined) updateData.alias = dto.alias;
-    if (dto.city !== undefined) updateData.city = dto.city;
-    if (dto.neighborhood !== undefined)
-      updateData.neighborhood = dto.neighborhood;
-    if (dto.street !== undefined) updateData.street = dto.street;
-    if (dto.details !== undefined) updateData.details = dto.details;
-    if (dto.isDefault !== undefined) updateData.isDefault = dto.isDefault;
+      if (!address) {
+        throw new BadRequestException(messages.address.notFound());
+      }
 
-    return await prisma.address.update({
-      where: { id },
-      data: updateData,
+      if (dto.isDefault) {
+        await tx.address.updateMany({
+          where: {
+            userId,
+            isDefault: true,
+            id: { not: id },
+          },
+          data: { isDefault: false },
+        });
+      }
+
+      return tx.address.update({
+        where: { id },
+        data: {
+          alias: dto.alias ?? address.alias,
+          city: dto.city ?? address.city,
+          neighborhood: dto.neighborhood ?? address.neighborhood,
+          street: dto.street ?? address.street,
+          details: dto.details ?? address.details,
+          isDefault: dto.isDefault ?? address.isDefault,
+        },
+      });
     });
   },
 
   async delete(id: number, userId: number): Promise<void> {
-    const address = await this.findById(id, userId);
+    await prisma.$transaction(async (tx) => {
+      const address = await tx.address.findFirst({
+        where: { id, userId },
+      });
 
-    if (!address) {
-      throw new BadRequestException(messages.address.notFound());
-    }
+      if (!address) {
+        throw new BadRequestException(messages.address.notFound());
+      }
 
-    await prisma.address.delete({
-      where: { id },
+      await tx.address.delete({
+        where: { id },
+      });
+
+      if (address.isDefault) {
+        const nextAddress = await tx.address.findFirst({
+          where: { userId },
+          orderBy: { createdAt: 'asc' },
+        });
+
+        if (nextAddress) {
+          await tx.address.update({
+            where: { id: nextAddress.id },
+            data: { isDefault: true },
+          });
+        }
+      }
     });
   },
 };

@@ -8,6 +8,7 @@ export const addressRepositoryImplementation = (
 ): AddressRepository => ({
   create: (dto: CreateAddressDtoType, userId: number) =>
     datasource.create(dto, userId),
+  countByUser: (userId: number) => datasource.countByUser(userId),
   findByUser: (userId: number) => datasource.findByUser(userId),
   findById: (id: number, userId: number) => datasource.findById(id, userId),
   update: (id: number, dto: UpdateAddressDtoType, userId: number) =>

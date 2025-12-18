@@ -4,6 +4,7 @@ import { UpdateAddressDtoType } from '@/domain/dtos/address/update-address.dto';
 
 export interface AddressRepository {
   create(dto: CreateAddressDtoType, userId: number): Promise<AddressEntity>;
+  countByUser(userId: number): Promise<number>;
   findByUser(userId: number): Promise<AddressEntity[]>;
   findById(id: number, userId: number): Promise<AddressEntity | null>;
   update(
