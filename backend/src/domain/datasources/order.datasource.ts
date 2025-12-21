@@ -11,7 +11,7 @@ export interface OrderDatasource {
 
   createOrder(data: CreateOrderDtoType): Promise<OrderEntity>;
   updateState(id: number, state: UpdateOrderStateData): Promise<OrderEntity>;
-  cancelOrder(id: number): Promise<OrderEntity>;
+  cancelOrder(id: number, cancellationReason?: string): Promise<OrderEntity>;
   completeOrder(id: number): Promise<OrderEntity>;
 
   deleteOrder(id: number): Promise<OrderEntity>;

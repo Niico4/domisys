@@ -21,6 +21,7 @@ import { GetMyOrders } from '@/domain/use-cases/order/get-my-orders';
 import { validateId } from '@/shared/utils/validate-id';
 import { ResponseHandler } from '@/shared/http/response-handler';
 import { messages } from '@/shared/messages';
+import { CancelOrderDto } from '@/domain/dtos/orders/cancel-order.dto';
 
 export const orderController = (orderRepository: OrderRepository) => ({
   getAllOrders: async (_req: Request, res: Response) => {
@@ -112,9 +113,10 @@ export const orderController = (orderRepository: OrderRepository) => ({
   cancelOrder: async (req: Request, res: Response) => {
     try {
       const id = validateId(req.params.id);
+      const { cancellationReason } = CancelOrderDto.parse(req.body);
 
       const useCase = new CancelOrder(orderRepository);
-      const data = await useCase.execute(id);
+      const data = await useCase.execute(id, cancellationReason);
 
       return ResponseHandler.ok(res, messages.order.cancelSuccess(), data);
     } catch (error) {
