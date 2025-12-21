@@ -11,21 +11,23 @@ import { ChangePasswordDtoType } from '@/domain/dtos/user/change-password.dto';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
 import { messages } from '@/shared/messages';
 
+const userSelectBasic = {
+  id: true,
+  email: true,
+  username: true,
+  name: true,
+  lastName: true,
+  phoneNumber: true,
+  role: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
 export const userDatasourceImplementation: UserRepository = {
   async findById(id: number): Promise<UserEntity | null> {
     const user = await prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        name: true,
-        lastName: true,
-        phoneNumber: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: userSelectBasic,
     });
 
     if (!user) {
@@ -42,17 +44,7 @@ export const userDatasourceImplementation: UserRepository = {
           in: [UserRole.admin],
         },
       },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        name: true,
-        lastName: true,
-        phoneNumber: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: userSelectBasic,
     });
 
     return admins as UserEntity[];
@@ -65,20 +57,23 @@ export const userDatasourceImplementation: UserRepository = {
           in: [UserRole.delivery],
         },
       },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        name: true,
-        lastName: true,
-        phoneNumber: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: userSelectBasic,
     });
 
     return deliveries as UserEntity[];
+  },
+
+  async findAllCashiers(): Promise<UserEntity[]> {
+    const cashiers = await prisma.user.findMany({
+      where: {
+        role: {
+          in: [UserRole.cashier],
+        },
+      },
+      select: userSelectBasic,
+    });
+
+    return cashiers as UserEntity[];
   },
 
   async updateProfile(
@@ -107,17 +102,7 @@ export const userDatasourceImplementation: UserRepository = {
         lastName: dto.lastName ?? user.lastName,
         phoneNumber: dto.phoneNumber ?? user.phoneNumber,
       },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        name: true,
-        lastName: true,
-        phoneNumber: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: userSelectBasic,
     });
 
     return updatedUser as UserEntity;
@@ -140,6 +125,12 @@ export const userDatasourceImplementation: UserRepository = {
 
     if (!isValidPassword) {
       throw new BadRequestException(messages.auth.invalidCurrentPassword());
+    }
+
+    const isSamePassword = await bcrypt.compare(dto.newPassword, user.password);
+
+    if (isSamePassword) {
+      throw new BadRequestException(messages.user.passwordMustBeDifferent());
     }
 
     const hashedPassword = await bcrypt.hash(dto.newPassword, 10);

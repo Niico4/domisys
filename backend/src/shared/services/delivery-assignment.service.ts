@@ -22,7 +22,7 @@ export class DeliveryAssignmentService {
           where: {
             deliveryId: delivery.id,
             state: {
-              notIn: [OrderState.delivered, OrderState.cancel],
+              notIn: [OrderState.delivered, OrderState.cancelled],
             },
           },
         });

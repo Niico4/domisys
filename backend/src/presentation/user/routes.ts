@@ -15,6 +15,7 @@ export const userRoutes = (): Router => {
   router.get('/current-user', controller.getCurrentUser);
   router.get('/admins', controller.getAllAdmins);
   router.get('/deliveries', controller.getAllDeliveries);
+  router.get('/cashiers', controller.getAllCashiers);
   router.put('/update-user', controller.updateProfile);
   router.patch('/change-password', controller.changePassword);
 

@@ -18,6 +18,21 @@ import { UserRoleService } from '@/infrastructure/services/user-role.service';
 import { DeliveryAssignmentService } from '@/shared/services/delivery-assignment.service';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
 import { messages } from '@/shared/messages';
+import { UpdateOrderStateData } from '@/domain/use-cases/order/update-order-state';
+
+const productSelectBasic = {
+  id: true,
+  name: true,
+  price: true,
+} as const;
+
+const userSelectBasic = {
+  id: true,
+  name: true,
+  lastName: true,
+  username: true,
+  phoneNumber: true,
+} as const;
 
 const userRoleService = new UserRoleService(prisma);
 const deliveryAssignmentService = new DeliveryAssignmentService();
@@ -25,14 +40,27 @@ const deliveryAssignmentService = new DeliveryAssignmentService();
 export const orderDatasourceImplementation: OrderDatasource = {
   async getAll(): Promise<OrderEntity[]> {
     return await prisma.order.findMany({
-      include: { orderProducts: true },
+      include: {
+        orderProducts: {
+          include: { product: { select: productSelectBasic } },
+        },
+        customer: { select: userSelectBasic },
+        delivery: { select: userSelectBasic },
+      },
+      orderBy: { createdAt: 'desc' },
     });
   },
 
   async findById(id: number): Promise<OrderEntity> {
     const order = await prisma.order.findUnique({
       where: { id },
-      include: { orderProducts: true },
+      include: {
+        orderProducts: {
+          include: { product: { select: productSelectBasic } },
+        },
+        customer: { select: userSelectBasic },
+        delivery: { select: userSelectBasic },
+      },
     });
 
     if (!order) throw new BadRequestException(messages.order.notFound());
@@ -61,6 +89,7 @@ export const orderDatasourceImplementation: OrderDatasource = {
     const assignedDeliveryId = await deliveryAssignmentService.assignDelivery();
 
     const productIds = products.map((p) => p.productId);
+
     const existingProducts = await prisma.product.findMany({
       where: { id: { in: productIds }, state: ProductState.active },
       select: { id: true, name: true, stock: true, price: true },
@@ -70,17 +99,10 @@ export const orderDatasourceImplementation: OrderDatasource = {
       throw new BadRequestException(messages.product.invalidOrInactive());
     }
 
-    // validar stock para cada producto
-    for (const orderProduct of products) {
-      const product = existingProducts.find(
-        (p) => p.id === orderProduct.productId
-      );
+    const productMap = new Map(existingProducts.map((p) => [p.id, p]));
 
-      if (!product) {
-        throw new BadRequestException(
-          messages.product.notFoundWithId(orderProduct.productId)
-        );
-      }
+    for (const orderProduct of products) {
+      const product = productMap.get(orderProduct.productId)!;
 
       if (product.stock < orderProduct.quantity) {
         throw new BadRequestException(
@@ -94,34 +116,39 @@ export const orderDatasourceImplementation: OrderDatasource = {
     }
 
     return await prisma.$transaction(async (tx) => {
-      let totalAmount: number = 0;
+      let totalAmount = 0;
+      const currentDate = new Date();
 
-      for (const orderProduct of products) {
-        await tx.product.update({
-          where: { id: orderProduct.productId },
-          data: {
-            stock: {
-              decrement: orderProduct.quantity,
-            },
-          },
-        });
+      const orderProductsData = products.map((p) => {
+        const product = productMap.get(p.productId)!;
+        totalAmount += Number(product.price) * p.quantity;
 
-        const product = existingProducts.find(
-          (p) => p.id === orderProduct.productId
-        );
-        totalAmount += Number(product!.price) * orderProduct.quantity;
+        return {
+          productId: p.productId,
+          quantity: p.quantity,
+          price: product.price,
+        };
+      });
 
-        await tx.inventoryMovement.create({
-          data: {
-            productId: orderProduct.productId,
-            quantity: orderProduct.quantity,
-            movementType: MovementType.out,
-            reason: MovementReason.sale,
-            adminId: assignedDeliveryId,
-            createdAt: new Date(),
-          },
-        });
-      }
+      await Promise.all(
+        products.map((p) =>
+          tx.product.update({
+            where: { id: p.productId },
+            data: { stock: { decrement: p.quantity } },
+          })
+        )
+      );
+
+      await tx.inventoryMovement.createMany({
+        data: products.map((p) => ({
+          productId: p.productId,
+          quantity: p.quantity,
+          movementType: MovementType.out,
+          reason: MovementReason.sale,
+          adminId: assignedDeliveryId,
+          createdAt: currentDate,
+        })),
+      });
 
       const newOrder = await tx.order.create({
         data: {
@@ -130,32 +157,35 @@ export const orderDatasourceImplementation: OrderDatasource = {
           state: OrderState.pending,
           deliveryId: assignedDeliveryId,
           customerId,
+          orderProducts: { create: orderProductsData },
+        },
+        include: {
+          customer: { select: userSelectBasic },
+          delivery: { select: userSelectBasic },
           orderProducts: {
-            create: products.map((p) => {
-              const product = existingProducts.find(
-                (prod) => prod.id === p.productId
-              );
-              return {
-                productId: p.productId,
-                quantity: p.quantity,
-                unitPrice: product!.price,
-              };
-            }),
+            include: { product: { select: productSelectBasic } },
           },
         },
-        include: { orderProducts: true },
       });
 
       return newOrder;
     });
   },
 
-  async updateState(id: number, state: OrderState): Promise<OrderEntity> {
-    await this.findById(id);
-
+  async updateState(
+    id: number,
+    data: UpdateOrderStateData
+  ): Promise<OrderEntity> {
     return await prisma.order.update({
       where: { id },
-      data: { state },
+      data: { state: data.state },
+      include: {
+        orderProducts: {
+          include: { product: { select: productSelectBasic } },
+        },
+        customer: { select: userSelectBasic },
+        delivery: { select: userSelectBasic },
+      },
     });
   },
 
@@ -170,45 +200,76 @@ export const orderDatasourceImplementation: OrderDatasource = {
         throw new BadRequestException(messages.order.notFound());
       }
 
-      for (const orderProduct of orderWithProducts.orderProducts) {
-        await tx.product.update({
-          where: { id: orderProduct.productId },
-          data: {
-            stock: {
-              increment: orderProduct.quantity,
-            },
-          },
-        });
+      const currentDate = new Date();
+      const adminId =
+        orderWithProducts.deliveryId || orderWithProducts.customerId;
 
-        // entrada por devolución
-        await tx.inventoryMovement.create({
-          data: {
-            productId: orderProduct.productId,
-            quantity: orderProduct.quantity,
-            movementType: MovementType.in,
-            reason: MovementReason.return,
-            adminId:
-              orderWithProducts.deliveryId || orderWithProducts.customerId || 0,
-            createdAt: new Date(),
-          },
-        });
-      }
+      await Promise.all(
+        orderWithProducts.orderProducts.map((p) =>
+          tx.product.update({
+            where: { id: p.productId },
+            data: { stock: { increment: p.quantity } },
+          })
+        )
+      );
+
+      await tx.inventoryMovement.createMany({
+        data: orderWithProducts.orderProducts.map((p) => ({
+          productId: p.productId,
+          quantity: p.quantity,
+          movementType: MovementType.in,
+          reason: MovementReason.return_from_customer,
+          adminId,
+          createdAt: currentDate,
+        })),
+      });
 
       const canceledOrder = await tx.order.update({
         where: { id },
-        data: { state: OrderState.cancel },
-        include: { orderProducts: true },
+        data: {
+          state: OrderState.cancelled,
+          cancelledAt: currentDate,
+        },
+        include: {
+          orderProducts: {
+            include: { product: { select: productSelectBasic } },
+          },
+          customer: { select: userSelectBasic },
+          delivery: { select: userSelectBasic },
+        },
       });
 
       return canceledOrder;
     });
   },
 
-  async deleteOrder(id: number): Promise<OrderEntity> {
-    await this.findById(id);
+  async completeOrder(id: number): Promise<OrderEntity> {
+    return await prisma.order.update({
+      where: { id },
+      data: {
+        state: OrderState.delivered,
+        deliveredAt: new Date(),
+      },
+      include: {
+        orderProducts: {
+          include: { product: { select: productSelectBasic } },
+        },
+        customer: { select: userSelectBasic },
+        delivery: { select: userSelectBasic },
+      },
+    });
+  },
 
+  async deleteOrder(id: number): Promise<OrderEntity> {
     return await prisma.order.delete({
       where: { id },
+      include: {
+        orderProducts: {
+          include: { product: { select: productSelectBasic } },
+        },
+        customer: { select: userSelectBasic },
+        delivery: { select: userSelectBasic },
+      },
     });
   },
 
@@ -219,29 +280,12 @@ export const orderDatasourceImplementation: OrderDatasource = {
         orderProducts: {
           include: {
             product: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
+              select: productSelectBasic,
             },
           },
         },
         customer: {
-          select: {
-            id: true,
-            name: true,
-            lastName: true,
-            phoneNumber: true,
-          },
-        },
-        delivery: {
-          select: {
-            id: true,
-            name: true,
-            lastName: true,
-            phoneNumber: true,
-          },
+          select: userSelectBasic,
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -255,21 +299,12 @@ export const orderDatasourceImplementation: OrderDatasource = {
         orderProducts: {
           include: {
             product: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-              },
+              select: productSelectBasic,
             },
           },
         },
         delivery: {
-          select: {
-            id: true,
-            name: true,
-            lastName: true,
-            phoneNumber: true,
-          },
+          select: userSelectBasic,
         },
       },
       orderBy: { createdAt: 'desc' },

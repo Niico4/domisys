@@ -1,7 +1,7 @@
 import { OrderEntity } from '@/domain/entities/order.entity';
 import { OrderRepository } from '@/domain/repositories/order.repository';
 
-interface GetMyOrdersUseCase {
+export interface GetMyOrdersUseCase {
   execute(customerId: number): Promise<OrderEntity[]>;
 }
 

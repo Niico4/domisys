@@ -6,24 +6,24 @@ import { OrderRepository } from '@/domain/repositories/order.repository';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
 import { messages } from '@/shared/messages';
 
-export interface CancelOrderUseCase {
+export interface CompleteOrderUseCase {
   execute(id: number): Promise<OrderEntity>;
 }
 
-export class CancelOrder implements CancelOrderUseCase {
+export class CompleteOrder implements CompleteOrderUseCase {
   constructor(private readonly repository: OrderRepository) {}
 
   async execute(id: number): Promise<OrderEntity> {
     const order = await this.repository.findById(id);
 
     if (order.state === OrderState.delivered) {
-      throw new BadRequestException(messages.order.cannotCancelDelivered());
+      throw new BadRequestException(messages.order.alreadyDelivered());
     }
 
-    if (order.state === OrderState.cancelled) {
-      throw new BadRequestException(messages.order.alreadyCanceled());
+    if (order.state !== OrderState.shipped) {
+      throw new BadRequestException(messages.order.mustBeShipped());
     }
 
-    return this.repository.cancelOrder(id);
+    return this.repository.completeOrder(id);
   }
 }

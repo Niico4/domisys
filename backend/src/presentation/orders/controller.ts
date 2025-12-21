@@ -7,6 +7,7 @@ import { ordersReportDto } from '@/domain/dtos/orders/orders-report.dto';
 import { updateOrderStateDto } from '@/domain/dtos/orders/update-order-state.dto';
 
 import { CancelOrder } from '@/domain/use-cases/order/cancel-order';
+import { CompleteOrder } from '@/domain/use-cases/order/complete-order';
 import { CreateOrder } from '@/domain/use-cases/order/create-order';
 import { DeleteOrder } from '@/domain/use-cases/order/delete-order';
 import { GetAllOrders } from '@/domain/use-cases/order/get-all-orders';
@@ -121,6 +122,23 @@ export const orderController = (orderRepository: OrderRepository) => ({
         res,
         error,
         messages.order.cancelError()
+      );
+    }
+  },
+
+  completeOrder: async (req: Request, res: Response) => {
+    try {
+      const id = validateId(req.params.id);
+
+      const useCase = new CompleteOrder(orderRepository);
+      const data = await useCase.execute(id);
+
+      return ResponseHandler.ok(res, messages.order.completeSuccess(), data);
+    } catch (error) {
+      return ResponseHandler.handleException(
+        res,
+        error,
+        messages.order.completeError()
       );
     }
   },

@@ -4,7 +4,7 @@ import { PaymentMethod, SaleState } from '@/generated/enums';
 export type SaleProductEntity = {
   readonly productId: number;
   readonly quantity: number;
-  readonly unitPrice: Decimal;
+  readonly price: Decimal;
 };
 
 export class SaleEntity {
@@ -14,7 +14,8 @@ export class SaleEntity {
     public readonly state: SaleState,
     public readonly totalAmount: Decimal,
     public readonly createdAt: Date,
-    public readonly cashierId: number | null,
+    public readonly cancelledAt: Date | null,
+    public readonly cashierId: number,
     public readonly saleProducts?: SaleProductEntity[]
   ) {}
 }

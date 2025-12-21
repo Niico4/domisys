@@ -9,7 +9,7 @@ export interface CreateOrderUseCase {
 export class CreateOrder implements CreateOrderUseCase {
   constructor(private readonly repository: OrderRepository) {}
 
-  execute(dto: CreateOrderDtoType): Promise<OrderEntity> {
+  async execute(dto: CreateOrderDtoType): Promise<OrderEntity> {
     return this.repository.createOrder(dto);
   }
 }
