@@ -1,9 +1,8 @@
-import { OrderState } from '@/generated/enums';
-
 import { OrderDatasource } from '@/domain/datasources/order.datasource';
 import { OrderRepository } from '@/domain/repositories/order.repository';
 
 import { OrdersReportDtoType } from '@/domain/dtos/orders/orders-report.dto';
+import { UpdateOrderStateData } from '@/domain/use-cases/order/update-order-state';
 
 export const orderRepositoryImplementation = (
   datasource: OrderDatasource
@@ -13,9 +12,10 @@ export const orderRepositoryImplementation = (
   findByDelivery: (deliveryId: number) => datasource.findByDelivery(deliveryId),
   findByCustomer: (customerId: number) => datasource.findByCustomer(customerId),
   createOrder: (data) => datasource.createOrder(data),
-  updateState: (id: number, newState: OrderState) =>
+  updateState: (id: number, newState: UpdateOrderStateData) =>
     datasource.updateState(id, newState),
   cancelOrder: (id: number) => datasource.cancelOrder(id),
+  completeOrder: (id: number) => datasource.completeOrder(id),
   deleteOrder: (id: number) => datasource.deleteOrder(id),
 
   getOrdersReport: (dto: OrdersReportDtoType) =>

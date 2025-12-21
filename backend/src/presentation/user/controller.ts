@@ -7,6 +7,7 @@ import { ChangePassword } from '@/domain/use-cases/user/change-password';
 import { GetCurrentUser } from '@/domain/use-cases/user/get-current-user';
 import { GetAllAdmins } from '@/domain/use-cases/user/get-all-admins';
 import { GetAllDeliveries } from '@/domain/use-cases/user/get-all-deliveries';
+import { GetAllCashiers } from '@/domain/use-cases/user/get-all-cashiers';
 
 import { updateProfileSchema } from '@/domain/dtos/user/update-profile.dto';
 import { changePasswordSchema } from '@/domain/dtos/user/change-password.dto';
@@ -58,6 +59,21 @@ export const userController = (userRepository: UserRepository) => ({
         res,
         error,
         messages.user.getDeliveriesError()
+      );
+    }
+  },
+
+  getAllCashiers: async (_req: Request, res: Response) => {
+    try {
+      const useCase = new GetAllCashiers(userRepository);
+      const cashiers = await useCase.execute();
+
+      return ResponseHandler.ok(res, messages.user.getCashiersSuccess(), cashiers);
+    } catch (error) {
+      return ResponseHandler.handleException(
+        res,
+        error,
+        messages.user.getCashiersError()
       );
     }
   },

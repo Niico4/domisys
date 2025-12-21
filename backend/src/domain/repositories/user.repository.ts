@@ -6,7 +6,10 @@ export interface UserRepository {
   findById(id: number): Promise<UserEntity | null>;
   findAllAdmins(): Promise<UserEntity[]>;
   findAllDeliveries(): Promise<UserEntity[]>;
+  findAllCashiers(): Promise<UserEntity[]>;
+
   updateProfile(userId: number, dto: UpdateProfileDtoType): Promise<UserEntity>;
   changePassword(userId: number, dto: ChangePasswordDtoType): Promise<void>;
+
   deleteAccount(userId: number): Promise<void>;
 }

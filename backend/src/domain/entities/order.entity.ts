@@ -4,7 +4,7 @@ import { Decimal } from '@/generated/internal/prismaNamespace';
 export type OrderProductEntity = {
   readonly productId: number;
   readonly quantity: number;
-  readonly unitPrice: Decimal;
+  readonly price: Decimal;
 };
 
 export class OrderEntity {
@@ -14,9 +14,13 @@ export class OrderEntity {
     public readonly paymentMethod: PaymentMethod,
     public readonly totalAmount: Decimal,
     public readonly createdAt: Date,
-    public readonly updatedAt: Date,
-    public readonly customerId: number | null,
+    public readonly confirmedAt: Date | null,
+    public readonly shippedAt: Date | null,
+    public readonly deliveredAt: Date | null,
+    public readonly cancelledAt: Date | null,
+    public readonly customerId: number,
     public readonly deliveryId: number | null,
+    public readonly addressId: number,
     public readonly orderProducts?: OrderProductEntity[]
   ) {}
 }

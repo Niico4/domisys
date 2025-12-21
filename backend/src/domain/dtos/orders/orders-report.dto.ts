@@ -14,15 +14,15 @@ export const ordersReportDto = z.object({
     })
     .optional(),
   customerId: z.coerce
-    .number({ error: 'La categoría es obligatoria y debe ser un número.' })
-    .int({ error: 'La categoría debe ser un número entero.' })
-    .positive({ error: 'La categoría debe ser un ID válido.' })
+    .number({ error: 'El ID del cliente debe ser un número.' })
+    .int({ error: 'El ID del cliente debe ser un número entero.' })
+    .positive({ error: 'El ID del cliente debe ser válido.' })
     .optional(),
 
   deliveryId: z.coerce
-    .number({ error: 'El proveedor es obligatorio y debe ser un número.' })
-    .int({ error: 'El proveedor debe ser un número entero.' })
-    .positive({ error: 'El proveedor debe ser un ID válido.' })
+    .number({ error: 'El ID del repartidor debe ser un número.' })
+    .int({ error: 'El ID del repartidor debe ser un número entero.' })
+    .positive({ error: 'El ID del repartidor debe ser válido.' })
     .optional(),
 });
 

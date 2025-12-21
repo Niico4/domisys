@@ -18,19 +18,43 @@ import { UserRoleService } from '../services/user-role.service';
 import { BadRequestException } from '@/shared/exceptions/bad-request';
 import { messages } from '@/shared/messages';
 
+const productSelectBasic = {
+  id: true,
+  name: true,
+  price: true,
+} as const;
+
+const userSelectBasic = {
+  id: true,
+  name: true,
+  lastName: true,
+  username: true,
+  phoneNumber: true,
+} as const;
+
 const userRoleService = new UserRoleService(prisma);
 
 export const saleDatasourceImplementation: SaleDatasource = {
   async getAll(): Promise<SaleEntity[]> {
     return await prisma.sale.findMany({
-      include: { saleProducts: true },
+      include: {
+        saleProducts: {
+          include: { product: { select: productSelectBasic } },
+        },
+        cashier: { select: userSelectBasic },
+      },
     });
   },
 
   async findById(id: number): Promise<SaleEntity> {
     const sale = await prisma.sale.findUnique({
       where: { id },
-      include: { saleProducts: true },
+      include: {
+        saleProducts: {
+          include: { product: { select: productSelectBasic } },
+        },
+        cashier: { select: userSelectBasic },
+      },
     });
 
     if (!sale) throw new BadRequestException(messages.sale.notFound());
@@ -38,13 +62,13 @@ export const saleDatasourceImplementation: SaleDatasource = {
     return sale;
   },
 
-  async createSale(data: CreateSaleDtoType, cashierId: number): Promise<SaleEntity> {
+  async createSale(
+    data: CreateSaleDtoType,
+    cashierId: number
+  ): Promise<SaleEntity> {
     const { products } = data;
 
-    await userRoleService.validateUserRole(
-      cashierId,
-      UserRole.cashier
-    );
+    await userRoleService.validateUserRole(cashierId, UserRole.cashier);
 
     const productIds = products.map((p) => p.productId);
     const existingProducts = await prisma.product.findMany({
@@ -56,17 +80,10 @@ export const saleDatasourceImplementation: SaleDatasource = {
       throw new BadRequestException(messages.product.invalidOrInactive());
     }
 
-    // validar stock para cada producto
-    for (const saleProduct of products) {
-      const product = existingProducts.find(
-        (p) => p.id === saleProduct.productId
-      );
+    const productMap = new Map(existingProducts.map((p) => [p.id, p]));
 
-      if (!product) {
-        throw new BadRequestException(
-          messages.product.notFoundWithId(saleProduct.productId)
-        );
-      }
+    for (const saleProduct of products) {
+      const product = productMap.get(saleProduct.productId)!;
 
       if (product.stock < saleProduct.quantity) {
         throw new BadRequestException(
@@ -80,34 +97,40 @@ export const saleDatasourceImplementation: SaleDatasource = {
     }
 
     return await prisma.$transaction(async (tx) => {
-      let totalAmount: number = 0;
+      const productMap = new Map(existingProducts.map((p) => [p.id, p]));
+      const currentDate = new Date();
 
-      for (const saleProduct of products) {
-        await tx.product.update({
-          where: { id: saleProduct.productId },
-          data: {
-            stock: {
-              decrement: saleProduct.quantity,
-            },
-          },
-        });
+      let totalAmount = 0;
+      const saleProductsData = products.map((p) => {
+        const product = productMap.get(p.productId)!;
+        totalAmount += Number(product.price) * p.quantity;
 
-        const product = existingProducts.find(
-          (p) => p.id === saleProduct.productId
-        );
-        totalAmount += Number(product!.price) * saleProduct.quantity;
+        return {
+          productId: p.productId,
+          quantity: p.quantity,
+          price: product.price,
+        };
+      });
 
-        await tx.inventoryMovement.create({
-          data: {
-            productId: saleProduct.productId,
-            quantity: saleProduct.quantity,
-            movementType: MovementType.out,
-            reason: MovementReason.sale,
-            adminId: cashierId,
-            createdAt: new Date(),
-          },
-        });
-      }
+      await Promise.all(
+        products.map((p) =>
+          tx.product.update({
+            where: { id: p.productId },
+            data: { stock: { decrement: p.quantity } },
+          })
+        )
+      );
+
+      await tx.inventoryMovement.createMany({
+        data: products.map((p) => ({
+          productId: p.productId,
+          quantity: p.quantity,
+          movementType: MovementType.out,
+          reason: MovementReason.sale,
+          adminId: cashierId,
+          createdAt: currentDate,
+        })),
+      });
 
       const newSale = await tx.sale.create({
         data: {
@@ -115,20 +138,14 @@ export const saleDatasourceImplementation: SaleDatasource = {
           paymentMethod: data.paymentMethod,
           totalAmount,
           state: SaleState.sold,
-          saleProducts: {
-            create: products.map((p) => {
-              const product = existingProducts.find(
-                (prod) => prod.id === p.productId
-              );
-              return {
-                productId: p.productId,
-                quantity: p.quantity,
-                unitPrice: product!.price,
-              };
-            }),
-          },
+          saleProducts: { create: saleProductsData },
         },
-        include: { saleProducts: true },
+        include: {
+          saleProducts: {
+            include: { product: { select: productSelectBasic } },
+          },
+          cashier: { select: userSelectBasic },
+        },
       });
 
       return newSale;
@@ -136,7 +153,14 @@ export const saleDatasourceImplementation: SaleDatasource = {
   },
 
   async cancelSale(id: number, cashierId: number): Promise<SaleEntity> {
-    await this.findById(id);
+    const existingSale = await prisma.sale.findUnique({
+      where: { id },
+      select: { state: true },
+    });
+
+    if (!existingSale) {
+      throw new BadRequestException(messages.sale.notFound());
+    }
 
     await userRoleService.validateUserRole(cashierId, UserRole.cashier);
 
@@ -150,37 +174,40 @@ export const saleDatasourceImplementation: SaleDatasource = {
         throw new BadRequestException(messages.sale.notFound());
       }
 
-      // devolver stock de cada producto
-      for (const saleProduct of saleWithProducts.saleProducts) {
-        await tx.product.update({
-          where: { id: saleProduct.productId },
-          data: {
-            stock: {
-              increment: saleProduct.quantity,
-            },
-          },
-        });
+      const currentDate = new Date();
 
-        // entrada por devolución
-        await tx.inventoryMovement.create({
-          data: {
-            productId: saleProduct.productId,
-            quantity: saleProduct.quantity,
-            movementType: MovementType.in,
-            reason: MovementReason.return,
-            adminId: cashierId,
-            createdAt: new Date(),
-          },
-        });
-      }
+      await Promise.all(
+        saleWithProducts.saleProducts.map((p) =>
+          tx.product.update({
+            where: { id: p.productId },
+            data: { stock: { increment: p.quantity } },
+          })
+        )
+      );
+
+      await tx.inventoryMovement.createMany({
+        data: saleWithProducts.saleProducts.map((p) => ({
+          productId: p.productId,
+          quantity: p.quantity,
+          movementType: MovementType.in,
+          reason: MovementReason.return_from_customer,
+          adminId: cashierId,
+          createdAt: currentDate,
+        })),
+      });
 
       const canceledSale = await tx.sale.update({
         where: { id },
         data: {
-          cashierId,
-          state: SaleState.cancel,
+          state: SaleState.cancelled,
+          cancelledAt: new Date(),
         },
-        include: { saleProducts: true },
+        include: {
+          saleProducts: {
+            include: { product: { select: productSelectBasic } },
+          },
+          cashier: { select: userSelectBasic },
+        },
       });
 
       return canceledSale;
@@ -219,7 +246,12 @@ export const saleDatasourceImplementation: SaleDatasource = {
     return await prisma.sale.findMany({
       where,
       orderBy: { createdAt: 'asc' },
-      include: { saleProducts: true },
+      include: {
+        saleProducts: {
+          include: { product: { select: productSelectBasic } },
+        },
+        cashier: { select: userSelectBasic },
+      },
     });
   },
 };

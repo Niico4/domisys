@@ -16,7 +16,7 @@ export class CancelSale implements CancelSaleUseCase {
   async execute(id: number, cashierId: number): Promise<SaleEntity> {
     const sale = await this.repository.findById(id);
 
-    if (sale.state === SaleState.cancel) {
+    if (sale.state === SaleState.cancelled) {
       throw new BadRequestException(messages.sale.alreadyCanceled());
     }
 

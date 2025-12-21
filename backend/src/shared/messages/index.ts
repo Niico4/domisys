@@ -74,10 +74,15 @@ export const messages = {
     retrieveError: () => 'Error al obtener la información del usuario',
     updateError: () => 'Error al actualizar el perfil',
     changePasswordError: () => 'Error al cambiar la contraseña',
+    passwordMustBeDifferent: () =>
+      'La nueva contraseña debe ser diferente a la actual',
+
     getAdminsSuccess: () => 'Administradores obtenidos correctamente',
     getAdminsError: () => 'Error al obtener los administradores',
     getDeliveriesSuccess: () => 'Repartidores obtenidos correctamente',
     getDeliveriesError: () => 'Error al obtener los repartidores',
+    getCashiersSuccess: () => 'Cajeros obtenidos correctamente',
+    getCashiersError: () => 'Error al obtener los cajeros',
   },
 
   address: {
@@ -123,6 +128,9 @@ export const messages = {
     alreadyInState: (state: string) =>
       `El pedido ya tiene el estado '${state}'`,
     alreadyCanceled: () => 'El pedido ya está cancelado',
+    alreadyDelivered: () => 'El pedido ya fue entregado',
+    mustBeShipped: () =>
+      'El pedido debe estar en estado "shipped" para poder completarse',
     cannotCancelDelivered: () => 'No se puede cancelar un pedido ya entregado',
     cannotModifyCanceled: () => 'No se puede modificar un pedido cancelado',
     cannotModifyDelivered: () => 'No se puede modificar un pedido ya entregado',
@@ -133,6 +141,7 @@ export const messages = {
     createSuccess: () => 'Pedido creado correctamente.',
     updateStateSuccess: () => 'Estado del pedido actualizado correctamente.',
     cancelSuccess: () => 'Pedido cancelado correctamente.',
+    completeSuccess: () => 'Pedido completado exitosamente.',
     reportSuccess: () => 'Reporte de pedidos generado correctamente.',
     deliveriesSuccess: () => 'Pedidos del repartidor obtenidos correctamente.',
     getAllError: () => 'Error al obtener los pedidos.',
@@ -141,6 +150,7 @@ export const messages = {
     updateStateError: () => 'Error al actualizar el estado del pedido.',
     deleteError: () => 'Error al eliminar el pedido.',
     cancelError: () => 'Error al cancelar el pedido.',
+    completeError: () => 'Error al completar el pedido.',
     reportError: () => 'Error al generar el reporte de pedidos.',
     deliveriesError: () => 'Error al obtener los pedidos del repartidor.',
     customerOrdersSuccess: () => 'Pedidos del cliente obtenidos correctamente.',

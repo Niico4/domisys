@@ -49,5 +49,11 @@ export const orderRoutes = (): Router => {
     controller.cancelOrder
   );
 
+  router.patch(
+    '/:id/complete',
+    hasRole(UserRole.delivery),
+    controller.completeOrder
+  );
+
   return router;
 };

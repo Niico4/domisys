@@ -10,14 +10,23 @@ export interface UpdateOrderStateUseCase {
   execute(id: number, state: OrderState): Promise<OrderEntity>;
 }
 
-export class UpdateOrderState implements UpdateOrderStateUseCase {
-  private readonly stateOrder: OrderState[] = [
-    'pending',
-    'confirmed',
-    'shipped',
-    'delivered',
-  ];
+const STATE_FLOW: Record<OrderState, OrderState[]> = {
+  pending: [OrderState.confirmed, OrderState.cancelled],
+  confirmed: [OrderState.shipped, OrderState.cancelled],
+  shipped: [OrderState.delivered, OrderState.cancelled],
+  delivered: [],
+  cancelled: [],
+};
 
+export type UpdateOrderStateData = {
+  state: OrderState;
+  confirmedAt?: Date;
+  shippedAt?: Date;
+  deliveredAt?: Date;
+  cancelledAt?: Date;
+};
+
+export class UpdateOrderState implements UpdateOrderStateUseCase {
   constructor(private readonly repository: OrderRepository) {}
 
   async execute(id: number, newState: OrderState): Promise<OrderEntity> {
@@ -27,36 +36,39 @@ export class UpdateOrderState implements UpdateOrderStateUseCase {
       throw new BadRequestException(messages.order.alreadyInState(newState));
     }
 
-    if (newState === OrderState.cancel) {
-      if (order.state === OrderState.cancel) {
-        throw new BadRequestException(messages.order.alreadyCanceled());
-      }
-      if (order.state === OrderState.delivered) {
-        throw new BadRequestException(messages.order.cannotCancelDelivered());
-      }
-      return this.repository.updateState(id, newState);
-    }
+    const allowedNextStates = STATE_FLOW[order.state];
 
-    if (order.state === OrderState.cancel) {
-      throw new BadRequestException(messages.order.cannotModifyCanceled());
-    }
-
-    if (order.state === OrderState.delivered) {
-      throw new BadRequestException(messages.order.cannotModifyDelivered());
-    }
-
-    const currentIndex = this.stateOrder.indexOf(order.state);
-    const newIndex = this.stateOrder.indexOf(newState);
-
-    // avanza exactamente 1 posición
-    if (newIndex !== currentIndex + 1) {
-      const nextState =
-        this.stateOrder[currentIndex + 1] || OrderState.delivered;
+    if (!allowedNextStates.includes(newState)) {
       throw new BadRequestException(
-        messages.order.invalidStateTransition(order.state, newState, nextState)
+        messages.order.invalidStateTransition(
+          order.state,
+          newState,
+          allowedNextStates[0] || 'No hay más estados'
+        )
       );
     }
 
-    return this.repository.updateState(id, newState);
+    const now = new Date();
+
+    const updateData: UpdateOrderStateData = {
+      state: newState,
+    };
+
+    switch (newState) {
+      case OrderState.confirmed:
+        updateData.confirmedAt = now;
+        break;
+      case OrderState.shipped:
+        updateData.shippedAt = now;
+        break;
+      case OrderState.delivered:
+        updateData.deliveredAt = now;
+        break;
+      case OrderState.cancelled:
+        updateData.cancelledAt = now;
+        break;
+    }
+
+    return this.repository.updateState(id, updateData);
   }
 }
