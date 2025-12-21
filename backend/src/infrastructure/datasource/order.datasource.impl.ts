@@ -189,7 +189,10 @@ export const orderDatasourceImplementation: OrderDatasource = {
     });
   },
 
-  async cancelOrder(id: number): Promise<OrderEntity> {
+  async cancelOrder(
+    id: number,
+    cancellationReason?: string
+  ): Promise<OrderEntity> {
     return await prisma.$transaction(async (tx) => {
       const orderWithProducts = await tx.order.findUnique({
         where: { id },
@@ -229,6 +232,7 @@ export const orderDatasourceImplementation: OrderDatasource = {
         data: {
           state: OrderState.cancelled,
           cancelledAt: currentDate,
+          cancellationReason: cancellationReason ?? null,
         },
         include: {
           orderProducts: {

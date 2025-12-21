@@ -14,7 +14,8 @@ export const orderRepositoryImplementation = (
   createOrder: (data) => datasource.createOrder(data),
   updateState: (id: number, newState: UpdateOrderStateData) =>
     datasource.updateState(id, newState),
-  cancelOrder: (id: number) => datasource.cancelOrder(id),
+  cancelOrder: (id: number, cancellationReason?: string) =>
+    datasource.cancelOrder(id, cancellationReason),
   completeOrder: (id: number) => datasource.completeOrder(id),
   deleteOrder: (id: number) => datasource.deleteOrder(id),
 

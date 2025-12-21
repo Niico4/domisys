@@ -13,6 +13,7 @@ export class OrderEntity {
     public readonly state: OrderState,
     public readonly paymentMethod: PaymentMethod,
     public readonly totalAmount: Decimal,
+    public readonly cancellationReason: string | null,
     public readonly createdAt: Date,
     public readonly confirmedAt: Date | null,
     public readonly shippedAt: Date | null,

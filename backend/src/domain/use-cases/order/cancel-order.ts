@@ -7,13 +7,13 @@ import { BadRequestException } from '@/shared/exceptions/bad-request';
 import { messages } from '@/shared/messages';
 
 export interface CancelOrderUseCase {
-  execute(id: number): Promise<OrderEntity>;
+  execute(id: number, cancellationReason?: string): Promise<OrderEntity>;
 }
 
 export class CancelOrder implements CancelOrderUseCase {
   constructor(private readonly repository: OrderRepository) {}
 
-  async execute(id: number): Promise<OrderEntity> {
+  async execute(id: number, cancellationReason?: string): Promise<OrderEntity> {
     const order = await this.repository.findById(id);
 
     if (order.state === OrderState.delivered) {
@@ -24,6 +24,6 @@ export class CancelOrder implements CancelOrderUseCase {
       throw new BadRequestException(messages.order.alreadyCanceled());
     }
 
-    return this.repository.cancelOrder(id);
+    return this.repository.cancelOrder(id, cancellationReason);
   }
 }
