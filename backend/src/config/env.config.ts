@@ -16,8 +16,6 @@ const envSchema = z.object({
 
   JWT_SECRET: z.string({ error: 'JWT_SECRET es requerido' }),
   JWT_REFRESH_SECRET: z.string({ error: 'JWT_REFRESH_SECRET es requerido' }),
-  JWT_EXPIRES_IN: z.string(),
-  JWT_REFRESH_EXPIRES_IN: z.string(),
 
   EMAIL_USER: z.email({ error: 'EMAIL_USER debe ser un email válido' }),
   EMAIL_PASSWORD: z.string({ error: 'EMAIL_PASSWORD es requerido' }),
@@ -52,8 +50,6 @@ export const {
 
   JWT_SECRET,
   JWT_REFRESH_SECRET,
-  JWT_EXPIRES_IN,
-  JWT_REFRESH_EXPIRES_IN,
 
   EMAIL_USER,
   EMAIL_PASSWORD,
