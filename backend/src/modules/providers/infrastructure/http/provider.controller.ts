@@ -1,19 +1,17 @@
 import { Request, Response } from 'express';
 
-import { createProviderDto } from '@/domain/dtos/providers/create-provider.dto';
-import { updateProviderDto } from '@/domain/dtos/providers/update-provider.dto';
-import { providerReportDto } from '@/domain/dtos/providers/provider-report.dto';
-import { ProviderRepository } from '@/domain/repositories/provider.repository';
+import { ResponseHandler } from '@shared/http/response-handler';
+import { validateId } from '@shared/utils/validate-id';
+import { messages } from '@shared/messages';
 
-import { CreateProvider } from '@/domain/use-cases/provider/create-provider';
-import { DeleteProvider } from '@/domain/use-cases/provider/delete-provider';
-import { GetAllProviders } from '@/domain/use-cases/provider/get-all-providers';
-import { GetProviderById } from '@/domain/use-cases/provider/get-provider-by-id';
-import { UpdateProvider } from '@/domain/use-cases/provider/update-provider';
-import { GetProviderReport } from '@/domain/use-cases/provider/get-provider-report';
-import { ResponseHandler } from '@/shared/http/response-handler';
-import { validateId } from '@/shared/utils/validate-id';
-import { messages } from '@/shared/messages';
+import { ProviderRepository } from '../../domain/provider.repository';
+import { createProviderDto } from '../../application/dtos/create-provider.dto';
+import { updateProviderDto } from '../../application/dtos/update-provider.dto';
+import { CreateProvider } from '../../application/use-cases/create-provider';
+import { GetProviderById } from '../../application/use-cases/get-provider-by-id';
+import { GetAllProviders } from '../../application/use-cases/get-all-providers';
+import { UpdateProvider } from '../../application/use-cases/update-provider';
+import { DeleteProvider } from '../../application/use-cases/delete-provider';
 
 export const providerController = (providerRepository: ProviderRepository) => ({
   getAllProviders: async (_req: Request, res: Response) => {
@@ -106,20 +104,20 @@ export const providerController = (providerRepository: ProviderRepository) => ({
     }
   },
 
-  getProviderReport: async (req: Request, res: Response) => {
-    try {
-      const dto = providerReportDto.parse(req.query);
+  // getProviderReport: async (req: Request, res: Response) => {
+  //   try {
+  //     const dto = providerReportDto.parse(req.query);
 
-      const useCase = new GetProviderReport(providerRepository);
-      const data = await useCase.execute(dto);
+  //     const useCase = new GetProviderReport(providerRepository);
+  //     const data = await useCase.execute(dto);
 
-      return ResponseHandler.ok(res, messages.provider.reportSuccess(), data);
-    } catch (error) {
-      return ResponseHandler.handleException(
-        res,
-        error,
-        messages.provider.reportError()
-      );
-    }
-  },
+  //     return ResponseHandler.ok(res, messages.provider.reportSuccess(), data);
+  //   } catch (error) {
+  //     return ResponseHandler.handleException(
+  //       res,
+  //       error,
+  //       messages.provider.reportError()
+  //     );
+  //   }
+  // },
 });

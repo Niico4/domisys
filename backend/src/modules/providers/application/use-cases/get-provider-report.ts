@@ -1,6 +1,6 @@
-import { ProviderReportDtoType } from '@/domain/dtos/providers/provider-report.dto';
 import { ProviderReportEntity } from '@/domain/entities/provider-report.entity';
-import { ProviderRepository } from '@/domain/repositories/provider.repository';
+import { ProviderRepository } from '../../domain/provider.repository';
+import { ProviderReportDtoType } from '../dtos/provider-report.dto';
 
 export interface GetProviderReportUseCase {
   execute(dto?: ProviderReportDtoType): Promise<ProviderReportEntity[]>;

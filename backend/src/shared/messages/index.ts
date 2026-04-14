@@ -294,6 +294,16 @@ export const messages = {
     mustBePositive: (field: string) => `${field} debe ser un número positivo`,
     idRequired: () => 'El ID es requerido',
     idMustBeNumber: () => 'El ID debe ser un número válido',
+    nit: {
+      required: () => 'El NIT es obligatorio',
+      invalidFormat: () => 'Formato de NIT inválido. Use el formato: 123456789-0',
+      invalidDv: (expected: number) =>
+        `Dígito de verificación inválido. Se esperaba ${expected}`,
+      invalidLength: () => 'El NIT debe tener entre 9 y 10 dígitos',
+      repeatedDigits: () => 'El NIT no puede tener todos los dígitos repetidos',
+      invalidCharacters: () => 'El NIT contiene caracteres inválidos',
+      tooLongForDv: () => 'NIT demasiado largo para el cálculo del dígito verificador',
+    },
   },
 };
 

@@ -1,5 +1,5 @@
-import { ProviderEntity } from '@/domain/entities/provider.entity';
-import { ProviderRepository } from '@/domain/repositories/provider.repository';
+import { ProviderEntity } from '../../domain/provider.entity';
+import { ProviderRepository } from '../../domain/provider.repository';
 
 export interface GetProviderByIdUseCase {
   execute(id: number): Promise<ProviderEntity>;

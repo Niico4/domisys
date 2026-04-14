@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { UserRole } from '@/generated/enums';
 
-import { providerRepositoryImplementation } from '@/infrastructure/repositories/provider.repository.impl';
-import { providerDatasourceImplementation } from '@/infrastructure/datasource/provider.datasource.impl';
-import { providerController } from './controller';
-import { isAuthenticated, hasRole } from '@/shared/auth/auth.middleware';
+import { UserRole } from '@generated/enums';
+import { isAuthenticated, hasRole } from '@shared/auth/auth.middleware';
+
+import { providerDatasourceImplementation } from '../provider.datasource.impl';
+import { providerRepositoryImplementation } from '../provider.repository.impl';
+import { providerController } from './provider.controller';
 
 export const providerRoutes = (): Router => {
   const router = Router();
@@ -17,8 +18,8 @@ export const providerRoutes = (): Router => {
 
   router.use(isAuthenticated);
 
-  router.get('/report', hasRole(UserRole.admin), controller.getProviderReport);
-  
+  // router.get('/report', hasRole(UserRole.admin), controller.getProviderReport);
+
   router.get('/', controller.getAllProviders);
   router.get('/:id', controller.getProviderById);
 

@@ -1,6 +1,6 @@
 import { PORT } from './config/env.config';
-import { appRoutes } from './presentation/routes';
-import { Server } from './presentation/server';
+import { appRoutes } from './api/v1/routes';
+import { Server } from './api/v1/server';
 import { startCronJobs } from './shared/cron';
 
 (async () => {
